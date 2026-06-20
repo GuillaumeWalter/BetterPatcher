@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 
 import { SiteHeader } from "@/components/site-header";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const plusJakarta = Plus_Jakarta_Sans({
+  variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -29,9 +30,14 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${plusJakarta.variable} ${geistMono.variable} dark h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
+      <body className="flex min-h-full flex-col font-sans text-foreground">
+        <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+          <div className="glow-orb -top-32 left-1/2 size-[600px] -translate-x-1/2 bg-[oklch(0.55_0.16_50)]" />
+          <div className="glow-orb top-1/3 -right-32 size-[400px] bg-[oklch(0.5_0.14_25)]" />
+          <div className="glow-orb -bottom-20 -left-20 size-[350px] bg-[oklch(0.45_0.12_65)]" />
+        </div>
         <SiteHeader />
         <main className="flex-1">{children}</main>
       </body>

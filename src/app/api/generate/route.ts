@@ -1,9 +1,11 @@
 import { generateText, Output } from "ai";
 
+import { auth } from "@/auth";
 import { getGenerationModel } from "@/lib/ai/model";
 import { getSystemPrompt } from "@/lib/ai/prompts";
 import { generationSchema } from "@/lib/ai/schema";
 import { TONE_OPTIONS, type Tone } from "@/lib/constants";
+import { savePatchNote } from "@/lib/supabase/patch-notes";
 
 const VALID_TONES = new Set(TONE_OPTIONS.map((option) => option.value));
 
@@ -32,6 +34,14 @@ export async function POST(request: Request) {
     typeof body === "object" && body !== null && "tone" in body
       ? body.tone
       : undefined;
+
+  const repoFullName =
+    typeof body === "object" &&
+    body !== null &&
+    "repoFullName" in body &&
+    typeof body.repoFullName === "string"
+      ? body.repoFullName.trim() || null
+      : null;
 
   if (!commits) {
     return Response.json(
@@ -62,7 +72,25 @@ export async function POST(request: Request) {
       output: Output.object({ schema: generationSchema }),
     });
 
-    return Response.json(output);
+    const session = await auth();
+
+    const savedId =
+      session?.user?.id && output
+        ? await savePatchNote({
+            userId: session.user.id,
+            userEmail: session.user.email,
+            tone,
+            commitsRaw: commits,
+            markdown: output.markdown,
+            socialPost: output.socialPost,
+            repoFullName,
+          })
+        : null;
+
+    return Response.json({
+      ...output,
+      savedId,
+    });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Erreur inconnue.";

@@ -1,7 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Copy, Loader2, Wand2 } from "lucide-react";
+
+import {
+  COMMITS_STORAGE_KEY,
+  REPO_STORAGE_KEY,
+} from "@/components/dashboard-content";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +41,21 @@ export function PatchNoteGenerator() {
   const [markdown, setMarkdown] = useState("");
   const [socialPost, setSocialPost] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [savedId, setSavedId] = useState<string | null>(null);
+  const [repoFullName, setRepoFullName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem(COMMITS_STORAGE_KEY);
+    if (stored) {
+      setCommits(stored);
+      sessionStorage.removeItem(COMMITS_STORAGE_KEY);
+    }
+    const storedRepo = sessionStorage.getItem(REPO_STORAGE_KEY);
+    if (storedRepo) {
+      setRepoFullName(storedRepo);
+      sessionStorage.removeItem(REPO_STORAGE_KEY);
+    }
+  }, []);
 
   async function handleGenerate() {
     if (!commits.trim()) return;
@@ -43,17 +64,19 @@ export function PatchNoteGenerator() {
     setMarkdown("");
     setSocialPost("");
     setError(null);
+    setSavedId(null);
 
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ commits, tone }),
+        body: JSON.stringify({ commits, tone, repoFullName }),
       });
 
       const data = (await response.json()) as {
         markdown?: string;
         socialPost?: string;
+        savedId?: string | null;
         error?: string;
       };
 
@@ -63,6 +86,7 @@ export function PatchNoteGenerator() {
 
       setMarkdown(data.markdown ?? "");
       setSocialPost(data.socialPost ?? "");
+      setSavedId(data.savedId ?? null);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Une erreur est survenue.",
@@ -79,7 +103,7 @@ export function PatchNoteGenerator() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <Card className="border-border/60 bg-card/50">
+      <Card className="surface-card gradient-border">
         <CardHeader>
           <CardTitle className="text-lg">Vos commits</CardTitle>
           <CardDescription>
@@ -148,16 +172,28 @@ export function PatchNoteGenerator() {
         </CardContent>
       </Card>
 
-      <Card className="border-border/60 bg-card/50">
+      <Card className="surface-card gradient-border">
         <CardHeader>
           <CardTitle className="text-lg">Résultat</CardTitle>
           <CardDescription>
             Markdown propre et post réseaux prêt à copier
+            {savedId ? (
+              <>
+                {" "}
+                ·{" "}
+                <Link
+                  href={`/dashboard/history/${savedId}`}
+                  className="text-primary underline-offset-4 hover:underline"
+                >
+                  Voir dans l&apos;historique
+                </Link>
+              </>
+            ) : null}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="markdown" className="w-full">
-            <TabsList className="w-full">
+            <TabsList className="w-full bg-muted/50">
               <TabsTrigger value="markdown" className="flex-1">
                 Markdown clean
               </TabsTrigger>
