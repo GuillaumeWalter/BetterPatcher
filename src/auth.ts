@@ -1,13 +1,19 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 
+import {
+  getAuthSecret,
+  getGitHubClientId,
+  getGitHubClientSecret,
+} from "@/lib/env";
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
-  secret: process.env.AUTH_SECRET,
+  secret: getAuthSecret(),
   providers: [
     GitHub({
-      clientId: process.env.AUTH_GITHUB_ID,
-      clientSecret: process.env.AUTH_GITHUB_SECRET,
+      clientId: getGitHubClientId(),
+      clientSecret: getGitHubClientSecret(),
       authorization: {
         params: {
           scope: "read:user user:email repo",
