@@ -1,0 +1,30 @@
+# PROJECT CONTEXT: Release Hub (Automated Patch Notes & Marketing Assets)
+
+## 1. Vision & Objectif
+- **Concept :** SaaS B2B qui se branche sur les dépôts de code (GitHub/GitLab), analyse les commits et les Pull Requests via LLM, et génère automatiquement des patch notes structurés ainsi que des assets marketing (posts LinkedIn, carrousels, résumés Discord/Steam).
+- **Objectif :** Éliminer la corvée de rédaction pour les devs et donner du contenu clé en main pour les équipes marketing/produit et les studios indés.
+- **Workflow de Dev :** Vibe coding (Cursor + Antigravity). On cherche la simplicité, la vitesse de livraison et un code ultra-propre (Next.js / Tailwind CSS / TypeScript).
+
+## 2. Personas Cibles
+- **Alex (Lead Dev) :** Veut un changelog technique propre en Markdown en 1 clic pour vider sa To-Do list.
+- **Sarah (Product/Marketer) :** Veut une traduction du jargon technique en bénéfices clients et des templates de posts LinkedIn/Réseaux.
+- **Lucas (Studio de Jeu Indé) :** Veut un format "Devlog/Patch Note" engageant et structuré pour sa communauté Steam/Discord.
+
+## 3. Architecture Technique (MVP Target)
+- **Framework :** Next.js (App Router) - parfait pour le SEO de la landing page et la structure de l'application.
+- **Styling :** Tailwind CSS + Shadcn/ui (pour des composants d'interface pro et rapides à intégrer).
+- **IA :** Intégration des API Vercel AI SDK (pour interroger GPT-4o ou Claude 3.5 Sonnet de manière ultra-fluide).
+- **Déploiement :** Antigravity (Zéro config ops).
+
+## 4. Phase 1 : Le "Side-Project Marketing" (Outil Gratuit)
+Pour attirer nos premiers utilisateurs sans forcer la vente, on commence par une page unique :
+- Un champ texte où l'utilisateur colle ses messages de commits bruts.
+- Un sélecteur de "Tonalité" (Technique épuré, Start-up/Marketing, Gaming/Devlog).
+- Un bouton "Générer".
+- En sortie : Le patch note formaté + un post de réseau social prêt à copier.
+- Un call-to-action (CTA) vers la liste d'attente de la version automatisée (Release Hub).
+
+## 5. Règles de Vibe Coding (Pour l'IA de Cursor)
+- Priorise toujours l'efficacité et la simplicité du code. Pas d'over-engineering.
+- Utilise des composants UI modernes, épurés et responsives.
+- Reste focus sur la tâche demandée sans réécrire des fichiers entiers si ce n'est pas nécessaire.
