@@ -14,7 +14,7 @@ export function DashboardNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="mb-8 flex gap-1 rounded-xl border border-white/10 bg-muted/30 p-1 backdrop-blur-sm">
+    <nav className="mb-8 flex gap-1 rounded-xl border border-border/70 bg-muted/60 p-1">
       {links.map((link) => {
         const isActive =
           link.href === "/dashboard"
@@ -28,8 +28,8 @@ export function DashboardNav() {
             className={cn(
               "rounded-lg px-4 py-2 text-sm font-medium transition-all",
               isActive
-                ? "bg-[image:var(--gradient-warm)] text-primary-foreground shadow-md shadow-primary/25"
-                : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
+                ? "bg-[image:var(--gradient-warm)] text-primary-foreground shadow-sm shadow-primary/15"
+                : "text-muted-foreground hover:bg-background hover:text-foreground",
             )}
           >
             {link.label}

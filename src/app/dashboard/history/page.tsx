@@ -61,7 +61,7 @@ export default async function HistoryPage() {
           {notes.map((note) => (
             <li key={note.id}>
               <Link href={`/dashboard/history/${note.id}`}>
-                <Card className="surface-card gradient-border transition-all hover:shadow-lg hover:shadow-primary/10">
+                <Card className="surface-card gradient-border transition-all hover:shadow-md hover:shadow-primary/5">
                   <CardHeader className="pb-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <CardTitle className="text-base font-medium">

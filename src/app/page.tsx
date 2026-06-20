@@ -28,13 +28,13 @@ export default function Home() {
       <section className="relative mb-14 space-y-6 text-center sm:text-left">
         <Badge
           variant="secondary"
-          className="border border-primary/25 bg-primary/10 px-3 py-1 text-primary"
+          className="border border-primary/15 bg-primary/8 px-3 py-1 text-primary"
         >
           Outil gratuit · Phase 1
         </Badge>
 
         <div className="space-y-4">
-          <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl sm:leading-[1.1]">
+          <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-foreground sm:text-5xl sm:leading-[1.15]">
             De vos commits au{" "}
             <span className="gradient-text">patch note</span>, en une minute
           </h1>
@@ -50,7 +50,7 @@ export default function Home() {
               key={feature.label}
               className="surface-card gradient-border rounded-2xl p-4 text-left"
             >
-              <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-primary/15 text-primary">
+              <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <feature.icon className="size-4" />
               </div>
               <p className="text-sm font-semibold">{feature.label}</p>

@@ -16,10 +16,10 @@ export default function LoginPage() {
     <div className="mx-auto flex max-w-md flex-1 items-center px-4 py-16">
       <Card className="surface-card gradient-border w-full">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[image:var(--gradient-warm)] text-primary-foreground shadow-lg shadow-primary/30">
+          <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[image:var(--gradient-warm)] text-primary-foreground shadow-sm shadow-primary/15">
             <LogIn className="size-7" />
           </div>
-          <CardTitle className="text-2xl font-bold">Connexion GitHub</CardTitle>
+          <CardTitle className="text-2xl font-semibold">Connexion GitHub</CardTitle>
           <CardDescription className="text-base">
             Accédez au dashboard pour importer vos commits directement depuis
             vos dépôts.

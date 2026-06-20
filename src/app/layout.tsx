@@ -30,13 +30,13 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${plusJakarta.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${plusJakarta.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans text-foreground">
         <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-          <div className="glow-orb -top-32 left-1/2 size-[600px] -translate-x-1/2 bg-[oklch(0.55_0.16_50)]" />
-          <div className="glow-orb top-1/3 -right-32 size-[400px] bg-[oklch(0.5_0.14_25)]" />
-          <div className="glow-orb -bottom-20 -left-20 size-[350px] bg-[oklch(0.45_0.12_65)]" />
+          <div className="glow-orb -top-32 left-1/2 size-[550px] -translate-x-1/2 bg-[oklch(0.88_0.06_72)]" />
+          <div className="glow-orb top-1/4 -right-24 size-[380px] bg-[oklch(0.91_0.05_58)]" />
+          <div className="glow-orb -bottom-16 -left-16 size-[320px] bg-[oklch(0.93_0.04_82)]" />
         </div>
         <SiteHeader />
         <main className="flex-1">{children}</main>

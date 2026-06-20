@@ -19,7 +19,7 @@ export default async function DashboardLayout({
         <p className="text-sm font-semibold uppercase tracking-wider text-primary">
           Phase 2
         </p>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           Dashboard —{" "}
           <span className="gradient-text">
             {session.user.name ?? session.user.email}

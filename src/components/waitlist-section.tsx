@@ -52,9 +52,9 @@ export function WaitlistSection() {
 
   return (
     <Card className="surface-card gradient-border relative overflow-hidden">
-      <div className="absolute inset-0 bg-[image:var(--gradient-warm-soft)] opacity-60" />
+      <div className="absolute inset-0 bg-[image:var(--gradient-warm-soft)] opacity-40" />
       <CardHeader className="relative text-center sm:text-left">
-        <div className="mb-3 flex size-10 items-center justify-center rounded-xl bg-[image:var(--gradient-warm)] text-primary-foreground shadow-md shadow-primary/25 sm:mb-0 sm:inline-flex">
+        <div className="mb-3 flex size-10 items-center justify-center rounded-xl bg-[image:var(--gradient-warm)] text-primary-foreground shadow-sm shadow-primary/15 sm:mb-0 sm:inline-flex">
           <Rocket className="size-4" />
         </div>
         <CardTitle className="text-xl sm:mt-3">
@@ -68,7 +68,7 @@ export function WaitlistSection() {
       </CardHeader>
       <CardContent className="relative">
         {submitted ? (
-          <p className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary">
+          <p className="rounded-xl border border-primary/15 bg-primary/8 px-4 py-3 text-sm text-primary">
             Merci ! Nous vous préviendrons dès que la version automatisée sera
             prête.
           </p>
@@ -87,7 +87,7 @@ export function WaitlistSection() {
                 onChange={(event) => setEmail(event.target.value)}
                 required
                 disabled={isLoading}
-                className="h-10 border-white/10 bg-background/50 backdrop-blur-sm"
+                className="h-10 border-border bg-white"
               />
             </div>
             <Button
