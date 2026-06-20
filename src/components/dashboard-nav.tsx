@@ -6,20 +6,21 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "/dashboard", label: "Repos" },
+  { href: "/dashboard", label: "Accueil", exact: true },
+  { href: "/dashboard/generate", label: "Générateur" },
   { href: "/dashboard/history", label: "Historique" },
+  { href: "/dashboard/billing", label: "Abonnement" },
 ];
 
 export function DashboardNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="mb-8 flex gap-1 rounded-xl border border-border/70 bg-muted/60 p-1">
+    <nav className="mb-8 flex flex-wrap gap-1 rounded-xl border border-border/70 bg-muted/60 p-1">
       {links.map((link) => {
-        const isActive =
-          link.href === "/dashboard"
-            ? pathname === "/dashboard"
-            : pathname.startsWith(link.href);
+        const isActive = link.exact
+          ? pathname === link.href
+          : pathname.startsWith(link.href);
 
         return (
           <Link

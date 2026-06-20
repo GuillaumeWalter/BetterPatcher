@@ -17,6 +17,11 @@ export async function GET() {
       AUTH_GITHUB_ID: Boolean(process.env.AUTH_GITHUB_ID?.trim()),
       AUTH_GITHUB_SECRET: Boolean(process.env.AUTH_GITHUB_SECRET?.trim()),
     },
+    stripe: {
+      STRIPE_SECRET_KEY: Boolean(process.env.STRIPE_SECRET_KEY?.trim()),
+      STRIPE_WEBHOOK_SECRET: Boolean(process.env.STRIPE_WEBHOOK_SECRET?.trim()),
+      STRIPE_PRO_PRICE_ID: Boolean(process.env.STRIPE_PRO_PRICE_ID?.trim()),
+    },
     supabase: {
       SUPABASE_URL: Boolean(process.env.SUPABASE_URL?.trim()),
       SUPABASE_SERVICE_ROLE_KEY: Boolean(

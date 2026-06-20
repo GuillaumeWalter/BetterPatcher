@@ -1,11 +1,21 @@
+import { auth } from "@/auth";
 import { generateText, Output } from "ai";
 
-import { auth } from "@/auth";
 import { getAiProvider, getGenerationModel } from "@/lib/ai/model";
 import { getSystemPrompt } from "@/lib/ai/prompts";
 import { generationSchema } from "@/lib/ai/schema";
-import { TONE_OPTIONS, parseGenerationOptions, type Tone } from "@/lib/constants";
+import { BILLING } from "@/lib/billing/constants";
+import {
+  TONE_OPTIONS,
+  parseGenerationOptions,
+  type Tone,
+} from "@/lib/constants";
 import { savePatchNote } from "@/lib/supabase/patch-notes";
+import {
+  consumeGeneration,
+  getUserQuota,
+  refundGeneration,
+} from "@/lib/supabase/users";
 
 const VALID_TONES = new Set(TONE_OPTIONS.map((option) => option.value));
 
@@ -13,7 +23,31 @@ function isTone(value: unknown): value is Tone {
   return typeof value === "string" && VALID_TONES.has(value as Tone);
 }
 
+function quotaErrorMessage(code: string) {
+  switch (code) {
+    case "setup_required":
+      return "Ajoutez votre carte bancaire (0 €) pour activer votre essai.";
+    case "subscription_required":
+      return `Essai terminé (${BILLING.TRIAL_GENERATIONS} générations). Passez au plan Pro (${BILLING.PRO_PRICE_LABEL}).`;
+    case "quota_exceeded":
+      return `Quota mensuel atteint (${BILLING.PRO_MONTHLY_GENERATIONS} générations). Renouvellement au prochain cycle.`;
+    case "rate_limited":
+      return `Patientez ${BILLING.MIN_SECONDS_BETWEEN_GENERATIONS} secondes entre deux générations.`;
+    default:
+      return "Génération indisponible pour votre compte.";
+  }
+}
+
 export async function POST(request: Request) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return Response.json(
+      { error: "Créez un compte pour générer des patch notes." },
+      { status: 401 },
+    );
+  }
+
   let body: unknown;
 
   try {
@@ -62,9 +96,21 @@ export async function POST(request: Request) {
     );
   }
 
-  if (commits.length > 50_000) {
+  if (commits.length > BILLING.MAX_COMMITS_CHARS) {
     return Response.json(
-      { error: "Trop de contenu (50 000 caractères max)." },
+      {
+        error: `Trop de contenu (${BILLING.MAX_COMMITS_CHARS.toLocaleString("fr-FR")} caractères max).`,
+      },
+      { status: 400 },
+    );
+  }
+
+  const lineCount = commits.split("\n").filter((line) => line.trim()).length;
+  if (lineCount > BILLING.MAX_COMMIT_LINES) {
+    return Response.json(
+      {
+        error: `Trop de commits (${BILLING.MAX_COMMIT_LINES} lignes max). Réduisez la sélection.`,
+      },
       { status: 400 },
     );
   }
@@ -79,6 +125,17 @@ export async function POST(request: Request) {
     );
   }
 
+  const consumed = await consumeGeneration(session.user.id);
+  if (!consumed.ok) {
+    return Response.json(
+      {
+        error: quotaErrorMessage(consumed.code),
+        code: consumed.code,
+      },
+      { status: consumed.code === "rate_limited" ? 429 : 402 },
+    );
+  }
+
   try {
     const { output } = await generateText({
       model: getGenerationModel(),
@@ -87,55 +144,36 @@ export async function POST(request: Request) {
       output: Output.object({ schema: generationSchema }),
     });
 
-    const session = await auth();
-
     const savedId =
-      session?.user?.id && output
-        ? await savePatchNote({
-            userId: session.user.id,
-            userEmail: session.user.email,
-            tone,
-            commitsRaw: commits,
-            markdown: output.markdown,
-            socialPost: output.socialPost,
-            repoFullName,
-          })
-        : null;
+      output &&
+      (await savePatchNote({
+        userId: session.user.id,
+        userEmail: session.user.email,
+        tone,
+        commitsRaw: commits,
+        markdown: output.markdown,
+        socialPost: output.socialPost,
+        repoFullName,
+      }));
+
+    const updatedQuota = await getUserQuota(session.user.id);
 
     return Response.json({
       ...output,
       savedId,
+      quota: updatedQuota,
+      generationsRemaining: consumed.generationsRemaining,
     });
   } catch (error) {
+    await refundGeneration(session.user.id, consumed.plan);
+    console.error("[/api/generate]", error);
+
     const message =
       error instanceof Error ? error.message : "Erreur inconnue.";
 
-    const isAuthError =
-      message.includes("API key") ||
-      message.includes("authentication") ||
-      message.includes("Unauthorized");
-
-    const needsBilling =
-      message.includes("credit card") ||
-      message.includes("customer_verification_required");
-
-    const googleConfigured = Boolean(
-      process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim(),
-    );
-
-    console.error("[/api/generate]", error);
-
     return Response.json(
-      {
-        error: isAuthError
-          ? "Clé AI Gateway manquante ou invalide. Configurez AI_GATEWAY_API_KEY."
-          : needsBilling
-            ? googleConfigured
-              ? "Erreur AI Gateway inattendue alors que Google est configuré. Redéployez le projet."
-              : "Vercel AI Gateway exige une carte bancaire. Ajoutez GOOGLE_GENERATIVE_AI_API_KEY sur Vercel et redéployez — ou retirez AI_GATEWAY_API_KEY."
-            : "La génération a échoué. Réessayez dans un instant.",
-      },
-      { status: isAuthError ? 503 : needsBilling ? 402 : 500 },
+      { error: "La génération a échoué. Réessayez dans un instant." },
+      { status: 500 },
     );
   }
 }

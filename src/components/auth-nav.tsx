@@ -10,7 +10,7 @@ export async function AuthNav() {
     return (
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/dashboard/generate">App</Link>
         </Button>
         <form
           action={async () => {
@@ -34,7 +34,7 @@ export async function AuthNav() {
       <form
         action={async () => {
           "use server";
-          await signIn("github", { redirectTo: "/dashboard" });
+          await signIn("github", { redirectTo: "/onboarding" });
         }}
       >
         <Button size="sm" type="submit">

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Copy, Loader2, Wand2 } from "lucide-react";
 
 import { GitHubCommitImport } from "@/components/github-commit-import";
+import { useBillingQuota } from "@/components/billing-quota-banner";
 import {
   COMMITS_STORAGE_KEY,
   REPO_STORAGE_KEY,
@@ -65,6 +66,7 @@ export function PatchNoteGenerator({
   const [error, setError] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [repoFullName, setRepoFullName] = useState<string | null>(null);
+  const { quota, refreshQuota } = useBillingQuota();
 
   useEffect(() => {
     const stored = sessionStorage.getItem(COMMITS_STORAGE_KEY);
@@ -109,6 +111,7 @@ export function PatchNoteGenerator({
       setMarkdown(data.markdown ?? "");
       setSocialPost(data.socialPost ?? "");
       setSavedId(data.savedId ?? null);
+      await refreshQuota();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Une erreur est survenue.",
@@ -135,7 +138,14 @@ export function PatchNoteGenerator({
         <CardHeader>
           <CardTitle className="text-lg">Vos commits</CardTitle>
           <CardDescription>
-            Collez vos commits ou importez-les depuis GitHub
+            Collez vos commits ou importez GitHub (optionnel)
+            {quota ? (
+              <>
+                {" "}
+                · {quota.generationsRemaining}/{quota.generationsLimit}{" "}
+                restantes
+              </>
+            ) : null}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -163,6 +173,7 @@ export function PatchNoteGenerator({
           {inputMode === "github" ? (
             <GitHubCommitImport
               isAuthenticated={isAuthenticated}
+              loginCallbackUrl="/dashboard/generate"
               onImport={handleGitHubImport}
             />
           ) : null}
@@ -243,7 +254,7 @@ export function PatchNoteGenerator({
             size="lg"
             className="w-full"
             onClick={handleGenerate}
-            disabled={isLoading || !commits.trim()}
+            disabled={isLoading || !commits.trim() || quota?.canGenerate === false}
           >
             {isLoading ? (
               <>
@@ -259,9 +270,16 @@ export function PatchNoteGenerator({
           </Button>
 
           {error ? (
-            <p className="text-sm text-destructive" role="alert">
-              {error}
-            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-destructive" role="alert">
+                {error}
+              </p>
+              {error.includes("Essai terminé") || error.includes("Quota") ? (
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/dashboard/billing">Voir l&apos;abonnement Pro</Link>
+                </Button>
+              ) : null}
+            </div>
           ) : null}
         </CardContent>
       </Card>

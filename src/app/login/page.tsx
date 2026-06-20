@@ -20,7 +20,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const redirectTo =
     callbackUrl?.startsWith("/") && !callbackUrl.startsWith("//")
       ? callbackUrl
-      : "/dashboard";
+      : "/onboarding";
 
   return (
     <div className="mx-auto flex max-w-md flex-1 items-center px-4 py-16">

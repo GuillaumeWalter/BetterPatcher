@@ -17,3 +17,15 @@ export function getGitHubClientId(): string | undefined {
 export function getGitHubClientSecret(): string | undefined {
   return readEnv("AUTH_GITHUB_SECRET", "GITHUB_SECRET");
 }
+
+export function getStripeSecretKey(): string | undefined {
+  return readEnv("STRIPE_SECRET_KEY");
+}
+
+export function getStripeWebhookSecret(): string | undefined {
+  return readEnv("STRIPE_WEBHOOK_SECRET");
+}
+
+export function getStripeProPriceId(): string | undefined {
+  return readEnv("STRIPE_PRO_PRICE_ID");
+}
