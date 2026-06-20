@@ -1,7 +1,7 @@
 import { generateText, Output } from "ai";
 
 import { auth } from "@/auth";
-import { getGenerationModel } from "@/lib/ai/model";
+import { getAiProvider, getGenerationModel } from "@/lib/ai/model";
 import { getSystemPrompt } from "@/lib/ai/prompts";
 import { generationSchema } from "@/lib/ai/schema";
 import { TONE_OPTIONS, type Tone } from "@/lib/constants";
@@ -61,6 +61,16 @@ export async function POST(request: Request) {
     return Response.json(
       { error: "Trop de contenu (50 000 caractères max)." },
       { status: 400 },
+    );
+  }
+
+  if (!getAiProvider()) {
+    return Response.json(
+      {
+        error:
+          "Aucune clé IA configurée. Ajoutez GOOGLE_GENERATIVE_AI_API_KEY ou AI_GATEWAY_API_KEY.",
+      },
+      { status: 503 },
     );
   }
 
