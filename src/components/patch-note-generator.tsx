@@ -10,6 +10,7 @@ import {
 } from "@/components/dashboard-content";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
@@ -27,7 +28,13 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { TONE_OPTIONS, type Tone } from "@/lib/constants";
+import {
+  DEFAULT_GENERATION_OPTIONS,
+  GENERATION_OPTION_DEFS,
+  TONE_OPTIONS,
+  type GenerationOptions,
+  type Tone,
+} from "@/lib/constants";
 
 const PLACEHOLDER_COMMITS = `feat(auth): add OAuth GitHub login
 fix(api): resolve race condition on webhook delivery
@@ -37,6 +44,9 @@ docs: update deployment guide`;
 export function PatchNoteGenerator() {
   const [commits, setCommits] = useState("");
   const [tone, setTone] = useState<Tone>("technical");
+  const [options, setOptions] = useState<GenerationOptions>(
+    DEFAULT_GENERATION_OPTIONS,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [markdown, setMarkdown] = useState("");
   const [socialPost, setSocialPost] = useState("");
@@ -70,7 +80,7 @@ export function PatchNoteGenerator() {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ commits, tone, repoFullName }),
+        body: JSON.stringify({ commits, tone, repoFullName, options }),
       });
 
       const data = (await response.json()) as {
@@ -143,6 +153,37 @@ export function PatchNoteGenerator() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-3">
+            <Label>Options de mise en forme</Label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {GENERATION_OPTION_DEFS.map((option) => (
+                <label
+                  key={option.key}
+                  className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-background/40 p-3 transition-colors hover:border-primary/30"
+                >
+                  <Checkbox
+                    checked={options[option.key]}
+                    onCheckedChange={(checked) =>
+                      setOptions((current) => ({
+                        ...current,
+                        [option.key]: checked === true,
+                      }))
+                    }
+                    className="mt-0.5"
+                  />
+                  <span className="space-y-0.5">
+                    <span className="block text-sm font-medium">
+                      {option.label}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      {option.description}
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </div>
           </div>
 
           <Button

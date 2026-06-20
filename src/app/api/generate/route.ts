@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { getAiProvider, getGenerationModel } from "@/lib/ai/model";
 import { getSystemPrompt } from "@/lib/ai/prompts";
 import { generationSchema } from "@/lib/ai/schema";
-import { TONE_OPTIONS, type Tone } from "@/lib/constants";
+import { TONE_OPTIONS, parseGenerationOptions, type Tone } from "@/lib/constants";
 import { savePatchNote } from "@/lib/supabase/patch-notes";
 
 const VALID_TONES = new Set(TONE_OPTIONS.map((option) => option.value));
@@ -43,6 +43,11 @@ export async function POST(request: Request) {
       ? body.repoFullName.trim() || null
       : null;
 
+  const options =
+    typeof body === "object" && body !== null && "options" in body
+      ? parseGenerationOptions(body.options)
+      : parseGenerationOptions(undefined);
+
   if (!commits) {
     return Response.json(
       { error: "Le champ commits est requis." },
@@ -77,7 +82,7 @@ export async function POST(request: Request) {
   try {
     const { output } = await generateText({
       model: getGenerationModel(),
-      system: getSystemPrompt(tone),
+      system: getSystemPrompt(tone, options),
       prompt: `Transforme ces messages de commit en patch note :\n\n${commits}`,
       output: Output.object({ schema: generationSchema }),
     });
