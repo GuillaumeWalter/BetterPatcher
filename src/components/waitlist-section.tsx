@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -17,13 +17,37 @@ import { Label } from "@/components/ui/label";
 export function WaitlistSection() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!email.trim()) return;
 
-    // Phase 1.4 — connecter Supabase / Resend
-    setSubmitted(true);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Inscription impossible.");
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Une erreur est survenue.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -58,12 +82,32 @@ export function WaitlistSection() {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
-            <Button type="submit" size="lg" className="sm:shrink-0">
-              Rejoindre la liste
-              <ArrowRight />
+            <Button
+              type="submit"
+              size="lg"
+              className="sm:shrink-0"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  Inscription…
+                </>
+              ) : (
+                <>
+                  Rejoindre la liste
+                  <ArrowRight />
+                </>
+              )}
             </Button>
+            {error ? (
+              <p className="text-sm text-destructive sm:col-span-2" role="alert">
+                {error}
+              </p>
+            ) : null}
           </form>
         )}
       </CardContent>

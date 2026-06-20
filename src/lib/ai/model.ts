@@ -1,4 +1,4 @@
-const DEFAULT_MODEL = "anthropic/claude-sonnet-4.6";
+const DEFAULT_MODEL = "google/gemini-2.5-flash";
 
 export function getGenerationModel(): string {
   return process.env.AI_GATEWAY_MODEL?.trim() || DEFAULT_MODEL;
