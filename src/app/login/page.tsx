@@ -11,7 +11,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams: Promise<{ callbackUrl?: string }>;
+};
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const { callbackUrl } = await searchParams;
+  const redirectTo =
+    callbackUrl?.startsWith("/") && !callbackUrl.startsWith("//")
+      ? callbackUrl
+      : "/dashboard";
+
   return (
     <div className="mx-auto flex max-w-md flex-1 items-center px-4 py-16">
       <Card className="surface-card gradient-border w-full">
@@ -21,15 +31,14 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl font-semibold">Connexion GitHub</CardTitle>
           <CardDescription className="text-base">
-            Accédez au dashboard pour importer vos commits directement depuis
-            vos dépôts.
+            Importez vos commits directement depuis vos dépôts.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <form
             action={async () => {
               "use server";
-              await signIn("github", { redirectTo: "/dashboard" });
+              await signIn("github", { redirectTo });
             }}
           >
             <Button type="submit" size="lg" className="w-full">

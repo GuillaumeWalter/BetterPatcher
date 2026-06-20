@@ -1,15 +1,17 @@
+import { auth } from "@/auth";
 import { DashboardContent } from "@/components/dashboard-content";
 import { DashboardNav } from "@/components/dashboard-nav";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const session = await auth();
+
   return (
     <>
       <DashboardNav />
-      <p className="mb-8 max-w-2xl text-base leading-relaxed text-muted-foreground">
-        Importez vos commits depuis GitHub, puis générez vos patch notes sur
-        l&apos;outil gratuit.
+      <p className="mb-8 text-muted-foreground">
+        Importez vos commits depuis GitHub, puis générez vos patch notes.
       </p>
-      <DashboardContent />
+      <DashboardContent isAuthenticated={Boolean(session?.user)} />
     </>
   );
 }

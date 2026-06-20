@@ -1,8 +1,8 @@
-import { GitBranch, Sparkles, Zap } from "lucide-react";
-
+import { auth } from "@/auth";
 import { PatchNoteGenerator } from "@/components/patch-note-generator";
 import { WaitlistSection } from "@/components/waitlist-section";
 import { Badge } from "@/components/ui/badge";
+import { GitBranch, Sparkles, Zap } from "lucide-react";
 
 const features = [
   {
@@ -22,7 +22,9 @@ const features = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
       <section className="relative mb-14 space-y-6 text-center sm:text-left">
@@ -62,7 +64,7 @@ export default function Home() {
         </div>
       </section>
 
-      <PatchNoteGenerator />
+      <PatchNoteGenerator isAuthenticated={Boolean(session?.user)} />
 
       <section className="mt-16">
         <WaitlistSection />

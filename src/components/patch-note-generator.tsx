@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Copy, Loader2, Wand2 } from "lucide-react";
 
+import { GitHubCommitImport } from "@/components/github-commit-import";
 import {
   COMMITS_STORAGE_KEY,
   REPO_STORAGE_KEY,
-} from "@/components/dashboard-content";
+} from "@/lib/github-session";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -41,7 +42,18 @@ fix(api): resolve race condition on webhook delivery
 chore(deps): bump next.js to 16.2
 docs: update deployment guide`;
 
-export function PatchNoteGenerator() {
+type InputMode = "paste" | "github";
+
+type PatchNoteGeneratorProps = {
+  isAuthenticated?: boolean;
+};
+
+export function PatchNoteGenerator({
+  isAuthenticated = false,
+}: PatchNoteGeneratorProps) {
+  const [inputMode, setInputMode] = useState<InputMode>(
+    isAuthenticated ? "github" : "paste",
+  );
   const [commits, setCommits] = useState("");
   const [tone, setTone] = useState<Tone>("technical");
   const [options, setOptions] = useState<GenerationOptions>(
@@ -111,18 +123,59 @@ export function PatchNoteGenerator() {
     await navigator.clipboard.writeText(text);
   }
 
+  function handleGitHubImport(text: string, repo: string) {
+    setCommits(text);
+    setRepoFullName(repo);
+    setInputMode("paste");
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <Card className="surface-card gradient-border">
         <CardHeader>
           <CardTitle className="text-lg">Vos commits</CardTitle>
           <CardDescription>
-            Collez les messages de commit bruts (git log, squash, etc.)
+            Collez vos commits ou importez-les depuis GitHub
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
+          <div className="flex gap-1 rounded-lg border border-white/10 bg-muted/30 p-1">
+            <Button
+              type="button"
+              variant={inputMode === "paste" ? "default" : "ghost"}
+              size="sm"
+              className="flex-1"
+              onClick={() => setInputMode("paste")}
+            >
+              Coller
+            </Button>
+            <Button
+              type="button"
+              variant={inputMode === "github" ? "default" : "ghost"}
+              size="sm"
+              className="flex-1"
+              onClick={() => setInputMode("github")}
+            >
+              GitHub
+            </Button>
+          </div>
+
+          {inputMode === "github" ? (
+            <GitHubCommitImport
+              isAuthenticated={isAuthenticated}
+              onImport={handleGitHubImport}
+            />
+          ) : null}
+
           <div className="space-y-2">
-            <Label htmlFor="commits">Messages de commit</Label>
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="commits">Messages de commit</Label>
+              {repoFullName ? (
+                <span className="truncate text-xs text-muted-foreground">
+                  {repoFullName}
+                </span>
+              ) : null}
+            </div>
             <Textarea
               id="commits"
               placeholder={PLACEHOLDER_COMMITS}
