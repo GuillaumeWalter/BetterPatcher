@@ -114,6 +114,10 @@ export async function POST(request: Request) {
       message.includes("credit card") ||
       message.includes("customer_verification_required");
 
+    const googleConfigured = Boolean(
+      process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim(),
+    );
+
     console.error("[/api/generate]", error);
 
     return Response.json(
@@ -121,7 +125,9 @@ export async function POST(request: Request) {
         error: isAuthError
           ? "Clé AI Gateway manquante ou invalide. Configurez AI_GATEWAY_API_KEY."
           : needsBilling
-            ? "Vercel AI Gateway : ajoutez une carte bancaire sur votre compte Vercel pour activer les crédits IA gratuits (Settings → Billing)."
+            ? googleConfigured
+              ? "Erreur AI Gateway inattendue alors que Google est configuré. Redéployez le projet."
+              : "Vercel AI Gateway exige une carte bancaire. Ajoutez GOOGLE_GENERATIVE_AI_API_KEY sur Vercel et redéployez — ou retirez AI_GATEWAY_API_KEY."
             : "La génération a échoué. Réessayez dans un instant.",
       },
       { status: isAuthError ? 503 : needsBilling ? 402 : 500 },
