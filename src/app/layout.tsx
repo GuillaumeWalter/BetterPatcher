@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
 import "./globals.css";
@@ -16,10 +17,46 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const appUrl =
+  process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
+  "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "Release Hub — Patch notes & assets marketing",
+  metadataBase: new URL(appUrl),
+  title: {
+    default: "Release Hub — Patch notes IA depuis vos commits",
+    template: "%s · Release Hub",
+  },
   description:
-    "Collez vos commits, choisissez une tonalité et générez un patch note plus un post réseaux en quelques secondes.",
+    "Transformez vos commits en changelog Markdown et post réseaux. Essai gratuit, import GitHub optionnel, abonnement Pro pour les équipes.",
+  keywords: [
+    "patch notes",
+    "changelog",
+    "commits",
+    "IA",
+    "release notes",
+    "marketing dev",
+  ],
+  authors: [{ name: "Release Hub" }],
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    siteName: "Release Hub",
+    title: "Release Hub — Patch notes IA depuis vos commits",
+    description:
+      "Changelog Markdown + post LinkedIn/X/Discord en quelques secondes.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Release Hub — Patch notes IA",
+    description:
+      "De vos commits au patch note, sans prise de tête.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -40,6 +77,7 @@ export default function RootLayout({
         </div>
         <SiteHeader />
         <main className="flex-1">{children}</main>
+        <SiteFooter />
       </body>
     </html>
   );
