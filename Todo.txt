@@ -1,48 +1,55 @@
 # 📋 RELEASE HUB - ROADMAP & TODO
+# Dernière mise à jour : juillet 2026
 
 ## 🚀 PHASE 1 : Le Side-Project Marketing (Outil Gratuit)
-*Objectif : Sortir un outil "Coller vos commits -> Générer le patch note" pour choper nos premiers emails et valider l'intérêt.*
+*Objectif : outil gratuit pour valider l'intérêt et collecter des emails.*
 
 ### 🛠️ Étape 1.1 : Initialisation & Structure
-- [ ] Initialiser le projet Next.js (App Router, TypeScript, Tailwind)
-- [ ] Installer et configurer Shadcn/ui (Boutons, Textarea, Card, Select)
-- [ ] Setup du layout global (Thème sombre/pro, structure épurée)
+- [x] Initialiser le projet Next.js (App Router, TypeScript, Tailwind)
+- [x] Installer et configurer Shadcn/ui
+- [x] Setup du layout global
 
 ### 🎨 Étape 1.2 : L'Interface (Front-end Unique)
-- [ ] Créer la Landing Page / App unique :
-    - [ ] Header simple avec le nom du projet
-    - [ ] Zone de saisie (Textarea) pour coller les commits bruts
-    - [ ] Sélecteur de tonalité (Technique, Marketing/Start-up, Gaming/Devlog)
-    - [ ] Bouton "Générer le Patch Note" stylé (avec état de chargement)
-    - [ ] Zone de résultats (Tabs : "Markdown Clean" / "Post Réseaux") avec bouton "Copier"
-- [ ] Intégrer la section "Liste d'attente" (CTA pour le produit automatisé)
+- [x] Landing Page (hero, tarifs, features)
+- [x] Générateur (textarea, tonalités, tabs Markdown / Post réseaux) — **dans le dashboard, pas en public**
+- [x] Section liste d'attente (landing)
+- [ ] **Générateur gratuit sans compte sur la landing** (retiré au profit du funnel payant)
 
 ### 🧠 Étape 1.3 : Logique & IA (Back-end)
-- [ ] Créer la Route d'API Next.js (`/api/generate`)
-- [ ] Setup du Vercel AI SDK (ou appel direct OpenAI/Anthropic)
-- [ ] Rédiger et peaufiner les 3 System Prompts (Technique, Marketing, Gaming)
-- [ ] Connecter le Front au Back (Gestion du streaming du texte si possible, sinon réponse bloc)
+- [x] Route `/api/generate`
+- [x] Vercel AI SDK + Gemini
+- [x] 3 System Prompts (Technique, Marketing, Gaming)
+- [ ] Streaming de la réponse IA
 
 ### 🌍 Étape 1.4 : Collecte de Leads & Déploiement
-- [ ] Connecter le formulaire de liste d'attente à une DB simple (Supabase, Resend, ou une Google Sheet rapide via API)
-- [ ] Déployer la première version via **Antigravity**
+- [x] Waitlist → Supabase (`/api/waitlist`)
+- [x] `.env.example` + README déploiement
+- [ ] Déployer en production (Vercel + secrets)
 - [ ] Tester en conditions réelles
 
 ---
 
 ## 🔒 PHASE 2 : Le SaaS Automatisé (B2B Payant)
-*Objectif : Connecter l'outil aux écosystèmes des boîtes et monétiser.*
 
 ### 🔑 Étape 2.1 : Authentification & Connexion GitHub
-- [ ] Intégrer NextAuth.js
-- [ ] Setup de l'OAuth GitHub (Demander les accès aux repositories)
-- [ ] Récupérer la liste des derniers commits / PR d'un repo sélectionné
+- [x] NextAuth.js + OAuth GitHub (scope repo)
+- [x] Import repos + 30 derniers commits
 
 ### 🗄️ Étape 2.2 : Dashboard & Automatisation
-- [ ] Espace utilisateur pour gérer ses projets/repos
-- [ ] Système de Webhooks : Déclencher la génération dès qu'un "Tag/Release" est poussé sur GitHub
-- [ ] Historique des patch notes générés et modifiables
+- [x] Dashboard (générer, historique, billing)
+- [x] Historique patch notes éditables
+- [ ] Gestion multi-projets / repos persistants
+- [ ] Webhooks GitHub sur tag/release → génération auto
 
 ### 💳 Étape 2.3 : Monétisation
-- [ ] Intégration de Stripe (Abonnements mensuels)
-- [ ] Gestion des limitations par plan (ex: Nombre de repos connectés)
+- [x] Stripe (vérif CB 0 € + abonnement Pro ~10 €/mois)
+- [x] Quotas essai (5) / Pro (60/mois)
+
+---
+
+## 🔧 Polish & infra restant
+- [x] UX cohérente (badge, liens login)
+- [x] Meta SEO + image OG dynamique
+- [x] Footer avec lien diagnostic env (dev)
+- [ ] Page 404 custom
+- [ ] CI/CD (lint + build sur PR)
