@@ -51,7 +51,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               href="/"
               className="text-primary underline-offset-4 transition-colors hover:underline"
             >
-              Retour à l&apos;outil gratuit
+              Retour à l&apos;accueil
             </Link>
           </p>
         </CardContent>

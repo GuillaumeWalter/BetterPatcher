@@ -2,6 +2,7 @@ import Link from "next/link";
 import { GitBranch, CreditCard, Shield, Sparkles, Zap } from "lucide-react";
 
 import { auth, signIn } from "@/auth";
+import { WaitlistSection } from "@/components/waitlist-section";
 import { BILLING } from "@/lib/billing/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -136,6 +137,10 @@ export default async function Home() {
             </CardContent>
           </Card>
         </div>
+      </section>
+
+      <section className="mb-14">
+        <WaitlistSection />
       </section>
 
       <section className="surface-card gradient-border rounded-2xl p-6 text-center sm:text-left">

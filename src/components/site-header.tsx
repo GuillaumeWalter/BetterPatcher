@@ -24,7 +24,7 @@ export function SiteHeader() {
             variant="secondary"
             className="hidden border border-primary/15 bg-primary/8 text-primary sm:inline-flex"
           >
-            Beta gratuite
+            Essai · 5 générations
           </Badge>
           <AuthNav />
         </div>
