@@ -26,7 +26,17 @@ export function StripeSetupButton() {
         body: JSON.stringify({ action: "setup" }),
       });
 
-      const data = (await response.json()) as { url?: string; error?: string };
+      const raw = await response.text();
+      let data: { url?: string; error?: string } = {};
+      try {
+        data = raw ? (JSON.parse(raw) as { url?: string; error?: string }) : {};
+      } catch {
+        throw new Error(
+          response.ok
+            ? "Invalid response from billing."
+            : `Billing failed (${response.status}).`,
+        );
+      }
 
       if (!response.ok || !data.url) {
         throw new Error(data.error ?? "Could not start card verification.");
@@ -94,7 +104,17 @@ export function StripeSubscribeButton({
         body: JSON.stringify({ action: "subscribe", plan }),
       });
 
-      const data = (await response.json()) as { url?: string; error?: string };
+      const raw = await response.text();
+      let data: { url?: string; error?: string } = {};
+      try {
+        data = raw ? (JSON.parse(raw) as { url?: string; error?: string }) : {};
+      } catch {
+        throw new Error(
+          response.ok
+            ? "Invalid response from billing."
+            : `Billing failed (${response.status}).`,
+        );
+      }
 
       if (!response.ok || !data.url) {
         throw new Error(data.error ?? "Could not start the subscription.");
