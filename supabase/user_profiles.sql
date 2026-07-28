@@ -1,4 +1,4 @@
--- Release Hub — profils utilisateurs, quotas IA, Stripe
+-- EasyPatch — profils utilisateurs, quotas IA, Stripe
 -- Exécuter dans Supabase → SQL Editor
 
 create table if not exists public.user_profiles (

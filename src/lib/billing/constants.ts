@@ -2,7 +2,7 @@
 export const BILLING = {
   /** Générations offertes après vérif CB (0 €). */
   TRIAL_GENERATIONS: 5,
-  /** Générations / mois sur abonnement Pro (~10 €). */
+  /** Générations / mois sur abonnement Pro (~9,99 €). */
   PRO_MONTHLY_GENERATIONS: 60,
   /** Délai minimum entre deux générations (anti-spam). */
   MIN_SECONDS_BETWEEN_GENERATIONS: 20,
@@ -10,7 +10,7 @@ export const BILLING = {
   MAX_COMMITS_CHARS: 15_000,
   /** Nombre max de lignes de commits. */
   MAX_COMMIT_LINES: 40,
-  PRO_PRICE_LABEL: "10 € / mois",
+  PRO_PRICE_LABEL: "9,99 € / mois",
 } as const;
 
 export type SubscriptionStatus = "none" | "active" | "past_due" | "canceled";

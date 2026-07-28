@@ -1,4 +1,4 @@
--- Release Hub — liste d'attente (Phase 1.4)
+-- EasyPatch — liste d'attente (Phase 1.4)
 -- Exécuter dans Supabase → SQL Editor sur un NOUVEAU projet dédié
 
 create table if not exists public.waitlist_signups (
