@@ -36,7 +36,7 @@ export function DashboardContent({ isAuthenticated }: DashboardContentProps) {
         <CardDescription>
           {repoFullName
             ? `${repoFullName} — ${commits.split("\n").filter(Boolean).length} commits`
-            : "Sélectionnez un dépôt GitHub ou collez vos commits"}
+            : "Importez GitHub ou collez vos commits (Perforce, Plastic, SVN…)"}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

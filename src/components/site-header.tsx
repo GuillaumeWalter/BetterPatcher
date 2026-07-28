@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
 import { AuthNav } from "@/components/auth-nav";
-import { Badge } from "@/components/ui/badge";
 
 export function SiteHeader() {
   return (
@@ -13,19 +12,13 @@ export function SiteHeader() {
             <Sparkles className="size-4" />
           </div>
           <div>
-            <p className="text-sm font-semibold tracking-tight">Release Hub</p>
+            <p className="text-sm font-semibold tracking-tight">Easy Patch</p>
             <p className="text-xs text-muted-foreground">
               Patch notes en un clic
             </p>
           </div>
         </Link>
         <div className="flex items-center gap-3">
-          <Badge
-            variant="secondary"
-            className="hidden border border-primary/15 bg-primary/8 text-primary sm:inline-flex"
-          >
-            Beta gratuite
-          </Badge>
           <AuthNav />
         </div>
       </div>

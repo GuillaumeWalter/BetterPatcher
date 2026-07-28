@@ -2,12 +2,27 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CreditCard, Loader2, Sparkles } from "lucide-react";
+import { CreditCard, Sparkles } from "lucide-react";
 
 import { BILLING } from "@/lib/billing/constants";
 import type { QuotaSnapshot } from "@/lib/billing/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
+function planLabel(plan: QuotaSnapshot["plan"]) {
+  switch (plan) {
+    case "pro":
+      return "Pro";
+    case "solo":
+      return "Solo";
+    case "trial":
+      return "Essai";
+    case "blocked":
+      return "Essai terminé";
+    default:
+      return "Activation requise";
+  }
+}
 
 export function BillingQuotaBanner() {
   const [quota, setQuota] = useState<QuotaSnapshot | null>(null);
@@ -30,20 +45,11 @@ export function BillingQuotaBanner() {
 
   if (isLoading || !quota) return null;
 
-  const label =
-    quota.plan === "pro"
-      ? "Pro"
-      : quota.plan === "trial"
-        ? "Essai"
-        : quota.plan === "blocked"
-          ? "Essai terminé"
-          : "Activation requise";
-
   return (
     <div className="surface-card gradient-border mb-6 flex flex-col gap-3 rounded-2xl p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="space-y-1">
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">{label}</Badge>
+          <Badge variant="secondary">{planLabel(quota.plan)}</Badge>
           {quota.paymentMethodVerified ? (
             <span className="text-sm text-muted-foreground">
               {quota.generationsRemaining} / {quota.generationsLimit} restantes
@@ -61,8 +67,9 @@ export function BillingQuotaBanner() {
           </p>
         ) : quota.requiresSubscription ? (
           <p className="text-sm text-muted-foreground">
-            Passez au Pro ({BILLING.PRO_PRICE_LABEL}) pour{" "}
-            {BILLING.PRO_MONTHLY_GENERATIONS} générations / mois.
+            Solo ({BILLING.SOLO_PRICE_LABEL}, {BILLING.SOLO_MONTHLY_GENERATIONS}/mois)
+            ou Pro ({BILLING.PRO_PRICE_LABEL}, {BILLING.PRO_MONTHLY_GENERATIONS}/mois
+            · équipe).
           </p>
         ) : null}
       </div>
@@ -78,6 +85,14 @@ export function BillingQuotaBanner() {
         ) : null}
         {quota.requiresSubscription ? (
           <Button asChild size="sm">
+            <Link href="/dashboard/billing">
+              <Sparkles />
+              Voir les offres
+            </Link>
+          </Button>
+        ) : null}
+        {quota.plan === "solo" ? (
+          <Button asChild size="sm" variant="outline">
             <Link href="/dashboard/billing">
               <Sparkles />
               Passer au Pro

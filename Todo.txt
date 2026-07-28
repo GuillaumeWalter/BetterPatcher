@@ -1,4 +1,4 @@
-# 📋 RELEASE HUB - ROADMAP & TODO
+# 📋 EASY PATCH - ROADMAP & TODO
 
 ## 🚀 PHASE 1 : Le Side-Project Marketing (Outil Gratuit)
 *Objectif : Sortir un outil "Coller vos commits -> Générer le patch note" pour choper nos premiers emails et valider l'intérêt.*

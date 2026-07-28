@@ -26,6 +26,10 @@ export function getStripeWebhookSecret(): string | undefined {
   return readEnv("STRIPE_WEBHOOK_SECRET");
 }
 
+export function getStripeSoloPriceId(): string | undefined {
+  return readEnv("STRIPE_SOLO_PRICE_ID");
+}
+
 export function getStripeProPriceId(): string | undefined {
   return readEnv("STRIPE_PRO_PRICE_ID");
 }

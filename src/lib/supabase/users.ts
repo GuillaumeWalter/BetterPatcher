@@ -1,6 +1,9 @@
 import {
   BILLING,
   buildQuotaSnapshot,
+  monthlyGenerationsForTier,
+  type PaidPlanTier,
+  type PlanTier,
   type QuotaSnapshot,
   type SubscriptionStatus,
   type UserBillingProfile,
@@ -14,6 +17,7 @@ type UserProfileRow = {
   payment_method_verified: boolean;
   subscription_status: SubscriptionStatus;
   stripe_subscription_id: string | null;
+  plan_tier: PlanTier | null;
   trial_generations_used: number;
   trial_generations_limit: number;
   period_generations_used: number;
@@ -21,6 +25,11 @@ type UserProfileRow = {
   billing_period_start: string | null;
   last_generation_at: string | null;
 };
+
+function mapPlanTier(value: PlanTier | null | undefined): PlanTier {
+  if (value === "solo" || value === "pro" || value === "none") return value;
+  return "none";
+}
 
 function mapProfile(row: UserProfileRow): UserBillingProfile {
   return {
@@ -30,6 +39,7 @@ function mapProfile(row: UserProfileRow): UserBillingProfile {
     paymentMethodVerified: row.payment_method_verified,
     subscriptionStatus: row.subscription_status,
     stripeSubscriptionId: row.stripe_subscription_id,
+    planTier: mapPlanTier(row.plan_tier),
     trialGenerationsUsed: row.trial_generations_used,
     trialGenerationsLimit: row.trial_generations_limit,
     periodGenerationsUsed: row.period_generations_used,
@@ -140,6 +150,7 @@ export async function updateSubscriptionState(input: {
   stripeCustomerId?: string;
   stripeSubscriptionId: string | null;
   subscriptionStatus: SubscriptionStatus;
+  planTier?: PaidPlanTier | "none";
   billingPeriodStart?: Date | null;
   resetPeriodUsage?: boolean;
 }) {
@@ -166,7 +177,12 @@ export async function updateSubscriptionState(input: {
   };
 
   if (input.subscriptionStatus === "active") {
-    patch.period_generations_limit = BILLING.PRO_MONTHLY_GENERATIONS;
+    const tier: PaidPlanTier =
+      input.planTier === "solo" || input.planTier === "pro"
+        ? input.planTier
+        : "pro";
+    patch.plan_tier = tier;
+    patch.period_generations_limit = monthlyGenerationsForTier(tier);
     if (input.resetPeriodUsage) {
       patch.period_generations_used = 0;
     }
@@ -177,6 +193,7 @@ export async function updateSubscriptionState(input: {
 
   if (input.subscriptionStatus === "canceled" || input.subscriptionStatus === "none") {
     patch.period_generations_limit = 0;
+    patch.plan_tier = "none";
   }
 
   const { error } = await supabase

@@ -2,20 +2,33 @@
 export const BILLING = {
   /** Générations offertes après vérif CB (0 €). */
   TRIAL_GENERATIONS: 5,
-  /** Générations / mois sur abonnement Pro (~10 €). */
-  PRO_MONTHLY_GENERATIONS: 60,
+  /** Générations / mois — plan Solo (1 utilisateur). */
+  SOLO_MONTHLY_GENERATIONS: 25,
+  /** Générations / mois — plan Pro (équipe). */
+  PRO_MONTHLY_GENERATIONS: 80,
   /** Délai minimum entre deux générations (anti-spam). */
   MIN_SECONDS_BETWEEN_GENERATIONS: 20,
   /** Taille max du texte commits envoyé à l'IA. */
   MAX_COMMITS_CHARS: 15_000,
   /** Nombre max de lignes de commits. */
   MAX_COMMIT_LINES: 40,
-  PRO_PRICE_LABEL: "10 € / mois",
+  SOLO_PRICE_LABEL: "4,99 € / mois",
+  PRO_PRICE_LABEL: "9,99 € / mois",
 } as const;
 
 export type SubscriptionStatus = "none" | "active" | "past_due" | "canceled";
 
-export type UserPlan = "pending_setup" | "trial" | "pro" | "blocked";
+/** Tier Stripe / abonnement payant (hors essai). */
+export type PaidPlanTier = "solo" | "pro";
+
+export type PlanTier = "none" | PaidPlanTier;
+
+export type UserPlan =
+  | "pending_setup"
+  | "trial"
+  | "solo"
+  | "pro"
+  | "blocked";
 
 export type UserBillingProfile = {
   userId: string;
@@ -24,6 +37,7 @@ export type UserBillingProfile = {
   paymentMethodVerified: boolean;
   subscriptionStatus: SubscriptionStatus;
   stripeSubscriptionId: string | null;
+  planTier: PlanTier;
   trialGenerationsUsed: number;
   trialGenerationsLimit: number;
   periodGenerationsUsed: number;
@@ -44,6 +58,20 @@ export type QuotaSnapshot = {
   minSecondsBetweenGenerations: number;
 };
 
+export function monthlyGenerationsForTier(tier: PaidPlanTier): number {
+  return tier === "solo"
+    ? BILLING.SOLO_MONTHLY_GENERATIONS
+    : BILLING.PRO_MONTHLY_GENERATIONS;
+}
+
+export function priceLabelForTier(tier: PaidPlanTier): string {
+  return tier === "solo" ? BILLING.SOLO_PRICE_LABEL : BILLING.PRO_PRICE_LABEL;
+}
+
+export function isPaidPlan(plan: string | undefined): boolean {
+  return plan === "solo" || plan === "pro";
+}
+
 export function buildQuotaSnapshot(
   profile: UserBillingProfile,
 ): QuotaSnapshot {
@@ -63,15 +91,20 @@ export function buildQuotaSnapshot(
     };
   }
 
-  const isPro = profile.subscriptionStatus === "active";
+  const isSubscribed = profile.subscriptionStatus === "active";
 
-  if (isPro) {
-    const limit = profile.periodGenerationsLimit || BILLING.PRO_MONTHLY_GENERATIONS;
+  if (isSubscribed) {
+    const tier: PaidPlanTier =
+      profile.planTier === "solo" || profile.planTier === "pro"
+        ? profile.planTier
+        : "pro";
+    const defaultLimit = monthlyGenerationsForTier(tier);
+    const limit = profile.periodGenerationsLimit || defaultLimit;
     const used = profile.periodGenerationsUsed;
     const remaining = Math.max(0, limit - used);
 
     return {
-      plan: "pro",
+      plan: tier,
       paymentMethodVerified: true,
       generationsUsed: used,
       generationsLimit: limit,

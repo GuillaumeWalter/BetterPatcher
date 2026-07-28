@@ -1,7 +1,14 @@
 import Stripe from "stripe";
 
-import { BILLING } from "@/lib/billing/constants";
-import { getStripeWebhookSecret } from "@/lib/env";
+import {
+  BILLING,
+  type PaidPlanTier,
+} from "@/lib/billing/constants";
+import {
+  getStripeProPriceId,
+  getStripeSoloPriceId,
+  getStripeWebhookSecret,
+} from "@/lib/env";
 import { getStripe } from "@/lib/stripe";
 import {
   getUserIdByStripeCustomerId,
@@ -25,6 +32,24 @@ function getBillingPeriodStart(subscription: Stripe.Subscription): Date {
   }
 
   return new Date(subscription.billing_cycle_anchor * 1000);
+}
+
+function resolvePlanTier(
+  subscription: Stripe.Subscription,
+  metadataPlan?: string | null,
+): PaidPlanTier {
+  if (metadataPlan === "solo" || metadataPlan === "pro") {
+    return metadataPlan;
+  }
+
+  const priceId = subscription.items?.data?.[0]?.price?.id;
+  const soloPriceId = getStripeSoloPriceId();
+  const proPriceId = getStripeProPriceId();
+
+  if (priceId && soloPriceId && priceId === soloPriceId) return "solo";
+  if (priceId && proPriceId && priceId === proPriceId) return "pro";
+
+  return "pro";
 }
 
 export async function POST(request: Request) {
@@ -80,6 +105,10 @@ export async function POST(request: Request) {
               userId: resolvedUserId,
               stripeSubscriptionId: subscription.id,
               subscriptionStatus: mapSubscriptionStatus(subscription.status),
+              planTier: resolvePlanTier(
+                subscription,
+                session.metadata?.planTier,
+              ),
               billingPeriodStart: getBillingPeriodStart(subscription),
               resetPeriodUsage: true,
             });
@@ -106,8 +135,11 @@ export async function POST(request: Request) {
           stripeSubscriptionId:
             status === "canceled" ? null : subscription.id,
           subscriptionStatus: status,
+          planTier:
+            status === "active" ? resolvePlanTier(subscription) : "none",
           billingPeriodStart: getBillingPeriodStart(subscription),
-          resetPeriodUsage: event.type === "customer.subscription.updated" && status === "active",
+          resetPeriodUsage:
+            event.type === "customer.subscription.updated" && status === "active",
         });
         break;
       }
@@ -138,6 +170,7 @@ export async function POST(request: Request) {
           stripeCustomerId: customerId,
           stripeSubscriptionId: subscription.id,
           subscriptionStatus: "active",
+          planTier: resolvePlanTier(subscription),
           billingPeriodStart: getBillingPeriodStart(subscription),
           resetPeriodUsage: invoice.billing_reason === "subscription_cycle",
         });

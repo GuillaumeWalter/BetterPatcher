@@ -20,6 +20,7 @@ export async function GET() {
     stripe: {
       STRIPE_SECRET_KEY: Boolean(process.env.STRIPE_SECRET_KEY?.trim()),
       STRIPE_WEBHOOK_SECRET: Boolean(process.env.STRIPE_WEBHOOK_SECRET?.trim()),
+      STRIPE_SOLO_PRICE_ID: Boolean(process.env.STRIPE_SOLO_PRICE_ID?.trim()),
       STRIPE_PRO_PRICE_ID: Boolean(process.env.STRIPE_PRO_PRICE_ID?.trim()),
     },
     supabase: {

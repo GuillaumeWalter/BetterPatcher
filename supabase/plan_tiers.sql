@@ -1,45 +1,20 @@
--- Easy Patch — profils utilisateurs, quotas IA, Stripe
--- Exécuter dans Supabase → SQL Editor
+-- Easy Patch — plan_tier Solo / Pro + quotas mis à jour
+-- Exécuter dans Supabase → SQL Editor (projets déjà provisionnés)
 
-create table if not exists public.user_profiles (
-  user_id text primary key,
-  email text,
-  stripe_customer_id text unique,
-  payment_method_verified boolean not null default false,
-  subscription_status text not null default 'none'
-    check (subscription_status in ('none', 'active', 'past_due', 'canceled')),
-  stripe_subscription_id text,
-  plan_tier text not null default 'none'
-    check (plan_tier in ('none', 'solo', 'pro')),
-  trial_generations_used integer not null default 0,
-  trial_generations_limit integer not null default 5,
-  period_generations_used integer not null default 0,
-  period_generations_limit integer not null default 0,
-  billing_period_start timestamptz,
-  last_generation_at timestamptz,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
+alter table public.user_profiles
+  add column if not exists plan_tier text not null default 'none'
+  check (plan_tier in ('none', 'solo', 'pro'));
 
-create index if not exists user_profiles_stripe_customer_id_idx
-  on public.user_profiles (stripe_customer_id);
-
-alter table public.user_profiles enable row level security;
-
-create or replace function public.set_user_profiles_updated_at()
-returns trigger as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$ language plpgsql;
-
-drop trigger if exists user_profiles_updated_at on public.user_profiles;
-
-create trigger user_profiles_updated_at
-  before update on public.user_profiles
-  for each row
-  execute function public.set_user_profiles_updated_at();
+-- Abonnés déjà actifs (ancien Pro unique) → tier pro + quota 80
+update public.user_profiles
+set
+  plan_tier = 'pro',
+  period_generations_limit = case
+    when period_generations_limit = 60 or period_generations_limit <= 0 then 80
+    else period_generations_limit
+  end
+where subscription_status = 'active'
+  and plan_tier = 'none';
 
 -- Consommation atomique d'une génération (évite les race conditions)
 create or replace function public.consume_generation(p_user_id text, p_min_interval_seconds integer default 20)

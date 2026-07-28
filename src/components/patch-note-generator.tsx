@@ -138,7 +138,7 @@ export function PatchNoteGenerator({
         <CardHeader>
           <CardTitle className="text-lg">Vos commits</CardTitle>
           <CardDescription>
-            Collez vos commits ou importez GitHub (optionnel)
+            Import GitHub, ou collez un log (Perforce, Plastic, SVN…)
             {quota ? (
               <>
                 {" "}

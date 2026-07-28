@@ -32,7 +32,7 @@ export default async function DashboardPage() {
               Générateur
             </CardTitle>
             <CardDescription>
-              Collez vos commits ou importez GitHub — patch note + post réseaux.
+              Import GitHub ou collage manuel (Perforce, Plastic, SVN…).
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -72,8 +72,10 @@ export default async function DashboardPage() {
               Abonnement
             </CardTitle>
             <CardDescription>
-              Essai : {BILLING.TRIAL_GENERATIONS} générations · Pro :{" "}
-              {BILLING.PRO_PRICE_LABEL} ({BILLING.PRO_MONTHLY_GENERATIONS}/mois)
+              Essai : {BILLING.TRIAL_GENERATIONS} générations · Solo :{" "}
+              {BILLING.SOLO_PRICE_LABEL} ({BILLING.SOLO_MONTHLY_GENERATIONS}/mois)
+              · Pro : {BILLING.PRO_PRICE_LABEL} (
+              {BILLING.PRO_MONTHLY_GENERATIONS}/mois · équipe)
               {quota ? (
                 <>
                   {" "}

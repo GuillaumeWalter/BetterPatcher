@@ -28,9 +28,9 @@ function quotaErrorMessage(code: string) {
     case "setup_required":
       return "Ajoutez votre carte bancaire (0 €) pour activer votre essai.";
     case "subscription_required":
-      return `Essai terminé (${BILLING.TRIAL_GENERATIONS} générations). Passez au plan Pro (${BILLING.PRO_PRICE_LABEL}).`;
+      return `Essai terminé (${BILLING.TRIAL_GENERATIONS} générations). Passez au Solo (${BILLING.SOLO_PRICE_LABEL}) ou au Pro (${BILLING.PRO_PRICE_LABEL}).`;
     case "quota_exceeded":
-      return `Quota mensuel atteint (${BILLING.PRO_MONTHLY_GENERATIONS} générations). Renouvellement au prochain cycle.`;
+      return "Quota mensuel atteint. Renouvellement au prochain cycle, ou passez au Pro pour plus de générations.";
     case "rate_limited":
       return `Patientez ${BILLING.MIN_SECONDS_BETWEEN_GENERATIONS} secondes entre deux générations.`;
     default:

@@ -1,4 +1,4 @@
--- Release Hub — historique des patch notes (Phase 2.2a)
+-- Easy Patch — historique des patch notes (Phase 2.2a)
 -- Exécuter dans Supabase → SQL Editor
 
 create table if not exists public.patch_notes (

@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { CreditCard, Loader2, ShieldCheck } from "lucide-react";
 
-import { BILLING } from "@/lib/billing/constants";
+import {
+  BILLING,
+  priceLabelForTier,
+  type PaidPlanTier,
+} from "@/lib/billing/constants";
 import { Button } from "@/components/ui/button";
 
 export function StripeSetupButton() {
@@ -64,9 +68,18 @@ export function StripeSetupButton() {
   );
 }
 
-export function StripeSubscribeButton() {
+type StripeSubscribeButtonProps = {
+  plan: PaidPlanTier;
+  variant?: "default" | "outline" | "secondary";
+};
+
+export function StripeSubscribeButton({
+  plan,
+  variant = "default",
+}: StripeSubscribeButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const label = plan === "solo" ? "Solo" : "Pro";
 
   async function startSubscribe() {
     setIsLoading(true);
@@ -76,7 +89,7 @@ export function StripeSubscribeButton() {
       const response = await fetch("/api/billing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "subscribe" }),
+        body: JSON.stringify({ action: "subscribe", plan }),
       });
 
       const data = (await response.json()) as { url?: string; error?: string };
@@ -94,7 +107,13 @@ export function StripeSubscribeButton() {
 
   return (
     <div className="space-y-3">
-      <Button size="lg" className="w-full" onClick={startSubscribe} disabled={isLoading}>
+      <Button
+        size="lg"
+        className="w-full"
+        variant={variant}
+        onClick={startSubscribe}
+        disabled={isLoading}
+      >
         {isLoading ? (
           <>
             <Loader2 className="animate-spin" />
@@ -103,7 +122,7 @@ export function StripeSubscribeButton() {
         ) : (
           <>
             <CreditCard />
-            S&apos;abonner — {BILLING.PRO_PRICE_LABEL}
+            S&apos;abonner {label} — {priceLabelForTier(plan)}
           </>
         )}
       </Button>

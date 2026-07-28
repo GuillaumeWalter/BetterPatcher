@@ -69,8 +69,8 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
             </li>
             <li>✓ Coller vos commits ou importer GitHub (optionnel)</li>
             <li>
-              ✓ Ensuite Pro : {BILLING.PRO_PRICE_LABEL} ·{" "}
-              {BILLING.PRO_MONTHLY_GENERATIONS} générations / mois
+              ✓ Ensuite Solo ({BILLING.SOLO_PRICE_LABEL}) ou Pro (
+              {BILLING.PRO_PRICE_LABEL} · équipe)
             </li>
           </ul>
 

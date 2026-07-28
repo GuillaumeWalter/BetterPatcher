@@ -1,6 +1,15 @@
 import { auth } from "@/auth";
+import {
+  type PaidPlanTier,
+} from "@/lib/billing/constants";
+import { getStripeProPriceId, getStripeSoloPriceId } from "@/lib/env";
 import { getAppBaseUrl, getOrCreateStripeCustomer, getStripe } from "@/lib/stripe";
 import { getUserQuota } from "@/lib/supabase/users";
+
+function parsePaidPlan(value: unknown): PaidPlanTier | null {
+  if (value === "solo" || value === "pro") return value;
+  return null;
+}
 
 export async function GET() {
   const session = await auth();
@@ -66,10 +75,29 @@ export async function POST(request: Request) {
   const baseUrl = getAppBaseUrl();
 
   if (action === "subscribe") {
-    const priceId = process.env.STRIPE_PRO_PRICE_ID?.trim();
+    const plan =
+      typeof body === "object" && body !== null && "plan" in body
+        ? parsePaidPlan(body.plan)
+        : null;
+
+    if (!plan) {
+      return Response.json(
+        { error: "Plan invalide. Choisissez solo ou pro." },
+        { status: 400 },
+      );
+    }
+
+    const priceId =
+      plan === "solo" ? getStripeSoloPriceId() : getStripeProPriceId();
+
     if (!priceId) {
       return Response.json(
-        { error: "STRIPE_PRO_PRICE_ID manquant." },
+        {
+          error:
+            plan === "solo"
+              ? "STRIPE_SOLO_PRICE_ID manquant."
+              : "STRIPE_PRO_PRICE_ID manquant.",
+        },
         { status: 503 },
       );
     }
@@ -90,6 +118,7 @@ export async function POST(request: Request) {
       cancel_url: `${baseUrl}/dashboard/billing?canceled=1`,
       metadata: {
         userId: session.user.id,
+        planTier: plan,
       },
     });
 

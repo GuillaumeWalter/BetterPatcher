@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GitBranch, CreditCard, Shield, Sparkles, Zap } from "lucide-react";
+import { GitBranch, CreditCard, Shield, Sparkles, Users, Zap } from "lucide-react";
 
 import { auth, signIn } from "@/auth";
 import { BILLING } from "@/lib/billing/constants";
@@ -17,7 +17,7 @@ const features = [
   {
     icon: GitBranch,
     label: "Commits → changelog",
-    description: "GitHub, collage manuel, ou autre VCS copié en texte",
+    description: "GitHub, collage Perforce / Plastic / SVN, ou tout log texte",
   },
   {
     icon: Sparkles,
@@ -41,7 +41,7 @@ export default async function Home() {
           variant="secondary"
           className="border border-primary/15 bg-primary/8 px-3 py-1 text-primary"
         >
-          Patch notes IA · Essai puis abonnement
+          Patch notes IA · Essai puis Solo / Pro
         </Badge>
 
         <div className="space-y-4">
@@ -50,10 +50,9 @@ export default async function Home() {
             <span className="gradient-text">patch note</span>, sans prise de tête
           </h1>
           <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Release Hub transforme un log brut en changelog Markdown et post
+            Easy Patch transforme un log brut en changelog Markdown et post
             réseaux. Créez un compte, vérifiez votre carte (0 €), testez{" "}
-            {BILLING.TRIAL_GENERATIONS} fois, puis passez au Pro si ça vous
-            convient.
+            {BILLING.TRIAL_GENERATIONS} fois, puis choisissez Solo ou Pro.
           </p>
         </div>
 
@@ -99,7 +98,7 @@ export default async function Home() {
 
       <section id="tarifs" className="mb-14 scroll-mt-24">
         <h2 className="mb-6 text-2xl font-semibold tracking-tight">Tarifs</h2>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
           <Card className="surface-card gradient-border">
             <CardHeader>
               <CardTitle className="text-lg">Essai</CardTitle>
@@ -118,6 +117,24 @@ export default async function Home() {
             </CardContent>
           </Card>
 
+          <Card className="surface-card gradient-border">
+            <CardHeader>
+              <CardTitle className="text-lg">Solo</CardTitle>
+              <CardDescription>{BILLING.SOLO_PRICE_LABEL}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-muted-foreground">
+              <p className="flex items-center gap-2">
+                <CreditCard className="size-4 text-primary" />
+                {BILLING.SOLO_MONTHLY_GENERATIONS} générations / mois · 1 utilisateur
+              </p>
+              <ul className="space-y-1.5">
+                <li>· Tout l&apos;essai + quotas mensuels</li>
+                <li>· Idéal indés &amp; solo marketers</li>
+                <li>· Annulation à tout moment</li>
+              </ul>
+            </CardContent>
+          </Card>
+
           <Card className="surface-card gradient-border border-primary/20">
             <CardHeader>
               <CardTitle className="text-lg">Pro</CardTitle>
@@ -125,12 +142,12 @@ export default async function Home() {
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p className="flex items-center gap-2">
-                <CreditCard className="size-4 text-primary" />
-                {BILLING.PRO_MONTHLY_GENERATIONS} générations / mois (plafonné)
+                <Users className="size-4 text-primary" />
+                {BILLING.PRO_MONTHLY_GENERATIONS} générations / mois · équipe
               </p>
               <ul className="space-y-1.5">
-                <li>· Tout l&apos;essai + quotas mensuels</li>
-                <li>· Idéal studios indés &amp; live ops</li>
+                <li>· Plusieurs users sur le même compte (bientôt)</li>
+                <li>· Idéal studios &amp; live ops</li>
                 <li>· Annulation à tout moment</li>
               </ul>
             </CardContent>
@@ -139,11 +156,11 @@ export default async function Home() {
       </section>
 
       <section className="surface-card gradient-border rounded-2xl p-6 text-center sm:text-left">
-        <h2 className="text-xl font-semibold">Pas sur GitHub ?</h2>
+        <h2 className="text-xl font-semibold">D&apos;où viennent vos commits ?</h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Beaucoup de studios jeux utilisent Perforce, Plastic, SVN… Collez
-          simplement vos messages de commit dans l&apos;app. GitHub reste
-          optionnel pour l&apos;import automatique.
+          Import automatique depuis GitHub, ou collez un log Perforce, Plastic
+          (Unity Version Control), SVN ou tout autre VCS. GitLab et Jira arrivent
+          bientôt pour tous les abonnés — pas réservés au Pro.
         </p>
       </section>
     </div>
