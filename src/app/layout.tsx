@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Release Hub — Patch notes & assets marketing",
+  title: "EasyPatch — Patch notes & assets marketing",
   description:
     "Collez vos commits, choisissez une tonalité et générez un patch note plus un post réseaux en quelques secondes.",
 };

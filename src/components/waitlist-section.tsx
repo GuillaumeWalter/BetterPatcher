@@ -58,7 +58,7 @@ export function WaitlistSection() {
           <Rocket className="size-4" />
         </div>
         <CardTitle className="text-xl sm:mt-3">
-          Release Hub automatisé — bientôt disponible
+          EasyPatch automatisé — bientôt disponible
         </CardTitle>
         <CardDescription className="max-w-2xl text-base">
           Connectez GitHub, déclenchez la génération à chaque release et

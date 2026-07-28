@@ -1,4 +1,4 @@
-# PROJECT CONTEXT: Release Hub (Automated Patch Notes & Marketing Assets)
+# PROJECT CONTEXT: EasyPatch (Automated Patch Notes & Marketing Assets)
 
 ## 1. Vision & Objectif
 - **Concept :** SaaS B2B qui se branche sur les dépôts de code (GitHub/GitLab), analyse les commits et les Pull Requests via LLM, et génère automatiquement des patch notes structurés ainsi que des assets marketing (posts LinkedIn, carrousels, résumés Discord/Steam).
@@ -22,7 +22,7 @@ Pour attirer nos premiers utilisateurs sans forcer la vente, on commence par une
 - Un sélecteur de "Tonalité" (Technique épuré, Start-up/Marketing, Gaming/Devlog).
 - Un bouton "Générer".
 - En sortie : Le patch note formaté + un post de réseau social prêt à copier.
-- Un call-to-action (CTA) vers la liste d'attente de la version automatisée (Release Hub).
+- Un call-to-action (CTA) vers la liste d'attente de la version automatisée (EasyPatch).
 
 ## 5. Règles de Vibe Coding (Pour l'IA de Cursor)
 - Priorise toujours l'efficacité et la simplicité du code. Pas d'over-engineering.

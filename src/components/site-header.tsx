@@ -13,7 +13,7 @@ export function SiteHeader() {
             <Sparkles className="size-4" />
           </div>
           <div>
-            <p className="text-sm font-semibold tracking-tight">Release Hub</p>
+            <p className="text-sm font-semibold tracking-tight">EasyPatch</p>
             <p className="text-xs text-muted-foreground">
               Patch notes en un clic
             </p>

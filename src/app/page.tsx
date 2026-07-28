@@ -50,7 +50,7 @@ export default async function Home() {
             <span className="gradient-text">patch note</span>, sans prise de tête
           </h1>
           <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Release Hub transforme un log brut en changelog Markdown et post
+            EasyPatch transforme un log brut en changelog Markdown et post
             réseaux. Créez un compte, vérifiez votre carte (0 €), testez{" "}
             {BILLING.TRIAL_GENERATIONS} fois, puis passez au Pro si ça vous
             convient.
