@@ -5,6 +5,7 @@ import { CheckCircle2, CreditCard } from "lucide-react";
 import { auth } from "@/auth";
 import { StripeSetupButton } from "@/components/billing-actions";
 import { BILLING } from "@/lib/billing/constants";
+import { getLocalizedBillingLabels } from "@/lib/billing/localized-labels";
 import { getUserQuota } from "@/lib/supabase/users";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +33,7 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
 
   const { setup } = await searchParams;
   const setupSuccess = setup === "success";
+  const { soloPriceLabel, proPriceLabel } = await getLocalizedBillingLabels();
 
   return (
     <div className="mx-auto flex max-w-lg flex-1 items-center px-4 py-16">
@@ -69,8 +71,7 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
             </li>
             <li>✓ Paste commits or import GitHub (optional)</li>
             <li>
-              ✓ Then Solo ({BILLING.SOLO_PRICE_LABEL}) or Pro (
-              {BILLING.PRO_PRICE_LABEL} | team)
+              ✓ Then Solo ({soloPriceLabel}) or Pro ({proPriceLabel} | team)
             </li>
           </ul>
 

@@ -2,8 +2,11 @@ import { auth } from "@/auth";
 import {
   type PaidPlanTier,
 } from "@/lib/billing/constants";
-import { resolveSetupCurrency } from "@/lib/billing/currency";
-import { getStripeProPriceId, getStripeSoloPriceId } from "@/lib/env";
+import {
+  billingLabelsForCurrency,
+  resolveBillingCurrency,
+} from "@/lib/billing/currency";
+import { getStripePriceIdForCurrency } from "@/lib/env";
 import { getAppBaseUrl, getOrCreateStripeCustomer, getStripe } from "@/lib/stripe";
 import { ensureUserProfile, getUserQuota } from "@/lib/supabase/users";
 
@@ -16,9 +19,11 @@ function jsonError(message: string, status: number) {
   return Response.json({ error: message }, { status });
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await auth();
+    const currency = resolveBillingCurrency(request.headers);
+    const labels = billingLabelsForCurrency(currency);
 
     if (!session?.user?.id) {
       return jsonError("Sign in required.", 401);
@@ -35,7 +40,7 @@ export async function GET() {
       return jsonError("User profile not found.", 404);
     }
 
-    return Response.json(quota);
+    return Response.json({ ...quota, ...labels });
   } catch (error) {
     console.error("[billing GET]", error);
     return jsonError("Could not load billing status.", 500);
@@ -85,6 +90,7 @@ export async function POST(request: Request) {
     }
 
     const baseUrl = getAppBaseUrl();
+    const geoCurrency = resolveBillingCurrency(request.headers);
 
     if (action === "subscribe") {
       const plan =
@@ -96,14 +102,14 @@ export async function POST(request: Request) {
         return jsonError("Invalid plan. Choose solo or pro.", 400);
       }
 
-      const priceId =
-        plan === "solo" ? getStripeSoloPriceId() : getStripeProPriceId();
+      const { priceId, currency } = getStripePriceIdForCurrency(
+        plan,
+        geoCurrency,
+      );
 
       if (!priceId) {
         return jsonError(
-          plan === "solo"
-            ? "STRIPE_SOLO_PRICE_ID is missing."
-            : "STRIPE_PRO_PRICE_ID is missing.",
+          `Missing Stripe Price for ${plan} (${currency}). Set STRIPE_${plan.toUpperCase()}_PRICE_ID${currency === "eur" ? "" : `_${currency.toUpperCase()}`}.`,
           503,
         );
       }
@@ -122,6 +128,7 @@ export async function POST(request: Request) {
         metadata: {
           userId: session.user.id,
           planTier: plan,
+          currency,
         },
       });
 
@@ -129,21 +136,18 @@ export async function POST(request: Request) {
         return jsonError("Stripe did not return a checkout URL.", 502);
       }
 
-      return Response.json({ url: checkoutSession.url });
+      return Response.json({ url: checkoutSession.url, currency });
     }
 
-    // Setup mode: currency from visitor country (payment methods UX).
-    // Solo / Pro Prices stay EUR; no multi-currency Stripe Prices required.
-    const currency = resolveSetupCurrency(request);
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "setup",
-      currency,
+      currency: geoCurrency,
       customer: customerId,
       success_url: `${baseUrl}/onboarding?setup=success`,
       cancel_url: `${baseUrl}/onboarding?setup=canceled`,
       metadata: {
         userId: session.user.id,
-        setupCurrency: currency,
+        setupCurrency: geoCurrency,
       },
     });
 
@@ -151,7 +155,7 @@ export async function POST(request: Request) {
       return jsonError("Stripe did not return a checkout URL.", 502);
     }
 
-    return Response.json({ url: checkoutSession.url });
+    return Response.json({ url: checkoutSession.url, currency: geoCurrency });
   } catch (error) {
     console.error("[billing POST]", error);
     const message =

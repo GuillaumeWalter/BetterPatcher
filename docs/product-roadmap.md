@@ -28,14 +28,17 @@ Integrations (GitLab, Jira, Linear, etc.) are a roadmap for **all subscribers** 
 
 ### Stripe (Dashboard, manual)
 
-Create two monthly EUR Prices:
+Create monthly Prices per currency (same Product Solo / Product Pro):
 
-- Solo → `STRIPE_SOLO_PRICE_ID` (€4.99)
-- Pro → `STRIPE_PRO_PRICE_ID` (€9.99)
+| Currency | Solo | Pro | Env vars |
+|----------|------|-----|----------|
+| EUR (default) | 4.99 | 9.99 | `STRIPE_SOLO_PRICE_ID` · `STRIPE_PRO_PRICE_ID` |
+| USD | 4.99 | 9.99 | `STRIPE_SOLO_PRICE_ID_USD` · `STRIPE_PRO_PRICE_ID_USD` |
+| GBP | 4.99 | 9.99 | `STRIPE_SOLO_PRICE_ID_GBP` · `STRIPE_PRO_PRICE_ID_GBP` |
+| JPY (zero-decimal) | 740 | 1480 | `STRIPE_SOLO_PRICE_ID_JPY` · `STRIPE_PRO_PRICE_ID_JPY` |
+| KRW (zero-decimal) | 6900 | 13900 | `STRIPE_SOLO_PRICE_ID_KRW` · `STRIPE_PRO_PRICE_ID_KRW` |
 
-Card verification (setup Checkout) picks presentment currency from geo
-(`x-vercel-ip-country`). No multi-currency Prices needed for that.
-Subscriptions stay EUR (card network converts if needed).
+Geo (`x-vercel-ip-country`) picks currency for setup + subscribe. Missing local Price → falls back to EUR.
 
 Also run `supabase/plan_tiers.sql` and `supabase/gitlab_token.sql` on the Supabase project.
 

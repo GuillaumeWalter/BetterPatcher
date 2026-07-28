@@ -24,8 +24,13 @@ function planLabel(plan: QuotaSnapshot["plan"]) {
   }
 }
 
+type BillingPayload = QuotaSnapshot & {
+  soloPriceLabel?: string;
+  proPriceLabel?: string;
+};
+
 export function BillingQuotaBanner() {
-  const [quota, setQuota] = useState<QuotaSnapshot | null>(null);
+  const [quota, setQuota] = useState<BillingPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -33,7 +38,7 @@ export function BillingQuotaBanner() {
       try {
         const response = await fetch("/api/billing", { credentials: "same-origin" });
         if (response.ok) {
-          setQuota((await response.json()) as QuotaSnapshot);
+          setQuota((await response.json()) as BillingPayload);
         }
       } finally {
         setIsLoading(false);
@@ -44,6 +49,9 @@ export function BillingQuotaBanner() {
   }, []);
 
   if (isLoading || !quota) return null;
+
+  const soloLabel = quota.soloPriceLabel ?? BILLING.SOLO_PRICE_LABEL;
+  const proLabel = quota.proPriceLabel ?? BILLING.PRO_PRICE_LABEL;
 
   return (
     <div className="surface-card gradient-border mb-6 flex flex-col gap-3 rounded-2xl p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -67,12 +75,13 @@ export function BillingQuotaBanner() {
           </p>
         ) : quota.requiresSubscription ? (
           <p className="text-sm text-muted-foreground">
-            Solo ({BILLING.SOLO_PRICE_LABEL}, {BILLING.SOLO_MONTHLY_GENERATIONS}/mo)
-            or Pro ({BILLING.PRO_PRICE_LABEL}, {BILLING.PRO_MONTHLY_GENERATIONS}/mo
+            Solo ({soloLabel}, {BILLING.SOLO_MONTHLY_GENERATIONS}/mo)
+            or Pro ({proLabel}, {BILLING.PRO_MONTHLY_GENERATIONS}/mo
             | team).
           </p>
         ) : null}
       </div>
+
 
       <div className="flex flex-wrap gap-2">
         {quota.requiresSetup ? (

@@ -82,15 +82,19 @@ export function StripeSetupButton() {
 type StripeSubscribeButtonProps = {
   plan: PaidPlanTier;
   variant?: "default" | "outline" | "secondary";
+  /** Localized label from geo (falls back to EUR). */
+  priceLabel?: string;
 };
 
 export function StripeSubscribeButton({
   plan,
   variant = "default",
+  priceLabel,
 }: StripeSubscribeButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const label = plan === "solo" ? "Solo" : "Pro";
+  const displayPrice = priceLabel ?? priceLabelForTier(plan);
 
   async function startSubscribe() {
     setIsLoading(true);
@@ -144,7 +148,7 @@ export function StripeSubscribeButton({
         ) : (
           <>
             <CreditCard />
-            Subscribe {label} ({priceLabelForTier(plan)})
+            Subscribe {label} ({displayPrice})
           </>
         )}
       </Button>

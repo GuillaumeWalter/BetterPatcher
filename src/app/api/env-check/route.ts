@@ -24,6 +24,30 @@ export async function GET() {
       STRIPE_WEBHOOK_SECRET: Boolean(process.env.STRIPE_WEBHOOK_SECRET?.trim()),
       STRIPE_SOLO_PRICE_ID: Boolean(process.env.STRIPE_SOLO_PRICE_ID?.trim()),
       STRIPE_PRO_PRICE_ID: Boolean(process.env.STRIPE_PRO_PRICE_ID?.trim()),
+      STRIPE_SOLO_PRICE_ID_USD: Boolean(
+        process.env.STRIPE_SOLO_PRICE_ID_USD?.trim(),
+      ),
+      STRIPE_PRO_PRICE_ID_USD: Boolean(
+        process.env.STRIPE_PRO_PRICE_ID_USD?.trim(),
+      ),
+      STRIPE_SOLO_PRICE_ID_GBP: Boolean(
+        process.env.STRIPE_SOLO_PRICE_ID_GBP?.trim(),
+      ),
+      STRIPE_PRO_PRICE_ID_GBP: Boolean(
+        process.env.STRIPE_PRO_PRICE_ID_GBP?.trim(),
+      ),
+      STRIPE_SOLO_PRICE_ID_JPY: Boolean(
+        process.env.STRIPE_SOLO_PRICE_ID_JPY?.trim(),
+      ),
+      STRIPE_PRO_PRICE_ID_JPY: Boolean(
+        process.env.STRIPE_PRO_PRICE_ID_JPY?.trim(),
+      ),
+      STRIPE_SOLO_PRICE_ID_KRW: Boolean(
+        process.env.STRIPE_SOLO_PRICE_ID_KRW?.trim(),
+      ),
+      STRIPE_PRO_PRICE_ID_KRW: Boolean(
+        process.env.STRIPE_PRO_PRICE_ID_KRW?.trim(),
+      ),
     },
     supabase: {
       SUPABASE_URL: Boolean(process.env.SUPABASE_URL?.trim()),

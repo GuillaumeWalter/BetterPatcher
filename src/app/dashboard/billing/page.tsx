@@ -5,6 +5,7 @@ import { StripeSubscribeButton } from "@/components/billing-actions";
 import { BillingQuotaBanner } from "@/components/billing-quota-banner";
 import { DashboardNav } from "@/components/dashboard-nav";
 import { BILLING } from "@/lib/billing/constants";
+import { getLocalizedBillingLabels } from "@/lib/billing/localized-labels";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,6 +21,7 @@ type BillingPageProps = {
 
 export default async function BillingPage({ searchParams }: BillingPageProps) {
   const { success, canceled } = await searchParams;
+  const { soloPriceLabel, proPriceLabel } = await getLocalizedBillingLabels();
 
   return (
     <>
@@ -48,7 +50,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
               Solo
             </CardTitle>
             <CardDescription>
-              {BILLING.SOLO_PRICE_LABEL} · {BILLING.SOLO_MONTHLY_GENERATIONS}{" "}
+              {soloPriceLabel} · {BILLING.SOLO_MONTHLY_GENERATIONS}{" "}
               generations / month | 1 user
             </CardDescription>
           </CardHeader>
@@ -59,7 +61,11 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
               <li>✓ Upcoming integrations (Jira…)</li>
               <li>✓ Cancel anytime</li>
             </ul>
-            <StripeSubscribeButton plan="solo" variant="outline" />
+            <StripeSubscribeButton
+              plan="solo"
+              variant="outline"
+              priceLabel={soloPriceLabel}
+            />
           </CardContent>
         </Card>
 
@@ -70,7 +76,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
               Pro
             </CardTitle>
             <CardDescription>
-              {BILLING.PRO_PRICE_LABEL} · {BILLING.PRO_MONTHLY_GENERATIONS}{" "}
+              {proPriceLabel} · {BILLING.PRO_MONTHLY_GENERATIONS}{" "}
               generations / month | team
             </CardDescription>
           </CardHeader>
@@ -81,7 +87,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
               <li>✓ Ideal for studios &amp; live ops</li>
               <li>✓ Cancel anytime</li>
             </ul>
-            <StripeSubscribeButton plan="pro" />
+            <StripeSubscribeButton plan="pro" priceLabel={proPriceLabel} />
           </CardContent>
         </Card>
       </div>

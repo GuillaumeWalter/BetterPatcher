@@ -64,6 +64,7 @@ export function monthlyGenerationsForTier(tier: PaidPlanTier): number {
     : BILLING.PRO_MONTHLY_GENERATIONS;
 }
 
+/** Default EUR labels. Prefer priceLabelForCurrency from currency.ts when geo is known. */
 export function priceLabelForTier(tier: PaidPlanTier): string {
   return tier === "solo" ? BILLING.SOLO_PRICE_LABEL : BILLING.PRO_PRICE_LABEL;
 }

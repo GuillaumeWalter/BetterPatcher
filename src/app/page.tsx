@@ -3,6 +3,7 @@ import { GitBranch, CreditCard, Shield, Sparkles, Users, Zap } from "lucide-reac
 
 import { auth, signIn } from "@/auth";
 import { BILLING } from "@/lib/billing/constants";
+import { getLocalizedBillingLabels } from "@/lib/billing/localized-labels";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +34,7 @@ const features = [
 
 export default async function Home() {
   const session = await auth();
+  const { soloPriceLabel, proPriceLabel } = await getLocalizedBillingLabels();
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
@@ -120,7 +122,7 @@ export default async function Home() {
           <Card className="surface-card gradient-border">
             <CardHeader>
               <CardTitle className="text-lg">Solo</CardTitle>
-              <CardDescription>{BILLING.SOLO_PRICE_LABEL}</CardDescription>
+              <CardDescription>{soloPriceLabel}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p className="flex items-center gap-2">
@@ -138,7 +140,7 @@ export default async function Home() {
           <Card className="surface-card gradient-border border-primary/20">
             <CardHeader>
               <CardTitle className="text-lg">Pro</CardTitle>
-              <CardDescription>{BILLING.PRO_PRICE_LABEL}</CardDescription>
+              <CardDescription>{proPriceLabel}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p className="flex items-center gap-2">

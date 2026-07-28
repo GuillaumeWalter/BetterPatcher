@@ -4,6 +4,7 @@ import { ArrowRight, History, Sparkles, Wand2 } from "lucide-react";
 import { BillingQuotaBanner } from "@/components/billing-quota-banner";
 import { DashboardNav } from "@/components/dashboard-nav";
 import { BILLING } from "@/lib/billing/constants";
+import { getLocalizedBillingLabels } from "@/lib/billing/localized-labels";
 import { getUserQuota } from "@/lib/supabase/users";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import {
 export default async function DashboardPage() {
   const session = await auth();
   const quota = session?.user?.id ? await getUserQuota(session.user.id) : null;
+  const { soloPriceLabel, proPriceLabel } = await getLocalizedBillingLabels();
 
   return (
     <>
@@ -73,8 +75,8 @@ export default async function DashboardPage() {
             </CardTitle>
             <CardDescription>
               Trial: {BILLING.TRIAL_GENERATIONS} generations · Solo:{" "}
-              {BILLING.SOLO_PRICE_LABEL} ({BILLING.SOLO_MONTHLY_GENERATIONS}/mo)
-              · Pro: {BILLING.PRO_PRICE_LABEL} (
+              {soloPriceLabel} ({BILLING.SOLO_MONTHLY_GENERATIONS}/mo)
+              · Pro: {proPriceLabel} (
               {BILLING.PRO_MONTHLY_GENERATIONS}/mo | team)
               {quota ? (
                 <>

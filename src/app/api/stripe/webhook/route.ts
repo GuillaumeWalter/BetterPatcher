@@ -5,9 +5,8 @@ import {
   type PaidPlanTier,
 } from "@/lib/billing/constants";
 import {
-  getStripeProPriceId,
-  getStripeSoloPriceId,
   getStripeWebhookSecret,
+  listConfiguredStripePriceIds,
 } from "@/lib/env";
 import { getStripe } from "@/lib/stripe";
 import {
@@ -43,11 +42,11 @@ function resolvePlanTier(
   }
 
   const priceId = subscription.items?.data?.[0]?.price?.id;
-  const soloPriceId = getStripeSoloPriceId();
-  const proPriceId = getStripeProPriceId();
+  if (!priceId) return "pro";
 
-  if (priceId && soloPriceId && priceId === soloPriceId) return "solo";
-  if (priceId && proPriceId && priceId === proPriceId) return "pro";
+  const { solo, pro } = listConfiguredStripePriceIds();
+  if (solo.includes(priceId)) return "solo";
+  if (pro.includes(priceId)) return "pro";
 
   return "pro";
 }
