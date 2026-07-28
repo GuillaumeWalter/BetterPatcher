@@ -33,6 +33,10 @@ Create two monthly EUR Prices:
 - Solo → `STRIPE_SOLO_PRICE_ID` (€4.99)
 - Pro → `STRIPE_PRO_PRICE_ID` (€9.99)
 
+Card verification (setup Checkout) picks presentment currency from geo
+(`x-vercel-ip-country`). No multi-currency Prices needed for that.
+Subscriptions stay EUR (card network converts if needed).
+
 Also run `supabase/plan_tiers.sql` and `supabase/gitlab_token.sql` on the Supabase project.
 
 ### GitLab OAuth (Vercel env)

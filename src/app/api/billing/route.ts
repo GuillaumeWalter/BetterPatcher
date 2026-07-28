@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import {
   type PaidPlanTier,
 } from "@/lib/billing/constants";
+import { resolveSetupCurrency } from "@/lib/billing/currency";
 import { getStripeProPriceId, getStripeSoloPriceId } from "@/lib/env";
 import { getAppBaseUrl, getOrCreateStripeCustomer, getStripe } from "@/lib/stripe";
 import { ensureUserProfile, getUserQuota } from "@/lib/supabase/users";
@@ -131,15 +132,18 @@ export async function POST(request: Request) {
       return Response.json({ url: checkoutSession.url });
     }
 
-    // Setup mode requires currency when using Dashboard dynamic payment methods
+    // Setup mode: currency from visitor country (payment methods UX).
+    // Solo / Pro Prices stay EUR; no multi-currency Stripe Prices required.
+    const currency = resolveSetupCurrency(request);
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "setup",
-      currency: "eur",
+      currency,
       customer: customerId,
       success_url: `${baseUrl}/onboarding?setup=success`,
       cancel_url: `${baseUrl}/onboarding?setup=canceled`,
       metadata: {
         userId: session.user.id,
+        setupCurrency: currency,
       },
     });
 
