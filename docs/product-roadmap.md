@@ -1,132 +1,133 @@
-# Easy Patch — Product roadmap
+# Easy Patch | Product roadmap
 
-Document vivant. À relire avant toute évolution produit, billing ou intégrations.
+Living doc. Re-read before product, billing, or integration work.
 
-## Positionnement
+**Hosting:** Vercel. **UI language:** English (see `docs/copywriting.md`).
 
-Easy Patch transforme un log de commits (ou collage manuel) en **patch note Markdown** + **post réseaux** (LinkedIn, X, Discord, Steam-style selon la tonalité).
+## Positioning
 
-Cible : indés, studios jeux, live ops, eng leads, product marketers.
+Easy Patch turns a commit log (or pasted text) into a **Markdown patch note** plus a **social post** (LinkedIn, X, Discord, Steam-style by tone).
 
-## Grille tarifaire
+Audience: indies, game studios, live ops, eng leads, product marketers.
 
-| Palier | Prix | Quotas | Différenciation |
-|--------|------|--------|-----------------|
-| **Essai** | 0 € (CB anti-abus) | 5 générations one-shot | 1 user · GitHub import + collage |
-| **Solo** | **4,99 € / mois** | **25** générations / mois | **1 utilisateur** · historique · mêmes sources / intégrations |
-| **Pro** | **9,99 € / mois** | **80** générations / mois | **Équipe** : plusieurs users sur le même compte (sièges / invites) · quota partagé |
+## Pricing
 
-### Clarification « multi-connexions »
+| Tier | Price | Quotas | Differentiation |
+|------|-------|--------|-----------------|
+| **Trial** | €0 (card required to limit abuse) | 5 one-time generations | 1 user | GitHub import + paste |
+| **Solo** | **€4.99 / month** | **25** generations / month | **1 user** | history | same sources / integrations as they ship |
+| **Pro** | **€9.99 / month** | **80** generations / month | **Team**: several users on one account (seats / invites) | shared quota |
 
-Ce n’est **pas** « plusieurs services (GitHub + Jira) réservés au Pro ».
+### Multi-seat clarification
 
-**Multi-connexion = plusieurs utilisateurs rattachés au même compte / workspace entreprise** (inviter collègues, historique et quotas partagés). Différenciateur **Pro**.
+This is **not** “several services (GitHub + Jira) locked to Pro”.
 
-Les intégrations (GitLab, Jira, Linear, etc.) sont une roadmap **pour tous les abonnés** (Solo inclus).
+**Multi-seat** means several people on the same company account / workspace (invites, shared history and quotas). That is the **Pro** differentiator.
 
-### Stripe (manuel Dashboard)
+Integrations (GitLab, Jira, Linear, etc.) are a roadmap for **all subscribers** (Solo included).
 
-Créer deux Prices mensuels EUR :
+### Stripe (Dashboard, manual)
 
-- Solo → `STRIPE_SOLO_PRICE_ID` (4,99 €)
-- Pro → `STRIPE_PRO_PRICE_ID` (9,99 €)
+Create two monthly EUR Prices:
 
-## Sources de commits
+- Solo → `STRIPE_SOLO_PRICE_ID` (€4.99)
+- Pro → `STRIPE_PRO_PRICE_ID` (€9.99)
 
-| Source | Statut |
+Also run `supabase/plan_tiers.sql` and `supabase/gitlab_token.sql` on the Supabase project.
+
+### GitLab OAuth (Vercel env)
+
+Create a GitLab OAuth Application (gitlab.com → Applications):
+
+- Redirect URI: `https://YOUR_DOMAIN/api/gitlab/callback`
+- Scopes: `read_user`, `read_api`
+- Env: `AUTH_GITLAB_ID`, `AUTH_GITLAB_SECRET` (optional `GITLAB_BASE_URL` for self-hosted)
+
+## Commit sources
+
+| Source | Status |
 |--------|--------|
-| GitHub (OAuth + import repos/commits) | **Actuel** (aussi auth login) |
-| Collage manuel (Perforce, Plastic / Unity Version Control, SVN, tout log texte) | **Actuel** |
-| GitLab (import) | Roadmap — phase 1 |
-| Jira / Linear (enrichir notes avec tickets) | Roadmap — phase 2 · Solo + Pro |
-| Bitbucket | Plus tard |
-| Trello | Nice-to-have, pas prioritaire |
-| Perforce / Plastic API native | Non prévu (collage suffit) |
+| GitHub (OAuth + repo/commit import) | **Current** (also login) |
+| Manual paste (Perforce, Plastic / Unity Version Control, SVN, any text log) | **Current** |
+| GitLab (import) | **Current** (OAuth link · Solo + Pro + Trial) |
+| Jira / Linear (ticket titles into notes) | Phase 2 | Solo + Pro |
+| Bitbucket | Later |
+| Trello | Nice to have |
+| Native Perforce / Plastic API | Not planned (paste is enough) |
 
-## Différenciateur Pro (équipe)
+## Pro differentiator (team)
 
-Workspaces / sièges : invite d’autres users sur le même compte entreprise, historique et quota partagés. **Copy / pricing prêts** ; implémentation seats = phase ultérieure.
+Workspaces / seats: invite teammates to one company account, shared history and quota. **Copy and pricing are ready**; real seats come later.
 
-## Backlog idées
+## Backlog
 
-- Sièges équipe / workspaces (Pro)
-- Import GitLab
-- Jira / Linear → titres de tickets dans les patch notes
-- Auto-générer sur tag / GitHub Release
-- Brand voice / mémoire de ton studio
-- Multi-langue des patch notes
-- Format Steam News dédié
-- Publish Discord (pas seulement générer)
-- Abonnement annuel (-15 %)
+- Team seats / workspaces (Pro)
+- GitLab import
+- Jira / Linear → ticket titles in patch notes
+- Auto-generate on tag / GitHub Release
+- Brand voice / studio tone memory
+- Multi-language patch notes
+- Dedicated Steam News format
+- Discord publish (not only generate)
+- Annual plan (15% off)
 - Bitbucket
-- Trello (nice-to-have)
+- Trello (nice to have)
 
 ## Phases
 
-### Phase 0 (cette passe)
+### Phase 0 (done)
 
-- Doc produit + pointeur AGENTS
-- Paliers Essai / Solo / Pro (quotas + Stripe dual price)
-- Retirer messaging « Beta »
-- Copy sources (Perforce / Plastic / SVN + teaser GitLab / Jira, **pas** gated Pro)
+- Product doc + AGENTS pointer
+- Trial / Solo / Pro (quotas + dual Stripe prices)
+- Remove Beta messaging
+- Source copy (Perforce / Plastic / SVN + GitLab / Jira teaser, not Pro-gated)
+- Rebrand to Easy Patch
 
-### Phase 1
+### Phase 0.5 (done)
 
-- Import GitLab
+- Full English UI
+- Copywriting rules (no dash punctuation · middle dot `·` allowed)
+- Vercel hosting · Stripe / Supabase ops for Solo / Pro
 
-### Phase 2
+### Phase 1 (done)
 
-- Jira ou Linear (enrichissement tickets) — Solo + Pro
+- GitLab import (OAuth connect linked to existing account · last 30 commits)
+
+### Phase 2 (next)
+
+- Jira or Linear (ticket enrichment) | Solo + Pro
 
 ### Phase 3
 
-- Workspaces / invites multi-users (différenciateur Pro réel)
-- Bitbucket, Discord publish, auto-release, annuel, etc.
+- Workspaces / multi-user invites (real Pro differentiator)
+- Bitbucket, Discord publish, auto-release, annual, etc.
 
-## Market & comm (à traiter prochainement)
+## GTM (later)
 
-Principe : **attendre que le produit soit suffisamment terminé** (essai → Solo/Pro fluide, génération fiable, copy claire) avant de pousser pubs et listings. Sinon on brûle budget et premier contact sur un outil encore bancal.
+Wait until the product is solid (trial → Solo/Pro smooth, generation reliable, clear copy) before paid ads and big listings.
 
-### Timing
+| Action | When |
+|--------|------|
+| Light organic (posts, communities) | Early OK, low volume |
+| Paid ads (~€100 / month) | After the tool is ready |
+| Product Hunt / AlternativeTo / G2 | After ready + 1 to 2 testimonials or solid screenshots |
+| PWA “Install app” | When dashboard UI is stable |
+| GitHub Action (tag/release → patch note) | After core is reliable (best recurrence lever) |
+| Raycast / Alfred / browser extension | After core |
+| Discord / Slack bot | Later |
 
-| Action | Quand |
-|--------|--------|
-| Contenu organique léger (posts, communautés) | OK tôt, volume faible — tester le message |
-| Pubs payantes (~100 € / mois) | **Après** outil prêt (flow essai → payant OK) |
-| Product Hunt / AlternativeTo / G2 | **Après** outil prêt + 1–2 témoignages ou screenshots solides |
-| PWA « Installer l’app » | Dès que l’UI dashboard est stable |
-| GitHub Action (tag/release → patch note) | Après core fiable — **meilleur levier récurrence** |
-| Raycast / Alfred / extension navigateur | Après core ; point d’entrée secondaire |
-| Bot Discord / Slack (publish) | Plus tard (aligné backlog Discord publish) |
+### Suggested ad mix
 
-### Budget pubs (ordre d’idée)
+~**€100 / month** to start:
 
-~**100 € / mois** pour démarrer, concentré :
+- LinkedIn (60 to 80 €): B2B ICP | creative “commits → patch note + post”
+- Measure **GitHub trial signups**, not likes
+- Free: Reddit / Discord / forums (r/gamedev, r/indiedev)
 
-- **LinkedIn** (60–80 €) — ICP B2B (indés, studios, eng / product) ; 1 créatif « commits → patch note + post »
-- Reste éventuel : test X / Meta si besoin
-- Mesurer les **essais GitHub**, pas les likes
-- En parallèle (0 €) : Reddit / Discord / forums (r/gamedev, r/indiedev, serveurs studios)
+### Execution order (when GTM starts)
 
-### Plateformes — sous la main (récurrence)
-
-1. **GitHub Action / GitHub App** — tag/release → patch note (priorité #1 récurrence ; déjà dans backlog « Auto-générer sur tag »)
-2. **PWA** — icône bureau / dock
-3. **Raycast** (ou Alfred) — raccourci clavier
-4. **Extension navigateur** — accès rapide depuis GitHub Releases
-5. **Bot Discord / Slack** — plus tard
-
-### Plateformes — listings (découverte)
-
-- Product Hunt (1 lancement soigné)
-- AlternativeTo ; éventuellement G2 / Capterra
-- Indie Hackers, forums Steamworks / communautés indés
-- Chrome Web Store **seulement** si vraie extension utile
-
-### Ordre d’exécution (quand on s’y met)
-
-1. Produit prêt + pubs LinkedIn ciblées + organique communautés
-2. PWA install
+1. Product ready + LinkedIn + organic communities
+2. PWA
 3. GitHub Action
-4. Raycast ou extension Chrome
+4. Raycast or Chrome extension
 5. Product Hunt

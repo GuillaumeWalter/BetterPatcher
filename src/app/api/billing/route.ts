@@ -15,14 +15,14 @@ export async function GET() {
   const session = await auth();
 
   if (!session?.user?.id) {
-    return Response.json({ error: "Connexion requise." }, { status: 401 });
+    return Response.json({ error: "Sign in required." }, { status: 401 });
   }
 
   const quota = await getUserQuota(session.user.id);
 
   if (!quota) {
     return Response.json(
-      { error: "Profil utilisateur introuvable." },
+      { error: "User profile not found." },
       { status: 404 },
     );
   }
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   const session = await auth();
 
   if (!session?.user?.id) {
-    return Response.json({ error: "Connexion requise." }, { status: 401 });
+    return Response.json({ error: "Sign in required." }, { status: 401 });
   }
 
   let body: unknown;
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
   const stripe = getStripe();
   if (!stripe) {
     return Response.json(
-      { error: "Stripe non configuré (STRIPE_SECRET_KEY)." },
+      { error: "Stripe is not configured (STRIPE_SECRET_KEY)." },
       { status: 503 },
     );
   }
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
 
   if (!customerId) {
     return Response.json(
-      { error: "Impossible de créer le client Stripe." },
+      { error: "Could not create the Stripe customer." },
       { status: 500 },
     );
   }
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
 
     if (!plan) {
       return Response.json(
-        { error: "Plan invalide. Choisissez solo ou pro." },
+        { error: "Invalid plan. Choose solo or pro." },
         { status: 400 },
       );
     }
@@ -95,8 +95,8 @@ export async function POST(request: Request) {
         {
           error:
             plan === "solo"
-              ? "STRIPE_SOLO_PRICE_ID manquant."
-              : "STRIPE_PRO_PRICE_ID manquant.",
+              ? "STRIPE_SOLO_PRICE_ID is missing."
+              : "STRIPE_PRO_PRICE_ID is missing.",
         },
         { status: 503 },
       );
@@ -105,7 +105,7 @@ export async function POST(request: Request) {
     const quota = await getUserQuota(session.user.id);
     if (quota?.requiresSetup) {
       return Response.json(
-        { error: "Vérifiez d'abord votre carte bancaire." },
+        { error: "Verify your card first." },
         { status: 400 },
       );
     }

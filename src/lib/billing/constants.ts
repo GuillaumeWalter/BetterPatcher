@@ -1,24 +1,24 @@
-/** Limites produit — ajuster ici pour protéger les coûts IA. */
+/** Product limits: tune here to protect AI cost. */
 export const BILLING = {
-  /** Générations offertes après vérif CB (0 €). */
+  /** Generations after card check (€0). */
   TRIAL_GENERATIONS: 5,
-  /** Générations / mois — plan Solo (1 utilisateur). */
+  /** Generations / month on Solo (1 user). */
   SOLO_MONTHLY_GENERATIONS: 25,
-  /** Générations / mois — plan Pro (équipe). */
+  /** Generations / month on Pro (team). */
   PRO_MONTHLY_GENERATIONS: 80,
-  /** Délai minimum entre deux générations (anti-spam). */
+  /** Minimum seconds between generations. */
   MIN_SECONDS_BETWEEN_GENERATIONS: 20,
-  /** Taille max du texte commits envoyé à l'IA. */
+  /** Max commit text sent to the model. */
   MAX_COMMITS_CHARS: 15_000,
-  /** Nombre max de lignes de commits. */
+  /** Max commit lines. */
   MAX_COMMIT_LINES: 40,
-  SOLO_PRICE_LABEL: "4,99 € / mois",
-  PRO_PRICE_LABEL: "9,99 € / mois",
+  SOLO_PRICE_LABEL: "€4.99 / month",
+  PRO_PRICE_LABEL: "€9.99 / month",
 } as const;
 
 export type SubscriptionStatus = "none" | "active" | "past_due" | "canceled";
 
-/** Tier Stripe / abonnement payant (hors essai). */
+/** Paid Stripe tier (outside trial). */
 export type PaidPlanTier = "solo" | "pro";
 
 export type PlanTier = "none" | PaidPlanTier;

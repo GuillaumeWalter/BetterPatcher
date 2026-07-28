@@ -5,7 +5,7 @@ export async function GET(request: Request) {
   const session = await auth();
 
   if (!session?.accessToken) {
-    return Response.json({ error: "Non authentifié." }, { status: 401 });
+    return Response.json({ error: "Not authenticated." }, { status: 401 });
   }
 
   const { searchParams } = new URL(request.url);
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
   if (!repo || !repo.includes("/")) {
     return Response.json(
-      { error: "Paramètre repo requis (ex. owner/repo)." },
+      { error: "repo parameter required (e.g. owner/repo)." },
       { status: 400 },
     );
   }
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     );
   } catch {
     return Response.json(
-      { error: "Erreur lors de la récupération des commits." },
+      { error: "Failed to fetch commits." },
       { status: 502 },
     );
   }

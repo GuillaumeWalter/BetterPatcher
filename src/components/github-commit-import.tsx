@@ -51,13 +51,13 @@ export function GitHubCommitImport({
         };
 
         if (!response.ok) {
-          throw new Error(data.error ?? "Impossible de charger vos dépôts.");
+          throw new Error(data.error ?? "Could not load your repositories.");
         }
 
         setRepos(data);
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Erreur de chargement.",
+          err instanceof Error ? err.message : "Failed to load.",
         );
       } finally {
         setIsLoadingRepos(false);
@@ -81,14 +81,14 @@ export function GitHubCommitImport({
       };
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Impossible de charger les commits.");
+        throw new Error(data.error ?? "Could not load commits.");
       }
 
       const commits = data.map((entry) => entry.message.trim()).join("\n");
       onImport(commits, fullName);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Erreur de chargement.",
+        err instanceof Error ? err.message : "Failed to load.",
       );
     } finally {
       setIsLoadingCommits(false);
@@ -99,12 +99,12 @@ export function GitHubCommitImport({
     return (
       <div className="rounded-xl border border-dashed border-primary/25 bg-primary/5 p-4">
         <p className="text-sm text-muted-foreground">
-          Connectez GitHub pour importer vos 30 derniers commits sans copier-coller.
+          Connect GitHub to import your last 30 commits without copy paste.
         </p>
         <Button asChild size="sm" className="mt-3">
           <Link href={`/login?callbackUrl=${encodeURIComponent(loginCallbackUrl)}`}>
             <LogIn />
-            Connexion GitHub
+            Sign in with GitHub
           </Link>
         </Button>
       </div>
@@ -113,7 +113,7 @@ export function GitHubCommitImport({
 
   return (
     <div className="space-y-2 rounded-xl border border-white/10 bg-background/40 p-4">
-      <Label htmlFor="github-repo">Importer depuis GitHub</Label>
+      <Label htmlFor="github-repo">Import from GitHub</Label>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <Select
           value={selectedRepo}
@@ -124,8 +124,8 @@ export function GitHubCommitImport({
             <SelectValue
               placeholder={
                 isLoadingRepos
-                  ? "Chargement des dépôts…"
-                  : "Choisir un dépôt"
+                  ? "Loading repositories…"
+                  : "Choose a repository"
               }
             />
           </SelectTrigger>
@@ -133,7 +133,7 @@ export function GitHubCommitImport({
             {repos.map((repo) => (
               <SelectItem key={repo.id} value={repo.fullName}>
                 {repo.fullName}
-                {repo.private ? " (privé)" : ""}
+                {repo.private ? " (private)" : ""}
               </SelectItem>
             ))}
           </SelectContent>

@@ -57,12 +57,12 @@ export async function POST(request: Request) {
   const webhookSecret = getStripeWebhookSecret();
 
   if (!stripe || !webhookSecret) {
-    return Response.json({ error: "Stripe webhook non configuré." }, { status: 503 });
+    return Response.json({ error: "Stripe webhook is not configured." }, { status: 503 });
   }
 
   const signature = request.headers.get("stripe-signature");
   if (!signature) {
-    return Response.json({ error: "Signature manquante." }, { status: 400 });
+    return Response.json({ error: "Missing signature." }, { status: 400 });
   }
 
   const payload = await request.text();
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
   } catch (error) {
     console.error("[stripe/webhook] signature", error);
-    return Response.json({ error: "Signature invalide." }, { status: 400 });
+    return Response.json({ error: "Invalid signature." }, { status: 400 });
   }
 
   try {

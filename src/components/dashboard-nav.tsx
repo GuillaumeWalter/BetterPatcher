@@ -6,10 +6,10 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "/dashboard", label: "Accueil", exact: true },
-  { href: "/dashboard/generate", label: "Générateur" },
-  { href: "/dashboard/history", label: "Historique" },
-  { href: "/dashboard/billing", label: "Abonnement" },
+  { href: "/dashboard", label: "Home", exact: true },
+  { href: "/dashboard/generate", label: "Generator" },
+  { href: "/dashboard/history", label: "History" },
+  { href: "/dashboard/billing", label: "Billing" },
 ];
 
 export function DashboardNav() {

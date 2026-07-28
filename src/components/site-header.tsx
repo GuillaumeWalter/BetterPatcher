@@ -14,7 +14,7 @@ export function SiteHeader() {
           <div>
             <p className="text-sm font-semibold tracking-tight">Easy Patch</p>
             <p className="text-xs text-muted-foreground">
-              Patch notes en un clic
+              Patch notes in one click
             </p>
           </div>
         </Link>

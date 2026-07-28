@@ -292,3 +292,46 @@ export async function getUserIdByStripeCustomerId(
 
   return data?.user_id ?? null;
 }
+
+export async function getGitLabAccessToken(
+  userId: string,
+): Promise<string | null> {
+  const supabase = createSupabaseAdmin();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select("gitlab_access_token")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[getGitLabAccessToken]", error);
+    return null;
+  }
+
+  const token = data?.gitlab_access_token;
+  return typeof token === "string" && token.length > 0 ? token : null;
+}
+
+export async function setGitLabAccessToken(
+  userId: string,
+  token: string | null,
+): Promise<boolean> {
+  const supabase = createSupabaseAdmin();
+  if (!supabase) return false;
+
+  await ensureUserProfile({ userId, email: null });
+
+  const { error } = await supabase
+    .from("user_profiles")
+    .update({ gitlab_access_token: token })
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("[setGitLabAccessToken]", error);
+    return false;
+  }
+
+  return true;
+}

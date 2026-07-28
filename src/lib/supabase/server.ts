@@ -9,11 +9,8 @@ function readEnv(...keys: string[]): string | undefined {
 }
 
 export function createSupabaseAdmin() {
-  const url = readEnv("SUPABASE_URL", "URL SUPABASE");
-  const serviceRoleKey = readEnv(
-    "SUPABASE_SERVICE_ROLE_KEY",
-    "CLÉ DE RÔLE DU SERVICE SUPABASE",
-  );
+  const url = readEnv("SUPABASE_URL");
+  const serviceRoleKey = readEnv("SUPABASE_SERVICE_ROLE_KEY");
 
   if (!url || !serviceRoleKey) {
     return null;

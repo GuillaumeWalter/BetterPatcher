@@ -1,6 +1,6 @@
 import { getAiProvider } from "@/lib/ai/model";
 
-/** Diagnostic prod — indique quelles variables sont présentes (pas leurs valeurs). */
+/** Prod diagnostic: which variables are present (not their values). */
 export async function GET() {
   const provider = getAiProvider();
 
@@ -16,6 +16,8 @@ export async function GET() {
       AUTH_SECRET: Boolean(process.env.AUTH_SECRET?.trim()),
       AUTH_GITHUB_ID: Boolean(process.env.AUTH_GITHUB_ID?.trim()),
       AUTH_GITHUB_SECRET: Boolean(process.env.AUTH_GITHUB_SECRET?.trim()),
+      AUTH_GITLAB_ID: Boolean(process.env.AUTH_GITLAB_ID?.trim()),
+      AUTH_GITLAB_SECRET: Boolean(process.env.AUTH_GITLAB_SECRET?.trim()),
     },
     stripe: {
       STRIPE_SECRET_KEY: Boolean(process.env.STRIPE_SECRET_KEY?.trim()),

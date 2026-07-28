@@ -19,7 +19,7 @@ export async function AuthNav() {
           }}
         >
           <Button variant="outline" size="sm" type="submit">
-            Déconnexion
+            Sign out
           </Button>
         </form>
       </div>
@@ -29,7 +29,7 @@ export async function AuthNav() {
   return (
     <div className="flex items-center gap-2">
       <Button variant="ghost" size="sm" asChild>
-        <Link href="/login">Connexion</Link>
+        <Link href="/login">Sign in</Link>
       </Button>
       <form
         action={async () => {

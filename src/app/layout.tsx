@@ -17,9 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Easy Patch — Patch notes & assets marketing",
+  title: "Easy Patch | Patch notes & marketing assets",
   description:
-    "Collez vos commits, choisissez une tonalité et générez un patch note plus un post réseaux en quelques secondes.",
+    "Paste your commits, pick a tone, and get a patch note plus a social post in seconds.",
 };
 
 export default function RootLayout({
@@ -29,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="fr"
+      lang="en"
       className={`${plusJakarta.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans text-foreground">
@@ -39,7 +39,7 @@ export default function RootLayout({
           <div className="glow-orb -bottom-16 -left-16 size-[320px] bg-[oklch(0.93_0.04_82)]" />
         </div>
         <SiteHeader />
-        <main className="flex-1">{children}</main>
+        <main className="flex flex-1 flex-col">{children}</main>
       </body>
     </html>
   );

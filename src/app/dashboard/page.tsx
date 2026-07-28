@@ -29,16 +29,16 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Wand2 className="size-5 text-primary" />
-              Générateur
+              Generator
             </CardTitle>
             <CardDescription>
-              Import GitHub ou collage manuel (Perforce, Plastic, SVN…).
+              Import GitHub or paste manually (Perforce, Plastic, SVN…).
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button asChild className="w-full">
               <Link href="/dashboard/generate">
-                Ouvrir le générateur
+                Open generator
                 <ArrowRight />
               </Link>
             </Button>
@@ -49,16 +49,16 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <History className="size-5 text-primary" />
-              Historique
+              History
             </CardTitle>
             <CardDescription>
-              Retrouvez et éditez vos patch notes déjà générées.
+              Find and edit patch notes you already generated.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button variant="outline" asChild className="w-full">
               <Link href="/dashboard/history">
-                Voir l&apos;historique
+                View history
                 <ArrowRight />
               </Link>
             </Button>
@@ -69,25 +69,25 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Sparkles className="size-5 text-primary" />
-              Abonnement
+              Subscription
             </CardTitle>
             <CardDescription>
-              Essai : {BILLING.TRIAL_GENERATIONS} générations · Solo :{" "}
-              {BILLING.SOLO_PRICE_LABEL} ({BILLING.SOLO_MONTHLY_GENERATIONS}/mois)
-              · Pro : {BILLING.PRO_PRICE_LABEL} (
-              {BILLING.PRO_MONTHLY_GENERATIONS}/mois · équipe)
+              Trial: {BILLING.TRIAL_GENERATIONS} generations · Solo:{" "}
+              {BILLING.SOLO_PRICE_LABEL} ({BILLING.SOLO_MONTHLY_GENERATIONS}/mo)
+              · Pro: {BILLING.PRO_PRICE_LABEL} (
+              {BILLING.PRO_MONTHLY_GENERATIONS}/mo | team)
               {quota ? (
                 <>
                   {" "}
-                  · Vous : {quota.generationsRemaining}/{quota.generationsLimit}{" "}
-                  restantes
+                  · You: {quota.generationsRemaining}/{quota.generationsLimit}{" "}
+                  left
                 </>
               ) : null}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button variant="secondary" asChild>
-              <Link href="/dashboard/billing">Gérer l&apos;abonnement</Link>
+              <Link href="/dashboard/billing">Manage subscription</Link>
             </Button>
           </CardContent>
         </Card>

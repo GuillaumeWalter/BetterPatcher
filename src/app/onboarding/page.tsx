@@ -41,15 +41,15 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
             <CreditCard className="size-7" />
           </div>
           <CardTitle className="text-2xl font-semibold">
-            Activez votre essai
+            Activate your trial
           </CardTitle>
           <CardDescription className="text-base">
-            Compte créé pour{" "}
+            Account created for{" "}
             <span className="font-medium text-foreground">
               {session.user.name ?? session.user.email}
             </span>
-            . Une carte est requise pour limiter les abus —{" "}
-            <strong className="text-foreground">0 € aujourd&apos;hui</strong>.
+            . A card is required to limit abuse:{" "}
+            <strong className="text-foreground">€0 today</strong>.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -57,27 +57,27 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
             <div className="flex items-start gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm">
               <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-400" />
               <p>
-                Carte enregistrée. Si Stripe confirme encore le webhook, actualisez
-                dans quelques secondes ou continuez.
+                Card saved. If Stripe is still confirming the webhook, refresh
+                in a few seconds or continue.
               </p>
             </div>
           ) : null}
 
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>
-              ✓ {BILLING.TRIAL_GENERATIONS} patch notes offertes après vérification
+              ✓ {BILLING.TRIAL_GENERATIONS} patch notes after verification
             </li>
-            <li>✓ Coller vos commits ou importer GitHub (optionnel)</li>
+            <li>✓ Paste commits or import GitHub (optional)</li>
             <li>
-              ✓ Ensuite Solo ({BILLING.SOLO_PRICE_LABEL}) ou Pro (
-              {BILLING.PRO_PRICE_LABEL} · équipe)
+              ✓ Then Solo ({BILLING.SOLO_PRICE_LABEL}) or Pro (
+              {BILLING.PRO_PRICE_LABEL} | team)
             </li>
           </ul>
 
           <StripeSetupButton />
 
           <Button variant="ghost" className="w-full" asChild>
-            <Link href="/">Retour à l&apos;accueil</Link>
+            <Link href="/">Back to home</Link>
           </Button>
         </CardContent>
       </Card>

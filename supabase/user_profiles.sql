@@ -11,6 +11,7 @@ create table if not exists public.user_profiles (
   stripe_subscription_id text,
   plan_tier text not null default 'none'
     check (plan_tier in ('none', 'solo', 'pro')),
+  gitlab_access_token text,
   trial_generations_used integer not null default 0,
   trial_generations_limit integer not null default 5,
   period_generations_used integer not null default 0,

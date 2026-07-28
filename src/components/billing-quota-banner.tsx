@@ -16,11 +16,11 @@ function planLabel(plan: QuotaSnapshot["plan"]) {
     case "solo":
       return "Solo";
     case "trial":
-      return "Essai";
+      return "Trial";
     case "blocked":
-      return "Essai terminé";
+      return "Trial ended";
     default:
-      return "Activation requise";
+      return "Activation required";
   }
 }
 
@@ -52,24 +52,24 @@ export function BillingQuotaBanner() {
           <Badge variant="secondary">{planLabel(quota.plan)}</Badge>
           {quota.paymentMethodVerified ? (
             <span className="text-sm text-muted-foreground">
-              {quota.generationsRemaining} / {quota.generationsLimit} restantes
+              {quota.generationsRemaining} / {quota.generationsLimit} left
             </span>
           ) : (
             <span className="text-sm text-muted-foreground">
-              Carte requise — aucun prélèvement aujourd&apos;hui
+              Card required (no charge today)
             </span>
           )}
         </div>
         {quota.requiresSetup ? (
           <p className="text-sm text-muted-foreground">
-            Vérifiez votre CB pour débloquer {BILLING.TRIAL_GENERATIONS} générations
-            gratuites (anti-abus).
+            Verify your card to unlock {BILLING.TRIAL_GENERATIONS} free
+            generations (abuse prevention).
           </p>
         ) : quota.requiresSubscription ? (
           <p className="text-sm text-muted-foreground">
-            Solo ({BILLING.SOLO_PRICE_LABEL}, {BILLING.SOLO_MONTHLY_GENERATIONS}/mois)
-            ou Pro ({BILLING.PRO_PRICE_LABEL}, {BILLING.PRO_MONTHLY_GENERATIONS}/mois
-            · équipe).
+            Solo ({BILLING.SOLO_PRICE_LABEL}, {BILLING.SOLO_MONTHLY_GENERATIONS}/mo)
+            or Pro ({BILLING.PRO_PRICE_LABEL}, {BILLING.PRO_MONTHLY_GENERATIONS}/mo
+            | team).
           </p>
         ) : null}
       </div>
@@ -79,7 +79,7 @@ export function BillingQuotaBanner() {
           <Button asChild size="sm">
             <Link href="/onboarding">
               <CreditCard />
-              Activer mon essai
+              Activate trial
             </Link>
           </Button>
         ) : null}
@@ -87,7 +87,7 @@ export function BillingQuotaBanner() {
           <Button asChild size="sm">
             <Link href="/dashboard/billing">
               <Sparkles />
-              Voir les offres
+              View plans
             </Link>
           </Button>
         ) : null}
@@ -95,7 +95,7 @@ export function BillingQuotaBanner() {
           <Button asChild size="sm" variant="outline">
             <Link href="/dashboard/billing">
               <Sparkles />
-              Passer au Pro
+              Upgrade to Pro
             </Link>
           </Button>
         ) : null}

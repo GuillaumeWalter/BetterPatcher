@@ -26,15 +26,15 @@ function isTone(value: unknown): value is Tone {
 function quotaErrorMessage(code: string) {
   switch (code) {
     case "setup_required":
-      return "Ajoutez votre carte bancaire (0 €) pour activer votre essai.";
+      return "Add your card (€0) to activate your trial.";
     case "subscription_required":
-      return `Essai terminé (${BILLING.TRIAL_GENERATIONS} générations). Passez au Solo (${BILLING.SOLO_PRICE_LABEL}) ou au Pro (${BILLING.PRO_PRICE_LABEL}).`;
+      return `Trial ended (${BILLING.TRIAL_GENERATIONS} generations). Upgrade to Solo (${BILLING.SOLO_PRICE_LABEL}) or Pro (${BILLING.PRO_PRICE_LABEL}).`;
     case "quota_exceeded":
-      return "Quota mensuel atteint. Renouvellement au prochain cycle, ou passez au Pro pour plus de générations.";
+      return "Monthly quota reached. Resets next cycle, or upgrade to Pro for more generations.";
     case "rate_limited":
-      return `Patientez ${BILLING.MIN_SECONDS_BETWEEN_GENERATIONS} secondes entre deux générations.`;
+      return `Wait ${BILLING.MIN_SECONDS_BETWEEN_GENERATIONS} seconds between generations.`;
     default:
-      return "Génération indisponible pour votre compte.";
+      return "Generation is unavailable for your account.";
   }
 }
 
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 
   if (!session?.user?.id) {
     return Response.json(
-      { error: "Créez un compte pour générer des patch notes." },
+      { error: "Create an account to generate patch notes." },
       { status: 401 },
     );
   }
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return Response.json({ error: "Corps JSON invalide." }, { status: 400 });
+    return Response.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
   const commits =
@@ -84,14 +84,14 @@ export async function POST(request: Request) {
 
   if (!commits) {
     return Response.json(
-      { error: "Le champ commits est requis." },
+      { error: "The commits field is required." },
       { status: 400 },
     );
   }
 
   if (!isTone(tone)) {
     return Response.json(
-      { error: "Tonalité invalide." },
+      { error: "Invalid tone." },
       { status: 400 },
     );
   }
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
   if (commits.length > BILLING.MAX_COMMITS_CHARS) {
     return Response.json(
       {
-        error: `Trop de contenu (${BILLING.MAX_COMMITS_CHARS.toLocaleString("fr-FR")} caractères max).`,
+        error: `Too much content (${BILLING.MAX_COMMITS_CHARS.toLocaleString("en-US")} characters max).`,
       },
       { status: 400 },
     );
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
   if (lineCount > BILLING.MAX_COMMIT_LINES) {
     return Response.json(
       {
-        error: `Trop de commits (${BILLING.MAX_COMMIT_LINES} lignes max). Réduisez la sélection.`,
+        error: `Too many commits (${BILLING.MAX_COMMIT_LINES} lines max). Narrow your selection.`,
       },
       { status: 400 },
     );
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
     return Response.json(
       {
         error:
-          "Aucune clé IA configurée. Ajoutez GOOGLE_GENERATIVE_AI_API_KEY ou AI_GATEWAY_API_KEY.",
+          "No AI key configured. Add GOOGLE_GENERATIVE_AI_API_KEY or AI_GATEWAY_API_KEY.",
       },
       { status: 503 },
     );
@@ -140,7 +140,7 @@ export async function POST(request: Request) {
     const { output } = await generateText({
       model: getGenerationModel(),
       system: getSystemPrompt(tone, options),
-      prompt: `Transforme ces messages de commit en patch note :\n\n${commits}`,
+      prompt: `Turn these commit messages into a patch note:\n\n${commits}`,
       output: Output.object({ schema: generationSchema }),
     });
 
@@ -169,10 +169,10 @@ export async function POST(request: Request) {
     console.error("[/api/generate]", error);
 
     const message =
-      error instanceof Error ? error.message : "Erreur inconnue.";
+      error instanceof Error ? error.message : "Unknown error.";
 
     return Response.json(
-      { error: "La génération a échoué. Réessayez dans un instant." },
+      { error: "Generation failed. Try again in a moment." },
       { status: 500 },
     );
   }

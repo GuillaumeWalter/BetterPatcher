@@ -18,7 +18,7 @@ function toneLabel(tone: string) {
 }
 
 function formatDate(iso: string) {
-  return new Intl.DateTimeFormat("fr-FR", {
+  return new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(iso));
@@ -34,17 +34,16 @@ export default async function HistoryPage() {
     <>
       <DashboardNav />
       <p className="mb-8 max-w-2xl text-base leading-relaxed text-muted-foreground">
-        Vos patch notes générés sont sauvegardés ici. Cliquez pour consulter ou
-        modifier.
+        Your generated patch notes are saved here. Click to view or edit.
       </p>
 
       {notes.length === 0 ? (
         <Card className="surface-card gradient-border">
           <CardHeader>
-            <CardTitle className="text-lg">Aucun historique</CardTitle>
+            <CardTitle className="text-lg">No history yet</CardTitle>
             <CardDescription>
-              Générez un patch note depuis l&apos;outil gratuit en étant
-              connecté pour le voir apparaître ici.
+              Generate a patch note from the free tool while signed in to see it
+              appear here.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -52,7 +51,7 @@ export default async function HistoryPage() {
               href="/"
               className="text-sm font-medium text-primary underline-offset-4 hover:underline"
             >
-              Aller au générateur
+              Go to the generator
             </Link>
           </CardContent>
         </Card>
@@ -65,7 +64,7 @@ export default async function HistoryPage() {
                   <CardHeader className="pb-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <CardTitle className="text-base font-medium">
-                        {note.repoFullName ?? "Commits collés"}
+                        {note.repoFullName ?? "Pasted commits"}
                       </CardTitle>
                       <Badge variant="secondary">{toneLabel(note.tone)}</Badge>
                     </div>

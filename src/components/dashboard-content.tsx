@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { GitHubCommitImport } from "@/components/github-commit-import";
+import { GitLabCommitImport } from "@/components/gitlab-commit-import";
 import { sendCommitsToGenerator } from "@/lib/github-session";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +21,12 @@ type DashboardContentProps = {
   isAuthenticated: boolean;
 };
 
+type SourceTab = "github" | "gitlab";
+
 export function DashboardContent({ isAuthenticated }: DashboardContentProps) {
   const [commits, setCommits] = useState("");
   const [repoFullName, setRepoFullName] = useState<string | null>(null);
+  const [source, setSource] = useState<SourceTab>("github");
 
   function handleImport(text: string, repo: string) {
     setCommits(text);
@@ -32,27 +36,55 @@ export function DashboardContent({ isAuthenticated }: DashboardContentProps) {
   return (
     <Card className="surface-card gradient-border">
       <CardHeader>
-        <CardTitle className="text-lg">Importer vos commits</CardTitle>
+        <CardTitle className="text-lg">Import your commits</CardTitle>
         <CardDescription>
           {repoFullName
-            ? `${repoFullName} — ${commits.split("\n").filter(Boolean).length} commits`
-            : "Importez GitHub ou collez vos commits (Perforce, Plastic, SVN…)"}
+            ? `${repoFullName} | ${commits.split("\n").filter(Boolean).length} commits`
+            : "Import from GitHub / GitLab or paste (Perforce, Plastic, SVN…)"}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <GitHubCommitImport
-          isAuthenticated={isAuthenticated}
-          loginCallbackUrl="/dashboard"
-          onImport={handleImport}
-        />
+        <div className="flex gap-1 rounded-lg border border-white/10 bg-muted/30 p-1">
+          <Button
+            type="button"
+            variant={source === "github" ? "default" : "ghost"}
+            size="sm"
+            className="flex-1"
+            onClick={() => setSource("github")}
+          >
+            GitHub
+          </Button>
+          <Button
+            type="button"
+            variant={source === "gitlab" ? "default" : "ghost"}
+            size="sm"
+            className="flex-1"
+            onClick={() => setSource("gitlab")}
+          >
+            GitLab
+          </Button>
+        </div>
+
+        {source === "github" ? (
+          <GitHubCommitImport
+            isAuthenticated={isAuthenticated}
+            loginCallbackUrl="/dashboard"
+            onImport={handleImport}
+          />
+        ) : (
+          <GitLabCommitImport
+            isAuthenticated={isAuthenticated}
+            onImport={handleImport}
+          />
+        )}
 
         <div className="space-y-2">
-          <Label htmlFor="dashboard-commits">Messages de commit</Label>
+          <Label htmlFor="dashboard-commits">Commit messages</Label>
           <Textarea
             id="dashboard-commits"
             value={commits}
             onChange={(event) => setCommits(event.target.value)}
-            placeholder="Les commits apparaîtront ici après import GitHub."
+            placeholder="Commits will appear here after an import."
             className="min-h-52 resize-y font-mono text-sm"
           />
         </div>
@@ -61,7 +93,7 @@ export function DashboardContent({ isAuthenticated }: DashboardContentProps) {
           onClick={() => sendCommitsToGenerator(commits, repoFullName)}
           disabled={!commits.trim()}
         >
-          Générer le patch note
+          Generate patch note
           <ArrowRight />
         </Button>
       </CardContent>

@@ -29,13 +29,13 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
       <div className="mb-6 max-w-3xl space-y-3">
         {success === "1" ? (
           <p className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm">
-            Abonnement activé (ou en cours de confirmation Stripe). Vous pouvez
-            générer vos patch notes.
+            Subscription active (or confirming with Stripe). You can generate
+            patch notes.
           </p>
         ) : null}
         {canceled === "1" ? (
           <p className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm">
-            Paiement annulé. Vous pouvez réessayer quand vous voulez.
+            Payment canceled. You can try again anytime.
           </p>
         ) : null}
       </div>
@@ -49,15 +49,15 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
             </CardTitle>
             <CardDescription>
               {BILLING.SOLO_PRICE_LABEL} · {BILLING.SOLO_MONTHLY_GENERATIONS}{" "}
-              générations / mois · 1 utilisateur
+              generations / month | 1 user
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>✓ Import GitHub ou collage manuel</li>
-              <li>✓ Historique des patch notes</li>
-              <li>✓ Intégrations à venir (GitLab, Jira…)</li>
-              <li>✓ Annulation à tout moment</li>
+              <li>✓ GitHub / GitLab import or manual paste</li>
+              <li>✓ Patch note history</li>
+              <li>✓ Upcoming integrations (Jira…)</li>
+              <li>✓ Cancel anytime</li>
             </ul>
             <StripeSubscribeButton plan="solo" variant="outline" />
           </CardContent>
@@ -71,15 +71,15 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
             </CardTitle>
             <CardDescription>
               {BILLING.PRO_PRICE_LABEL} · {BILLING.PRO_MONTHLY_GENERATIONS}{" "}
-              générations / mois · équipe
+              generations / month | team
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>✓ Tout Solo, quota plus généreux</li>
-              <li>✓ Plusieurs utilisateurs sur le même compte (bientôt)</li>
-              <li>✓ Idéal studios &amp; live ops</li>
-              <li>✓ Annulation à tout moment</li>
+              <li>✓ Everything in Solo, larger quota</li>
+              <li>✓ Several users on one account (coming soon)</li>
+              <li>✓ Ideal for studios &amp; live ops</li>
+              <li>✓ Cancel anytime</li>
             </ul>
             <StripeSubscribeButton plan="pro" />
           </CardContent>
@@ -88,7 +88,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
       <div className="mt-6">
         <Button variant="outline" asChild>
-          <Link href="/dashboard/generate">Retour au générateur</Link>
+          <Link href="/dashboard/generate">Back to generator</Link>
         </Button>
       </div>
     </>

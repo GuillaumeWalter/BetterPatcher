@@ -9,7 +9,7 @@ export async function PATCH(
   const { id } = await params;
 
   if (!session?.user?.id) {
-    return Response.json({ error: "Non authentifié." }, { status: 401 });
+    return Response.json({ error: "Not authenticated." }, { status: 401 });
   }
 
   let body: unknown;
@@ -17,7 +17,7 @@ export async function PATCH(
   try {
     body = await request.json();
   } catch {
-    return Response.json({ error: "Corps JSON invalide." }, { status: 400 });
+    return Response.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
   const markdown =
@@ -37,7 +37,7 @@ export async function PATCH(
       : undefined;
 
   if (markdown === undefined && socialPost === undefined) {
-    return Response.json({ error: "Rien à mettre à jour." }, { status: 400 });
+    return Response.json({ error: "Nothing to update." }, { status: 400 });
   }
 
   const ok = await updatePatchNoteForUser(session.user.id, id, {
@@ -47,7 +47,7 @@ export async function PATCH(
 
   if (!ok) {
     return Response.json(
-      { error: "Patch note introuvable ou sauvegarde impossible." },
+      { error: "Patch note not found or save failed." },
       { status: 404 },
     );
   }

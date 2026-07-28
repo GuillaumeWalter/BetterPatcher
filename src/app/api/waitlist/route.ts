@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return Response.json({ error: "Corps JSON invalide." }, { status: 400 });
+    return Response.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
   const email =
@@ -20,11 +20,11 @@ export async function POST(request: Request) {
       : "";
 
   if (!email || !EMAIL_PATTERN.test(email)) {
-    return Response.json({ error: "Email invalide." }, { status: 400 });
+    return Response.json({ error: "Invalid email." }, { status: 400 });
   }
 
   if (email.length > 320) {
-    return Response.json({ error: "Email trop long." }, { status: 400 });
+    return Response.json({ error: "Email is too long." }, { status: 400 });
   }
 
   const supabase = createSupabaseAdmin();
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     return Response.json(
       {
         error:
-          "Supabase non configuré. Ajoutez SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY.",
+          "Supabase is not configured. Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
       },
       { status: 503 },
     );
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
   if (error) {
     if (error.code === "23505") {
       return Response.json(
-        { error: "Cet email est déjà inscrit sur la liste d'attente." },
+        { error: "This email is already on the waitlist." },
         { status: 409 },
       );
     }
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     console.error("[/api/waitlist]", error);
 
     return Response.json(
-      { error: "Inscription impossible pour le moment. Réessayez plus tard." },
+      { error: "Could not join the waitlist right now. Try again later." },
       { status: 500 },
     );
   }

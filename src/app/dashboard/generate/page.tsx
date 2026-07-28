@@ -6,7 +6,37 @@ import { DashboardNav } from "@/components/dashboard-nav";
 import { PatchNoteGenerator } from "@/components/patch-note-generator";
 import { getUserQuota } from "@/lib/supabase/users";
 
-export default async function GeneratePage() {
+type GeneratePageProps = {
+  searchParams: Promise<{ gitlab?: string }>;
+};
+
+function gitlabBanner(status: string | undefined) {
+  if (status === "connected") {
+    return {
+      className: "border-emerald-500/20 bg-emerald-500/10",
+      text: "GitLab connected. Pick a project under the GitLab tab.",
+    };
+  }
+  if (status === "denied") {
+    return {
+      className: "border-amber-500/20 bg-amber-500/10",
+      text: "GitLab authorization was denied.",
+    };
+  }
+  if (
+    status === "error" ||
+    status === "invalid_state" ||
+    status === "save_failed"
+  ) {
+    return {
+      className: "border-destructive/20 bg-destructive/10",
+      text: "Could not connect GitLab. Try again from the GitLab tab.",
+    };
+  }
+  return null;
+}
+
+export default async function GeneratePage({ searchParams }: GeneratePageProps) {
   const session = await auth();
   if (!session?.user) {
     redirect("/login?callbackUrl=/dashboard/generate");
@@ -17,10 +47,18 @@ export default async function GeneratePage() {
     redirect("/onboarding");
   }
 
+  const { gitlab } = await searchParams;
+  const banner = gitlabBanner(gitlab);
+
   return (
     <>
       <DashboardNav />
       <BillingQuotaBanner />
+      {banner ? (
+        <p className={`mb-6 rounded-xl border p-4 text-sm ${banner.className}`}>
+          {banner.text}
+        </p>
+      ) : null}
       <PatchNoteGenerator isAuthenticated />
     </>
   );

@@ -37,13 +37,13 @@ export function WaitlistSection() {
       const data = (await response.json()) as { error?: string };
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Inscription impossible.");
+        throw new Error(data.error ?? "Could not join the waitlist.");
       }
 
       setSubmitted(true);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Une erreur est survenue.",
+        err instanceof Error ? err.message : "Something went wrong.",
       );
     } finally {
       setIsLoading(false);
@@ -58,19 +58,19 @@ export function WaitlistSection() {
           <Rocket className="size-4" />
         </div>
         <CardTitle className="text-xl sm:mt-3">
-          Easy Patch automatisé — bientôt disponible
+          Easy Patch automation (coming soon)
         </CardTitle>
         <CardDescription className="max-w-2xl text-base">
-          Connectez GitHub, déclenchez la génération à chaque release et
-          récupérez patch notes + assets marketing sans effort. Rejoignez la
-          liste d&apos;attente pour un accès anticipé.
+          Connect GitHub, trigger generation on every release, and get patch
+          notes plus marketing assets with no extra work. Join the waitlist for
+          early access.
         </CardDescription>
       </CardHeader>
       <CardContent className="relative">
         {submitted ? (
           <p className="rounded-xl border border-primary/15 bg-primary/8 px-4 py-3 text-sm text-primary">
-            Merci ! Nous vous préviendrons dès que la version automatisée sera
-            prête.
+            Thanks! We will let you know as soon as the automated version is
+            ready.
           </p>
         ) : (
           <form
@@ -78,11 +78,11 @@ export function WaitlistSection() {
             className="flex flex-col gap-3 sm:flex-row sm:items-end"
           >
             <div className="flex-1 space-y-2">
-              <Label htmlFor="email">Email professionnel</Label>
+              <Label htmlFor="email">Work email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="vous@entreprise.com"
+                placeholder="you@company.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 required
@@ -99,11 +99,11 @@ export function WaitlistSection() {
               {isLoading ? (
                 <>
                   <Loader2 className="animate-spin" />
-                  Inscription…
+                  Joining…
                 </>
               ) : (
                 <>
-                  Rejoindre la liste
+                  Join the waitlist
                   <ArrowRight />
                 </>
               )}

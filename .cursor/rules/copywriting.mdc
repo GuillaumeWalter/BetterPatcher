@@ -1,0 +1,39 @@
+---
+description: Easy Patch copywriting (English UI, no dash punctuation)
+alwaysApply: true
+---
+
+# Copywriting
+
+- Product UI and marketing copy are **English only**.
+- Hosting is **Vercel** (not Netlify).
+- Before product / billing / integrations work, also read `docs/product-roadmap.md` and `docs/copywriting.md`.
+
+## No dash punctuation in prose
+
+Do **not** use hyphens or dashes as sentence punctuation (`-`, `–`, `—`) to join clauses or as decorative separators.
+
+Prefer, depending on the sentence:
+
+- **Colon** `:` to introduce or explain
+- **Parentheses** `( )` for asides
+- **Slash** `/` for short alternatives (Solo / Pro)
+- **Pipe** `|` for compact UI labels (Easy Patch | Patch notes)
+- **Middle dot** `·` for light inline lists or meta separators (Trial · Solo · Pro)
+
+Compound technical tokens (OAuth, GitHub, IDs) stay as usual. Price strings may use `/` (e.g. `€4.99 / month`).
+
+### Examples
+
+```text
+Bad:  Card required — no charge today
+Good: Card required (no charge today)
+
+Bad:  Trial then Solo - or Pro
+Good: Trial then Solo / Pro
+
+Bad:  Easy Patch — Patch notes
+Good: Easy Patch | Patch notes
+
+Good: Trial · 5 generations · card required
+```

@@ -16,11 +16,8 @@ export default async function DashboardLayout({
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
       <section className="mb-10 space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-wider text-primary">
-          Phase 2
-        </p>
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Dashboard —{" "}
+          Dashboard |{" "}
           <span className="gradient-text">
             {session.user.name ?? session.user.email}
           </span>

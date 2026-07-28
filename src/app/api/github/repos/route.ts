@@ -1,11 +1,11 @@
 import { auth } from "@/auth";
-import { getRepoCommits, getUserRepos } from "@/lib/github";
+import { getUserRepos } from "@/lib/github";
 
 async function requireAccessToken() {
   const session = await auth();
 
   if (!session?.accessToken) {
-    return { error: Response.json({ error: "Non authentifié." }, { status: 401 }) };
+    return { error: Response.json({ error: "Not authenticated." }, { status: 401 }) };
   }
 
   return { accessToken: session.accessToken };
@@ -27,7 +27,7 @@ export async function GET() {
     );
   } catch {
     return Response.json(
-      { error: "Erreur lors de la récupération des dépôts." },
+      { error: "Failed to fetch repositories." },
       { status: 502 },
     );
   }

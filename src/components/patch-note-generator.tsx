@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Copy, Loader2, Wand2 } from "lucide-react";
 
 import { GitHubCommitImport } from "@/components/github-commit-import";
+import { GitLabCommitImport } from "@/components/gitlab-commit-import";
 import { useBillingQuota } from "@/components/billing-quota-banner";
 import {
   COMMITS_STORAGE_KEY,
@@ -43,7 +44,7 @@ fix(api): resolve race condition on webhook delivery
 chore(deps): bump next.js to 16.2
 docs: update deployment guide`;
 
-type InputMode = "paste" | "github";
+type InputMode = "paste" | "github" | "gitlab";
 
 type PatchNoteGeneratorProps = {
   isAuthenticated?: boolean;
@@ -105,7 +106,7 @@ export function PatchNoteGenerator({
       };
 
       if (!response.ok) {
-        throw new Error(data.error ?? "La génération a échoué.");
+        throw new Error(data.error ?? "Generation failed.");
       }
 
       setMarkdown(data.markdown ?? "");
@@ -114,7 +115,7 @@ export function PatchNoteGenerator({
       await refreshQuota();
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Une erreur est survenue.",
+        err instanceof Error ? err.message : "Something went wrong.",
       );
     } finally {
       setIsLoading(false);
@@ -126,7 +127,7 @@ export function PatchNoteGenerator({
     await navigator.clipboard.writeText(text);
   }
 
-  function handleGitHubImport(text: string, repo: string) {
+  function handleSourceImport(text: string, repo: string) {
     setCommits(text);
     setRepoFullName(repo);
     setInputMode("paste");
@@ -136,14 +137,14 @@ export function PatchNoteGenerator({
     <div className="grid gap-6 lg:grid-cols-2">
       <Card className="surface-card gradient-border">
         <CardHeader>
-          <CardTitle className="text-lg">Vos commits</CardTitle>
+          <CardTitle className="text-lg">Your commits</CardTitle>
           <CardDescription>
-            Import GitHub, ou collez un log (Perforce, Plastic, SVN…)
+            Import from GitHub / GitLab, or paste a log (Perforce, Plastic, SVN…)
             {quota ? (
               <>
                 {" "}
                 · {quota.generationsRemaining}/{quota.generationsLimit}{" "}
-                restantes
+                remaining
               </>
             ) : null}
           </CardDescription>
@@ -157,7 +158,7 @@ export function PatchNoteGenerator({
               className="flex-1"
               onClick={() => setInputMode("paste")}
             >
-              Coller
+              Paste
             </Button>
             <Button
               type="button"
@@ -168,19 +169,35 @@ export function PatchNoteGenerator({
             >
               GitHub
             </Button>
+            <Button
+              type="button"
+              variant={inputMode === "gitlab" ? "default" : "ghost"}
+              size="sm"
+              className="flex-1"
+              onClick={() => setInputMode("gitlab")}
+            >
+              GitLab
+            </Button>
           </div>
 
           {inputMode === "github" ? (
             <GitHubCommitImport
               isAuthenticated={isAuthenticated}
               loginCallbackUrl="/dashboard/generate"
-              onImport={handleGitHubImport}
+              onImport={handleSourceImport}
+            />
+          ) : null}
+
+          {inputMode === "gitlab" ? (
+            <GitLabCommitImport
+              isAuthenticated={isAuthenticated}
+              onImport={handleSourceImport}
             />
           ) : null}
 
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <Label htmlFor="commits">Messages de commit</Label>
+              <Label htmlFor="commits">Commit messages</Label>
               {repoFullName ? (
                 <span className="truncate text-xs text-muted-foreground">
                   {repoFullName}
@@ -197,13 +214,13 @@ export function PatchNoteGenerator({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tone">Tonalité</Label>
+            <Label htmlFor="tone">Tone</Label>
             <Select
               value={tone}
               onValueChange={(value) => setTone(value as Tone)}
             >
               <SelectTrigger id="tone" className="w-full">
-                <SelectValue placeholder="Choisir une tonalité" />
+                <SelectValue placeholder="Choose a tone" />
               </SelectTrigger>
               <SelectContent>
                 {TONE_OPTIONS.map((option) => (
@@ -211,7 +228,7 @@ export function PatchNoteGenerator({
                     <span className="font-medium">{option.label}</span>
                     <span className="text-muted-foreground">
                       {" "}
-                      — {option.description}
+                      : {option.description}
                     </span>
                   </SelectItem>
                 ))}
@@ -220,7 +237,7 @@ export function PatchNoteGenerator({
           </div>
 
           <div className="space-y-3">
-            <Label>Options de mise en forme</Label>
+            <Label>Formatting options</Label>
             <div className="grid gap-3 sm:grid-cols-2">
               {GENERATION_OPTION_DEFS.map((option) => (
                 <label
@@ -259,12 +276,12 @@ export function PatchNoteGenerator({
             {isLoading ? (
               <>
                 <Loader2 className="animate-spin" />
-                Génération…
+                Generating…
               </>
             ) : (
               <>
                 <Wand2 />
-                Générer le patch note
+                Generate patch note
               </>
             )}
           </Button>
@@ -274,9 +291,9 @@ export function PatchNoteGenerator({
               <p className="text-sm text-destructive" role="alert">
                 {error}
               </p>
-              {error.includes("Essai terminé") || error.includes("Quota") ? (
+              {error.includes("Trial ended") || error.includes("Quota") ? (
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="/dashboard/billing">Voir l&apos;abonnement Pro</Link>
+                  <Link href="/dashboard/billing">View Pro subscription</Link>
                 </Button>
               ) : null}
             </div>
@@ -286,9 +303,9 @@ export function PatchNoteGenerator({
 
       <Card className="surface-card gradient-border">
         <CardHeader>
-          <CardTitle className="text-lg">Résultat</CardTitle>
+          <CardTitle className="text-lg">Result</CardTitle>
           <CardDescription>
-            Markdown propre et post réseaux prêt à copier
+            Clean Markdown and a social post ready to copy
             {savedId ? (
               <>
                 {" "}
@@ -297,7 +314,7 @@ export function PatchNoteGenerator({
                   href={`/dashboard/history/${savedId}`}
                   className="text-primary underline-offset-4 hover:underline"
                 >
-                  Voir dans l&apos;historique
+                  View in history
                 </Link>
               </>
             ) : null}
@@ -307,10 +324,10 @@ export function PatchNoteGenerator({
           <Tabs defaultValue="markdown" className="w-full">
             <TabsList className="w-full bg-muted/50">
               <TabsTrigger value="markdown" className="flex-1">
-                Markdown clean
+                Clean Markdown
               </TabsTrigger>
               <TabsTrigger value="social" className="flex-1">
-                Post réseaux
+                Social post
               </TabsTrigger>
             </TabsList>
 
@@ -318,7 +335,7 @@ export function PatchNoteGenerator({
               <Textarea
                 readOnly
                 value={markdown}
-                placeholder="Le patch note apparaîtra ici après génération."
+                placeholder="The patch note will appear here after generation."
                 className="min-h-52 resize-none font-mono text-sm"
               />
               <Button
@@ -328,7 +345,7 @@ export function PatchNoteGenerator({
                 onClick={() => copyToClipboard(markdown)}
               >
                 <Copy />
-                Copier le Markdown
+                Copy Markdown
               </Button>
             </TabsContent>
 
@@ -336,7 +353,7 @@ export function PatchNoteGenerator({
               <Textarea
                 readOnly
                 value={socialPost}
-                placeholder="Le post LinkedIn / X apparaîtra ici après génération."
+                placeholder="The LinkedIn / X post will appear here after generation."
                 className="min-h-52 resize-none text-sm"
               />
               <Button
@@ -346,7 +363,7 @@ export function PatchNoteGenerator({
                 onClick={() => copyToClipboard(socialPost)}
               >
                 <Copy />
-                Copier le post
+                Copy post
               </Button>
             </TabsContent>
           </Tabs>

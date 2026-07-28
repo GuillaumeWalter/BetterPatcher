@@ -28,12 +28,12 @@ export function StripeSetupButton() {
       const data = (await response.json()) as { url?: string; error?: string };
 
       if (!response.ok || !data.url) {
-        throw new Error(data.error ?? "Impossible de démarrer la vérification.");
+        throw new Error(data.error ?? "Could not start card verification.");
       }
 
       window.location.href = data.url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inattendue.");
+      setError(err instanceof Error ? err.message : "Unexpected error.");
       setIsLoading(false);
     }
   }
@@ -44,20 +44,20 @@ export function StripeSetupButton() {
         {isLoading ? (
           <>
             <Loader2 className="animate-spin" />
-            Redirection Stripe…
+            Redirecting to Stripe…
           </>
         ) : (
           <>
             <CreditCard />
-            Vérifier ma carte (0 €)
+            Verify my card (€0)
           </>
         )}
       </Button>
       <p className="flex items-start gap-2 text-xs text-muted-foreground">
         <ShieldCheck className="mt-0.5 size-3.5 shrink-0" />
-        Stripe peut afficher une autorisation temporaire (souvent 0 €) pour valider
-        la carte. Aucun abonnement n&apos;est activé à cette étape. Ensuite :{" "}
-        {BILLING.TRIAL_GENERATIONS} générations offertes.
+        Stripe may show a temporary authorization (often €0) to validate the
+        card. No subscription starts at this step. Next:{" "}
+        {BILLING.TRIAL_GENERATIONS} free generations.
       </p>
       {error ? (
         <p className="text-sm text-destructive" role="alert">
@@ -95,12 +95,12 @@ export function StripeSubscribeButton({
       const data = (await response.json()) as { url?: string; error?: string };
 
       if (!response.ok || !data.url) {
-        throw new Error(data.error ?? "Impossible de démarrer l'abonnement.");
+        throw new Error(data.error ?? "Could not start the subscription.");
       }
 
       window.location.href = data.url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inattendue.");
+      setError(err instanceof Error ? err.message : "Unexpected error.");
       setIsLoading(false);
     }
   }
@@ -117,12 +117,12 @@ export function StripeSubscribeButton({
         {isLoading ? (
           <>
             <Loader2 className="animate-spin" />
-            Redirection Stripe…
+            Redirecting to Stripe…
           </>
         ) : (
           <>
             <CreditCard />
-            S&apos;abonner {label} — {priceLabelForTier(plan)}
+            Subscribe {label} ({priceLabelForTier(plan)})
           </>
         )}
       </Button>

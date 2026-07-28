@@ -34,7 +34,7 @@ function toneLabel(tone: Tone) {
 }
 
 function formatDate(iso: string) {
-  return new Intl.DateTimeFormat("fr-FR", {
+  return new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(iso));
@@ -74,12 +74,12 @@ export function PatchNoteDetail({
       const data = (await response.json()) as { error?: string };
 
       if (!response.ok) {
-        throw new Error(data.error ?? "Sauvegarde impossible.");
+        throw new Error(data.error ?? "Could not save.");
       }
 
       setSaved(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur de sauvegarde.");
+      setError(err instanceof Error ? err.message : "Save failed.");
     } finally {
       setIsSaving(false);
     }
@@ -99,20 +99,20 @@ export function PatchNoteDetail({
             {repoFullName ? ` · ${repoFullName}` : ""}
           </p>
           <p className="text-xs text-muted-foreground">
-            Créé {formatDate(createdAt)}
-            {updatedAt !== createdAt ? ` · Modifié ${formatDate(updatedAt)}` : ""}
+            Created {formatDate(createdAt)}
+            {updatedAt !== createdAt ? ` · Updated ${formatDate(updatedAt)}` : ""}
           </p>
         </div>
         <Button variant="outline" size="sm" asChild>
-          <Link href="/dashboard/history">← Historique</Link>
+          <Link href="/dashboard/history">← History</Link>
         </Button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="surface-card gradient-border">
           <CardHeader>
-            <CardTitle className="text-lg">Commits source</CardTitle>
-            <CardDescription>Texte brut utilisé pour la génération</CardDescription>
+            <CardTitle className="text-lg">Source commits</CardTitle>
+            <CardDescription>Raw text used for generation</CardDescription>
           </CardHeader>
           <CardContent>
             <Textarea
@@ -125,9 +125,9 @@ export function PatchNoteDetail({
 
         <Card className="surface-card gradient-border">
           <CardHeader>
-            <CardTitle className="text-lg">Contenu éditable</CardTitle>
+            <CardTitle className="text-lg">Editable content</CardTitle>
             <CardDescription>
-              Ajustez le Markdown et le post avant publication
+              Adjust the Markdown and post before publishing
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -137,7 +137,7 @@ export function PatchNoteDetail({
                   Markdown
                 </TabsTrigger>
                 <TabsTrigger value="social" className="flex-1">
-                  Post réseaux
+                  Social post
                 </TabsTrigger>
               </TabsList>
 
@@ -160,13 +160,13 @@ export function PatchNoteDetail({
                   onClick={() => copyToClipboard(markdown)}
                 >
                   <Copy />
-                  Copier
+                  Copy
                 </Button>
               </TabsContent>
 
               <TabsContent value="social" className="mt-4 space-y-3">
                 <Label htmlFor="social" className="sr-only">
-                  Post réseaux
+                  Social post
                 </Label>
                 <Textarea
                   id="social"
@@ -183,7 +183,7 @@ export function PatchNoteDetail({
                   onClick={() => copyToClipboard(socialPost)}
                 >
                   <Copy />
-                  Copier
+                  Copy
                 </Button>
               </TabsContent>
             </Tabs>
@@ -196,18 +196,18 @@ export function PatchNoteDetail({
                 {isSaving ? (
                   <>
                     <Loader2 className="animate-spin" />
-                    Sauvegarde…
+                    Saving…
                   </>
                 ) : (
                   <>
                     <Save />
-                    Enregistrer
+                    Save
                   </>
                 )}
               </Button>
               {saved ? (
                 <span className="text-sm text-muted-foreground">
-                  Modifications enregistrées
+                  Changes saved
                 </span>
               ) : null}
               {error ? (

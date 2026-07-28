@@ -29,7 +29,7 @@ export async function getUserRepos(accessToken: string): Promise<GitHubRepo[]> {
   );
 
   if (!response.ok) {
-    throw new Error("Impossible de récupérer les dépôts GitHub.");
+    throw new Error("Could not fetch GitHub repositories.");
   }
 
   return response.json() as Promise<GitHubRepo[]>;
@@ -47,7 +47,7 @@ export async function getRepoCommits(
   );
 
   if (!response.ok) {
-    throw new Error("Impossible de récupérer les commits.");
+    throw new Error("Could not fetch commits.");
   }
 
   return response.json() as Promise<GitHubCommit[]>;

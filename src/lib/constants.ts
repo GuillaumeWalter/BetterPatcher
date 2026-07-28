@@ -7,18 +7,18 @@ export const TONE_OPTIONS: {
 }[] = [
   {
     value: "technical",
-    label: "Technique",
-    description: "Changelog Markdown clair pour les devs",
+    label: "Technical",
+    description: "Clear Markdown changelog for engineers",
   },
   {
     value: "marketing",
-    label: "Marketing / Start-up",
-    description: "Bénéfices clients et langage produit",
+    label: "Marketing / Startup",
+    description: "Customer benefits and product language",
   },
   {
     value: "gaming",
     label: "Gaming / Devlog",
-    description: "Ton engageant pour Steam & Discord",
+    description: "Engaging tone for Steam & Discord",
   },
 ];
 
@@ -44,22 +44,22 @@ export const GENERATION_OPTION_DEFS: {
   {
     key: "emojis",
     label: "Emojis",
-    description: "Titres et puces plus visuels (✨ 🐛 🚀)",
+    description: "More visual titles and bullets (✨ 🐛 🚀)",
   },
   {
     key: "summary",
-    label: "Résumé d'intro",
-    description: "2–3 phrases de synthèse en ouverture",
+    label: "Intro summary",
+    description: "2 to 3 sentences under the title",
   },
   {
     key: "highlights",
-    label: "Points clés",
-    description: "Bloc « Highlights » avec les changements majeurs",
+    label: "Highlights",
+    description: "A Highlights block for major changes",
   },
   {
     key: "hashtags",
     label: "Hashtags",
-    description: "3–5 hashtags pertinents sur le post réseaux",
+    description: "3 to 5 relevant hashtags on the social post",
   },
 ];
 
