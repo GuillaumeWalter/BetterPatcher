@@ -31,7 +31,7 @@ export function BillingQuotaBanner() {
   useEffect(() => {
     async function load() {
       try {
-        const response = await fetch("/api/billing");
+        const response = await fetch("/api/billing", { credentials: "same-origin" });
         if (response.ok) {
           setQuota((await response.json()) as QuotaSnapshot);
         }
@@ -108,7 +108,7 @@ export function useBillingQuota() {
   const [quota, setQuota] = useState<QuotaSnapshot | null>(null);
 
   async function refresh() {
-    const response = await fetch("/api/billing");
+    const response = await fetch("/api/billing", { credentials: "same-origin" });
     if (response.ok) {
       setQuota((await response.json()) as QuotaSnapshot);
     }

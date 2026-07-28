@@ -33,13 +33,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   callbacks: {
-    jwt({ token, account }) {
+    jwt({ token, account, profile }) {
       if (account?.access_token) {
         token.accessToken = account.access_token;
+      }
+      // GitHub numeric id as stable subject when present
+      if (profile && "id" in profile && profile.id != null) {
+        token.sub = String(profile.id);
       }
       return token;
     },
     session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.sub ?? session.user.id;
+      }
       session.accessToken = token.accessToken;
       return session;
     },

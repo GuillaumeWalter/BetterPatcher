@@ -21,6 +21,7 @@ export function StripeSetupButton() {
     try {
       const response = await fetch("/api/billing", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "setup" }),
       });
@@ -88,6 +89,7 @@ export function StripeSubscribeButton({
     try {
       const response = await fetch("/api/billing", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "subscribe", plan }),
       });
