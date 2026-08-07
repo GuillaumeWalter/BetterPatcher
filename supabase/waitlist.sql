@@ -1,5 +1,5 @@
--- Easy Patch — liste d'attente (Phase 1.4)
--- Exécuter dans Supabase → SQL Editor sur un NOUVEAU projet dédié
+-- Easy Patch | Waitlist signups (optional)
+-- Run in Supabase → SQL Editor if you re-enable the landing waitlist UI.
 
 create table if not exists public.waitlist_signups (
   id uuid primary key default gen_random_uuid(),
@@ -16,4 +16,4 @@ create index if not exists waitlist_signups_created_at_idx
 
 alter table public.waitlist_signups enable row level security;
 
--- Pas de policy publique : les inserts passent par l'API Next.js (service role).
+-- No public policies: inserts go through the Next.js API with the service role.

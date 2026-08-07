@@ -42,16 +42,15 @@ export default async function HistoryPage() {
           <CardHeader>
             <CardTitle className="text-lg">No history yet</CardTitle>
             <CardDescription>
-              Generate a patch note from the free tool while signed in to see it
-              appear here.
+              Generate a patch note while signed in to see it appear here.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Link
-              href="/"
+              href="/dashboard/generate"
               className="text-sm font-medium text-primary underline-offset-4 hover:underline"
             >
-              Go to the generator
+              Open the generator
             </Link>
           </CardContent>
         </Card>

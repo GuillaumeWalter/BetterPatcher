@@ -1,48 +1,37 @@
-# 📋 EASY PATCH - ROADMAP & TODO
+# Easy Patch | Living TODO
 
-## 🚀 PHASE 1 : Le Side-Project Marketing (Outil Gratuit)
-*Objectif : Sortir un outil "Coller vos commits -> Générer le patch note" pour choper nos premiers emails et valider l'intérêt.*
+Canonical product plan: docs/product-roadmap.md
+Env checklist: docs/env-setup.md
+Open decisions: docs/open-questions.md
 
-### 🛠️ Étape 1.1 : Initialisation & Structure
-- [ ] Initialiser le projet Next.js (App Router, TypeScript, Tailwind)
-- [ ] Installer et configurer Shadcn/ui (Boutons, Textarea, Card, Select)
-- [ ] Setup du layout global (Thème sombre/pro, structure épurée)
+## Done
 
-### 🎨 Étape 1.2 : L'Interface (Front-end Unique)
-- [ ] Créer la Landing Page / App unique :
-    - [ ] Header simple avec le nom du projet
-    - [ ] Zone de saisie (Textarea) pour coller les commits bruts
-    - [ ] Sélecteur de tonalité (Technique, Marketing/Start-up, Gaming/Devlog)
-    - [ ] Bouton "Générer le Patch Note" stylé (avec état de chargement)
-    - [ ] Zone de résultats (Tabs : "Markdown Clean" / "Post Réseaux") avec bouton "Copier"
-- [ ] Intégrer la section "Liste d'attente" (CTA pour le produit automatisé)
+- [x] Next.js app + English UI + Easy Patch branding
+- [x] Trial / Solo / Pro billing (Stripe setup + quotas)
+- [x] GitHub OAuth login + commit import
+- [x] Manual paste (Perforce / Plastic / SVN / any log)
+- [x] GitLab OAuth link + commit import
+- [x] Patch note history
+- [x] Generation tones + formatting options
 
-### 🧠 Étape 1.3 : Logique & IA (Back-end)
-- [ ] Créer la Route d'API Next.js (`/api/generate`)
-- [ ] Setup du Vercel AI SDK (ou appel direct OpenAI/Anthropic)
-- [ ] Rédiger et peaufiner les 3 System Prompts (Technique, Marketing, Gaming)
-- [ ] Connecter le Front au Back (Gestion du streaming du texte si possible, sinon réponse bloc)
+## Your side (dashboards)
 
-### 🌍 Étape 1.4 : Collecte de Leads & Déploiement
-- [ ] Connecter le formulaire de liste d'attente à une DB simple (Supabase, Resend, ou une Google Sheet rapide via API)
-- [ ] Déployer la première version via **Antigravity**
-- [ ] Tester en conditions réelles
+- [ ] Confirm Vercel env vars (see docs/env-setup.md)
+- [ ] Stripe Prices per currency + webhook
+- [ ] Run Supabase SQL files
+- [ ] GitLab OAuth app if not live yet
 
----
+## Next product work (needs your answers in docs/open-questions.md)
 
-## 🔒 PHASE 2 : Le SaaS Automatisé (B2B Payant)
-*Objectif : Connecter l'outil aux écosystèmes des boîtes et monétiser.*
+- [ ] Phase 2: Jira or Linear ticket enrichment
+- [ ] Phase 3: real Pro seats / workspaces
 
-### 🔑 Étape 2.1 : Authentification & Connexion GitHub
-- [ ] Intégrer NextAuth.js
-- [ ] Setup de l'OAuth GitHub (Demander les accès aux repositories)
-- [ ] Récupérer la liste des derniers commits / PR d'un repo sélectionné
+## Later
 
-### 🗄️ Étape 2.2 : Dashboard & Automatisation
-- [ ] Espace utilisateur pour gérer ses projets/repos
-- [ ] Système de Webhooks : Déclencher la génération dès qu'un "Tag/Release" est poussé sur GitHub
-- [ ] Historique des patch notes générés et modifiables
-
-### 💳 Étape 2.3 : Monétisation
-- [ ] Intégration de Stripe (Abonnements mensuels)
-- [ ] Gestion des limitations par plan (ex: Nombre de repos connectés)
+- [ ] Auto-generate on GitHub tag / Release
+- [ ] Brand voice memory
+- [ ] Multi-language override
+- [ ] Dedicated Steam News format
+- [ ] Discord publish
+- [ ] Annual plan
+- [ ] Bitbucket
