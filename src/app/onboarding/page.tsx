@@ -69,7 +69,7 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
             <li>
               ✓ {BILLING.TRIAL_GENERATIONS} patch notes after verification
             </li>
-            <li>✓ Paste commits or import GitHub (optional)</li>
+            <li>✓ Paste commits or import GitHub / GitLab</li>
             <li>
               ✓ Then Solo ({soloPriceLabel}) or Pro ({proPriceLabel} | team)
             </li>

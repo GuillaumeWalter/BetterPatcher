@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Copy, Loader2, Wand2 } from "lucide-react";
+import { Loader2, Wand2 } from "lucide-react";
 
+import { CopyButton } from "@/components/copy-button";
 import { GitHubCommitImport } from "@/components/github-commit-import";
 import { GitLabCommitImport } from "@/components/gitlab-commit-import";
 import { useBillingQuota } from "@/components/billing-quota-banner";
@@ -65,21 +66,25 @@ export function PatchNoteGenerator({
   const [markdown, setMarkdown] = useState("");
   const [socialPost, setSocialPost] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [repoFullName, setRepoFullName] = useState<string | null>(null);
   const { quota, refreshQuota } = useBillingQuota();
 
   useEffect(() => {
-    const stored = sessionStorage.getItem(COMMITS_STORAGE_KEY);
-    if (stored) {
-      setCommits(stored);
-      sessionStorage.removeItem(COMMITS_STORAGE_KEY);
-    }
-    const storedRepo = sessionStorage.getItem(REPO_STORAGE_KEY);
-    if (storedRepo) {
-      setRepoFullName(storedRepo);
-      sessionStorage.removeItem(REPO_STORAGE_KEY);
-    }
+    const frame = requestAnimationFrame(() => {
+      const stored = sessionStorage.getItem(COMMITS_STORAGE_KEY);
+      if (stored) {
+        setCommits(stored);
+        sessionStorage.removeItem(COMMITS_STORAGE_KEY);
+      }
+      const storedRepo = sessionStorage.getItem(REPO_STORAGE_KEY);
+      if (storedRepo) {
+        setRepoFullName(storedRepo);
+        sessionStorage.removeItem(REPO_STORAGE_KEY);
+      }
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   async function handleGenerate() {
@@ -89,6 +94,7 @@ export function PatchNoteGenerator({
     setMarkdown("");
     setSocialPost("");
     setError(null);
+    setErrorCode(null);
     setSavedId(null);
 
     try {
@@ -103,9 +109,11 @@ export function PatchNoteGenerator({
         socialPost?: string;
         savedId?: string | null;
         error?: string;
+        code?: string;
       };
 
       if (!response.ok) {
+        setErrorCode(data.code ?? null);
         throw new Error(data.error ?? "Generation failed.");
       }
 
@@ -122,16 +130,25 @@ export function PatchNoteGenerator({
     }
   }
 
-  async function copyToClipboard(text: string) {
-    if (!text) return;
-    await navigator.clipboard.writeText(text);
-  }
-
   function handleSourceImport(text: string, repo: string) {
     setCommits(text);
     setRepoFullName(repo);
     setInputMode("paste");
   }
+
+  const showBillingCta =
+    errorCode === "subscription_required" ||
+    errorCode === "quota_exceeded" ||
+    errorCode === "setup_required" ||
+    (error !== null &&
+      (error.includes("Trial ended") ||
+        error.includes("quota") ||
+        error.includes("card")));
+
+  const billingCtaLabel =
+    errorCode === "setup_required" || error?.includes("card")
+      ? "Activate trial"
+      : "View billing";
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -150,34 +167,31 @@ export function PatchNoteGenerator({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div className="flex gap-1 rounded-lg border border-white/10 bg-muted/30 p-1">
-            <Button
-              type="button"
-              variant={inputMode === "paste" ? "default" : "ghost"}
-              size="sm"
-              className="flex-1"
-              onClick={() => setInputMode("paste")}
-            >
-              Paste
-            </Button>
-            <Button
-              type="button"
-              variant={inputMode === "github" ? "default" : "ghost"}
-              size="sm"
-              className="flex-1"
-              onClick={() => setInputMode("github")}
-            >
-              GitHub
-            </Button>
-            <Button
-              type="button"
-              variant={inputMode === "gitlab" ? "default" : "ghost"}
-              size="sm"
-              className="flex-1"
-              onClick={() => setInputMode("gitlab")}
-            >
-              GitLab
-            </Button>
+          <div
+            className="flex gap-1 rounded-lg border border-white/10 bg-muted/30 p-1"
+            role="tablist"
+            aria-label="Commit source"
+          >
+            {(
+              [
+                ["paste", "Paste"],
+                ["github", "GitHub"],
+                ["gitlab", "GitLab"],
+              ] as const
+            ).map(([mode, label]) => (
+              <Button
+                key={mode}
+                type="button"
+                role="tab"
+                aria-selected={inputMode === mode}
+                variant={inputMode === mode ? "default" : "ghost"}
+                size="sm"
+                className="flex-1"
+                onClick={() => setInputMode(mode)}
+              >
+                {label}
+              </Button>
+            ))}
           </div>
 
           {inputMode === "github" ? (
@@ -291,9 +305,9 @@ export function PatchNoteGenerator({
               <p className="text-sm text-destructive" role="alert">
                 {error}
               </p>
-              {error.includes("Trial ended") || error.includes("Quota") ? (
+              {showBillingCta ? (
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="/dashboard/billing">View Pro subscription</Link>
+                  <Link href="/dashboard/billing">{billingCtaLabel}</Link>
                 </Button>
               ) : null}
             </div>
@@ -338,15 +352,7 @@ export function PatchNoteGenerator({
                 placeholder="The patch note will appear here after generation."
                 className="min-h-52 resize-none font-mono text-sm"
               />
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={!markdown}
-                onClick={() => copyToClipboard(markdown)}
-              >
-                <Copy />
-                Copy Markdown
-              </Button>
+              <CopyButton text={markdown} label="Copy Markdown" />
             </TabsContent>
 
             <TabsContent value="social" className="mt-4 space-y-3">
@@ -356,15 +362,7 @@ export function PatchNoteGenerator({
                 placeholder="The LinkedIn / X post will appear here after generation."
                 className="min-h-52 resize-none text-sm"
               />
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={!socialPost}
-                onClick={() => copyToClipboard(socialPost)}
-              >
-                <Copy />
-                Copy post
-              </Button>
+              <CopyButton text={socialPost} label="Copy post" />
             </TabsContent>
           </Tabs>
         </CardContent>

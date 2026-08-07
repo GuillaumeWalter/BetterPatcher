@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Unplug } from "lucide-react";
+import { Loader2, LogIn, Unplug } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -32,7 +33,7 @@ export function GitLabCommitImport({
   const [configured, setConfigured] = useState(true);
   const [repos, setRepos] = useState<RepoOption[]>([]);
   const [selectedRepo, setSelectedRepo] = useState("");
-  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(isAuthenticated);
   const [isLoadingRepos, setIsLoadingRepos] = useState(false);
   const [isLoadingCommits, setIsLoadingCommits] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,20 +84,25 @@ export function GitLabCommitImport({
   }
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setIsLoadingStatus(false);
-      return;
-    }
-    loadStatus();
+    if (!isAuthenticated) return;
+    const frame = requestAnimationFrame(() => {
+      void loadStatus();
+    });
+    return () => cancelAnimationFrame(frame);
   }, [isAuthenticated]);
 
   useEffect(() => {
-    if (connected) {
-      loadRepos();
-    } else {
-      setRepos([]);
-      setSelectedRepo("");
+    if (!connected) {
+      const frame = requestAnimationFrame(() => {
+        setRepos([]);
+        setSelectedRepo("");
+      });
+      return () => cancelAnimationFrame(frame);
     }
+    const frame = requestAnimationFrame(() => {
+      void loadRepos();
+    });
+    return () => cancelAnimationFrame(frame);
   }, [connected]);
 
   async function handleDisconnect() {
@@ -147,8 +153,14 @@ export function GitLabCommitImport({
     return (
       <div className="rounded-xl border border-dashed border-primary/25 bg-primary/5 p-4">
         <p className="text-sm text-muted-foreground">
-          Sign in to connect GitLab and import your last 30 commits.
+          Sign in with GitHub to connect GitLab and import your last 30 commits.
         </p>
+        <Button asChild size="sm" className="mt-3">
+          <Link href="/login?callbackUrl=%2Fdashboard%2Fgenerate">
+            <LogIn />
+            Sign in with GitHub
+          </Link>
+        </Button>
       </div>
     );
   }
@@ -238,6 +250,11 @@ export function GitLabCommitImport({
       {error ? (
         <p className="text-sm text-destructive" role="alert">
           {error}
+        </p>
+      ) : null}
+      {!isLoadingRepos && repos.length === 0 && !error ? (
+        <p className="text-sm text-muted-foreground">
+          No GitLab projects found for this account.
         </p>
       ) : null}
     </div>

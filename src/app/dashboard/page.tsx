@@ -34,7 +34,7 @@ export default async function DashboardPage() {
               Generator
             </CardTitle>
             <CardDescription>
-              Import GitHub or paste manually (Perforce, Plastic, SVN…).
+              Import GitHub / GitLab, or paste manually (Perforce, Plastic, SVN…).
             </CardDescription>
           </CardHeader>
           <CardContent>

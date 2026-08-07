@@ -150,6 +150,11 @@ export function GitHubCommitImport({
           {error}
         </p>
       ) : null}
+      {!isLoadingRepos && repos.length === 0 && !error ? (
+        <p className="text-sm text-muted-foreground">
+          No repositories found for this GitHub account.
+        </p>
+      ) : null}
     </div>
   );
 }

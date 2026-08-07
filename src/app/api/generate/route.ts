@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { generateText, Output } from "ai";
 
 import { getAiProvider, getGenerationModel } from "@/lib/ai/model";
-import { getSystemPrompt } from "@/lib/ai/prompts";
+import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
 import { generationSchema } from "@/lib/ai/schema";
 import { BILLING } from "@/lib/billing/constants";
 import {
@@ -140,7 +140,7 @@ export async function POST(request: Request) {
     const { output } = await generateText({
       model: getGenerationModel(),
       system: getSystemPrompt(tone, options),
-      prompt: `Turn these commit messages into a patch note:\n\n${commits}`,
+      prompt: getUserPrompt(commits, tone),
       output: Output.object({ schema: generationSchema }),
     });
 
@@ -167,9 +167,6 @@ export async function POST(request: Request) {
   } catch (error) {
     await refundGeneration(session.user.id, consumed.plan);
     console.error("[/api/generate]", error);
-
-    const message =
-      error instanceof Error ? error.message : "Unknown error.";
 
     return Response.json(
       { error: "Generation failed. Try again in a moment." },

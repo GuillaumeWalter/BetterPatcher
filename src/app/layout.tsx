@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Easy Patch | Patch notes & marketing assets",
   description:
-    "Paste your commits, pick a tone, and get a patch note plus a social post in seconds.",
+    "Easy Patch turns GitHub, GitLab, or pasted commits into a Markdown patch note and a social post.",
 };
 
 export default function RootLayout({
