@@ -1,3 +1,5 @@
+import { normalizeImportedCommitMessages } from "@/lib/commit-messages";
+
 export type GitHubRepo = {
   id: number;
   full_name: string;
@@ -54,7 +56,9 @@ export async function getRepoCommits(
 }
 
 export function formatCommitsForGenerator(commits: GitHubCommit[]): string {
-  return commits.map((entry) => entry.commit.message.trim()).join("\n");
+  return normalizeImportedCommitMessages(
+    commits.map((entry) => entry.commit.message),
+  ).join("\n");
 }
 
 export function parseRepoFullName(fullName: string): {

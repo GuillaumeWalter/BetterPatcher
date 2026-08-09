@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { normalizeImportedCommitMessages } from "@/lib/commit-messages";
 import { getGitLabProjectCommits } from "@/lib/gitlab";
 import { getGitLabAccessToken } from "@/lib/supabase/users";
 
@@ -32,11 +33,13 @@ export async function GET(request: Request) {
       token,
       projectId ?? project!,
     );
+    const messages = normalizeImportedCommitMessages(
+      commits.map((entry) => entry.title || entry.message || ""),
+    );
+
     return Response.json(
-      commits.map((entry) => ({
-        sha: entry.short_id,
-        message: entry.message,
-        date: entry.created_at,
+      messages.map((message) => ({
+        message,
       })),
     );
   } catch {
