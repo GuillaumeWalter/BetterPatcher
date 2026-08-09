@@ -124,7 +124,10 @@ export function useBillingQuota() {
   }
 
   useEffect(() => {
-    refresh();
+    const frame = requestAnimationFrame(() => {
+      void refresh();
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   return { quota, refreshQuota: refresh };

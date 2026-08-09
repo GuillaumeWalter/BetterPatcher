@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Copy, Loader2, Save } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 
+import { CopyButton } from "@/components/copy-button";
 import { DashboardNav } from "@/components/dashboard-nav";
 import { Button } from "@/components/ui/button";
 import {
@@ -85,10 +86,6 @@ export function PatchNoteDetail({
     }
   }
 
-  async function copyToClipboard(text: string) {
-    await navigator.clipboard.writeText(text);
-  }
-
   return (
     <>
       <DashboardNav />
@@ -104,7 +101,7 @@ export function PatchNoteDetail({
           </p>
         </div>
         <Button variant="outline" size="sm" asChild>
-          <Link href="/dashboard/history">← History</Link>
+          <Link href="/dashboard/history">Back to history</Link>
         </Button>
       </div>
 
@@ -154,14 +151,7 @@ export function PatchNoteDetail({
                   }}
                   className="min-h-48 resize-y font-mono text-sm"
                 />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => copyToClipboard(markdown)}
-                >
-                  <Copy />
-                  Copy
-                </Button>
+                <CopyButton text={markdown} label="Copy" />
               </TabsContent>
 
               <TabsContent value="social" className="mt-4 space-y-3">
@@ -177,14 +167,7 @@ export function PatchNoteDetail({
                   }}
                   className="min-h-48 resize-y text-sm"
                 />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => copyToClipboard(socialPost)}
-                >
-                  <Copy />
-                  Copy
-                </Button>
+                <CopyButton text={socialPost} label="Copy" />
               </TabsContent>
             </Tabs>
 
