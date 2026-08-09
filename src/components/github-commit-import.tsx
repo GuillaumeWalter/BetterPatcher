@@ -150,6 +150,7 @@ export function GitHubCommitImport({
       {selectedRepo && !isLoadingCommits ? (
         <CommitRangePicker
           commits={commits}
+          repoFullName={selectedRepo}
           onConfirm={(text) => onImport(text, selectedRepo)}
         />
       ) : null}

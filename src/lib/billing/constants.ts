@@ -12,6 +12,8 @@ export const BILLING = {
   MAX_COMMITS_CHARS: 15_000,
   /** Max commit lines. */
   MAX_COMMIT_LINES: 40,
+  /** Max style-reference patch note characters. */
+  MAX_REFERENCE_CHARS: 12_000,
   SOLO_PRICE_LABEL: "€4.99 / month",
   PRO_PRICE_LABEL: "€9.99 / month",
 } as const;

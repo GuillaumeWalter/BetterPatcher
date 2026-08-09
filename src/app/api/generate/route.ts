@@ -82,6 +82,14 @@ export async function POST(request: Request) {
       ? parseGenerationOptions(body.options)
       : parseGenerationOptions(undefined);
 
+  const referencePatch =
+    typeof body === "object" &&
+    body !== null &&
+    "referencePatch" in body &&
+    typeof body.referencePatch === "string"
+      ? body.referencePatch.trim()
+      : "";
+
   if (!commits) {
     return Response.json(
       { error: "The commits field is required." },
@@ -115,6 +123,15 @@ export async function POST(request: Request) {
     );
   }
 
+  if (referencePatch.length > BILLING.MAX_REFERENCE_CHARS) {
+    return Response.json(
+      {
+        error: `Reference patch is too long (${BILLING.MAX_REFERENCE_CHARS.toLocaleString("en-US")} characters max).`,
+      },
+      { status: 400 },
+    );
+  }
+
   if (!getAiProvider()) {
     return Response.json(
       {
@@ -139,8 +156,8 @@ export async function POST(request: Request) {
   try {
     const { output } = await generateText({
       model: getGenerationModel(),
-      system: getSystemPrompt(tone, options),
-      prompt: getUserPrompt(commits, tone),
+      system: getSystemPrompt(tone, options, referencePatch || null),
+      prompt: getUserPrompt(commits, tone, referencePatch || null),
       output: Output.object({ schema: generationSchema }),
     });
 
