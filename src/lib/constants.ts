@@ -31,7 +31,7 @@ export type GenerationOptions = {
 
 export const DEFAULT_GENERATION_OPTIONS: GenerationOptions = {
   emojis: false,
-  summary: true,
+  summary: false,
   hashtags: false,
   highlights: true,
 };
@@ -49,12 +49,12 @@ export const GENERATION_OPTION_DEFS: {
   {
     key: "summary",
     label: "Intro summary",
-    description: "2 to 3 sentences under the title",
+    description: "1 to 2 factual sentences under the title",
   },
   {
     key: "highlights",
     label: "Highlights",
-    description: "A Highlights block for major changes",
+    description: "Short Highlights block only for clear standouts",
   },
   {
     key: "hashtags",
