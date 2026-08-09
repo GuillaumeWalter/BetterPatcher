@@ -12,6 +12,7 @@ import {
   COMMITS_STORAGE_KEY,
   REPO_STORAGE_KEY,
 } from "@/lib/github-session";
+import { rememberGeneratedMessages } from "@/lib/import-memory";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -120,6 +121,7 @@ export function PatchNoteGenerator({
       setMarkdown(data.markdown ?? "");
       setSocialPost(data.socialPost ?? "");
       setSavedId(data.savedId ?? null);
+      rememberGeneratedMessages(repoFullName, commits);
       await refreshQuota();
     } catch (err) {
       setError(

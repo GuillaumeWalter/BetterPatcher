@@ -1,13 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { messagesForGenerator, type ImportedCommit } from "@/lib/commit-messages";
+import {
+  messagesForGenerator,
+  type ImportedCommit,
+} from "@/lib/commit-messages";
+import {
+  getRememberedImport,
+  isCommitRemembered,
+  rememberImportedCommits,
+  type RememberedImport,
+} from "@/lib/import-memory";
 
 type CommitRangePickerProps = {
   commits: ImportedCommit[];
+  repoFullName: string;
   onConfirm: (commitsText: string) => void;
 };
 
@@ -22,20 +32,47 @@ function formatCommitDate(iso: string) {
   }
 }
 
+function defaultSelection(
+  commits: ImportedCommit[],
+  remembered: RememberedImport | null,
+): Set<string> {
+  if (!remembered || (remembered.shas.length === 0 && remembered.messages.length === 0)) {
+    return new Set(commits.map((commit) => commit.sha));
+  }
+
+  const fresh = commits.filter(
+    (commit) => !isCommitRemembered(commit, remembered),
+  );
+  if (fresh.length > 0) {
+    return new Set(fresh.map((commit) => commit.sha));
+  }
+
+  return new Set();
+}
+
 export function CommitRangePicker({
   commits,
+  repoFullName,
   onConfirm,
 }: CommitRangePickerProps) {
-  const [selected, setSelected] = useState<Set<string>>(
-    () => new Set(commits.map((commit) => commit.sha)),
-  );
+  const [remembered, setRemembered] = useState<RememberedImport | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
-      setSelected(new Set(commits.map((commit) => commit.sha)));
+      const memory = getRememberedImport(repoFullName);
+      setRemembered(memory);
+      setSelected(defaultSelection(commits, memory));
     });
     return () => cancelAnimationFrame(frame);
-  }, [commits]);
+  }, [commits, repoFullName]);
+
+  const newCount = useMemo(
+    () =>
+      commits.filter((commit) => !isCommitRemembered(commit, remembered))
+        .length,
+    [commits, remembered],
+  );
 
   function toggleSha(sha: string, checked: boolean) {
     setSelected((current) => {
@@ -59,14 +96,28 @@ export function CommitRangePicker({
     setSelected(new Set());
   }
 
+  function selectNewOnly() {
+    setSelected(
+      new Set(
+        commits
+          .filter((commit) => !isCommitRemembered(commit, remembered))
+          .map((commit) => commit.sha),
+      ),
+    );
+  }
+
   function handleConfirm() {
-    const messages = commits
-      .filter((commit) => selected.has(commit.sha))
-      .map((commit) => commit.message);
-    onConfirm(messagesForGenerator(messages));
+    const chosen = commits.filter((commit) => selected.has(commit.sha));
+    rememberImportedCommits(repoFullName, chosen);
+    setRemembered(getRememberedImport(repoFullName));
+    onConfirm(messagesForGenerator(chosen.map((commit) => commit.message)));
   }
 
   const selectedCount = selected.size;
+  const hasMemory =
+    Boolean(remembered) &&
+    ((remembered?.shas.length ?? 0) > 0 ||
+      (remembered?.messages.length ?? 0) > 0);
 
   if (commits.length === 0) {
     return (
@@ -81,8 +132,14 @@ export function CommitRangePicker({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">
           Newest first · {selectedCount} of {commits.length} selected
+          {hasMemory ? ` · ${newCount} new` : ""}
         </p>
         <div className="flex flex-wrap gap-1">
+          {hasMemory ? (
+            <Button type="button" variant="ghost" size="sm" onClick={selectNewOnly}>
+              New only
+            </Button>
+          ) : null}
           <Button type="button" variant="ghost" size="sm" onClick={selectAll}>
             All
           </Button>
@@ -93,13 +150,26 @@ export function CommitRangePicker({
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Tip: use <span className="font-medium text-foreground">From here</span>{" "}
-        on an older commit to take everything since then, then uncheck noise.
+        {hasMemory ? (
+          <>
+            <span className="font-medium text-foreground">New</span> commits
+            were not in your last import / generation for this repo.{" "}
+            <span className="font-medium text-foreground">Used</span> ones
+            already were. Default: new only.
+          </>
+        ) : (
+          <>
+            Tip: use{" "}
+            <span className="font-medium text-foreground">From here</span> on
+            an older commit to take everything since then, then uncheck noise.
+          </>
+        )}
       </p>
 
       <ul className="max-h-64 space-y-1 overflow-y-auto rounded-xl border border-white/10 bg-background/50 p-2">
         {commits.map((commit, index) => {
           const checked = selected.has(commit.sha);
+          const used = isCommitRemembered(commit, remembered);
           return (
             <li
               key={`${commit.sha}-${index}`}
@@ -114,7 +184,20 @@ export function CommitRangePicker({
                 aria-label={`Select ${commit.message}`}
               />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{commit.message}</p>
+                <div className="flex min-w-0 items-center gap-2">
+                  <p className="truncate text-sm font-medium">{commit.message}</p>
+                  {hasMemory ? (
+                    <span
+                      className={
+                        used
+                          ? "shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground"
+                          : "shrink-0 rounded-md bg-primary/12 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary"
+                      }
+                    >
+                      {used ? "Used" : "New"}
+                    </span>
+                  ) : null}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   {commit.sha}
                   {commit.date ? ` · ${formatCommitDate(commit.date)}` : ""}
