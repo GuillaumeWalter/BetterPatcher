@@ -1,4 +1,10 @@
-export type Tone = "technical" | "marketing" | "gaming";
+export type Tone =
+  | "technical"
+  | "marketing"
+  | "gaming"
+  | "steam"
+  | "discord"
+  | "minimal";
 
 export const TONE_OPTIONS: {
   value: Tone;
@@ -8,17 +14,32 @@ export const TONE_OPTIONS: {
   {
     value: "technical",
     label: "Technical",
-    description: "Clear Markdown changelog for engineers",
+    description: "Classic changelog for engineers",
   },
   {
     value: "marketing",
     label: "Marketing / Startup",
-    description: "Customer benefits and product language",
+    description: "Customer benefits, product language",
   },
   {
     value: "gaming",
     label: "Gaming / Devlog",
-    description: "Community tone for Steam & Discord (no fake host name)",
+    description: "Friendly community update (faithful, not hype)",
+  },
+  {
+    value: "steam",
+    label: "Steam News",
+    description: "Store-style patch note sections for players",
+  },
+  {
+    value: "discord",
+    label: "Discord",
+    description: "Short announcement ready to post in chat",
+  },
+  {
+    value: "minimal",
+    label: "Minimal",
+    description: "Bare bullets, almost no intro",
   },
 ];
 

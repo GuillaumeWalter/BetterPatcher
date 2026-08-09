@@ -23,7 +23,7 @@ const features = [
   {
     icon: Sparkles,
     label: "Tone of your choice",
-    description: "Technical, marketing, or gaming / devlog",
+    description: "Technical · Marketing · Gaming · Steam · Discord · Minimal",
   },
   {
     icon: Zap,

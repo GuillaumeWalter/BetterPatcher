@@ -10,7 +10,8 @@ In order:
 2. `supabase/patch_notes.sql`
 3. `supabase/plan_tiers.sql`
 4. `supabase/gitlab_token.sql`
-5. `supabase/waitlist.sql` (only if you re-enable the waitlist UI)
+5. `supabase/tone_options.sql` (adds Steam / Discord / Minimal tones)
+6. `supabase/waitlist.sql` (only if you re-enable the waitlist UI)
 
 ## 2. Vercel environment variables
 

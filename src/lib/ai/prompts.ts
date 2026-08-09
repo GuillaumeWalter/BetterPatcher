@@ -41,14 +41,49 @@ For "socialPost":
 
   gaming: `Tone: GAMING / DEVLOG (audience: players / community).
 
+This is a community update, not a press launch.
 For "markdown":
-- Steam / Discord / itch style patch note.
-- Clear title, short intro without a fake host name, then sections as needed (New, Balance, Fixes, Quality of life).
-- Light energy is OK; no cringe hype and no invented persona or sign-off.
-- Player-facing changes first; keep bullets tied to commits.
+- Warm, readable patch note / devlog. Short friendly intro is OK (no fake host name).
+- Prefer sections like New, Improvements, Fixes, Quality of life (only if needed).
+- Keep energy light. No "massive update" framing for a handful of tooling commits.
+- If commits are product/tooling (imports, billing, UI), write for the product's users in plain community language, still faithful to each commit.
+- Do not invent a persona or sign-off.
 
 For "socialPost":
-- Discord / X style: moderate energy, 3 to 5 highlights, invite feedback. No fake author.`,
+- Discord / X style: approachable, 3 to 5 concrete highlights, invite feedback. No fake author.`,
+
+  steam: `Tone: STEAM NEWS (audience: players on a store page).
+
+For "markdown":
+- Steam News / patch layout: title, short blurb, then clear sections (e.g. New, Improvements, Fixes, Known issues if present).
+- Direct player language. Concrete changes over vibe.
+- No invented roadmap, no fake patch number unless present in commits.
+- Keep it scannable; avoid long essays.
+
+For "socialPost":
+- Short Steam / Discord cross-post: title vibe + 3 highlights max.`,
+
+  discord: `Tone: DISCORD ANNOUNCEMENT (audience: server members).
+
+For "markdown":
+- Write as a Discord announcement body (Markdown that pastes well in Discord).
+- Very short intro (1 line), then tight bullets. Prefer fewer sections.
+- Casual but precise. No essay, no fake @everyone theatrics unless reference style uses it.
+- Still no invented features.
+
+For "socialPost":
+- Even shorter chat blurb (2 to 5 lines) for a second channel or status update.`,
+
+  minimal: `Tone: MINIMAL (audience: anyone who wants zero fluff).
+
+For "markdown":
+- Almost no prose. Title + bullets only.
+- Prefer a flat list or very light Added / Fixed grouping.
+- No highlights theater, no metaphors, no "hey everyone".
+- If summary/highlights options are on, keep them extremely short or skip if empty of value.
+
+For "socialPost":
+- 1 to 3 plain lines. No hashtags unless that option is enabled.`,
 };
 
 function buildOptionsBlock(options: GenerationOptions): string {
@@ -133,6 +168,7 @@ Hard constraints:
 - Do not upgrade an improvement into a first-time launch.
 - Do not invent narrator names, team signatures, or version numbers.
 - Prefer understating over overselling.
+- Respect the selected tone's format, but never at the cost of fidelity.
 
 Commits:
 ${commits}`;

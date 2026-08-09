@@ -5,7 +5,16 @@ create table if not exists public.patch_notes (
   id uuid primary key default gen_random_uuid(),
   user_id text not null,
   user_email text,
-  tone text not null check (tone in ('technical', 'marketing', 'gaming')),
+  tone text not null check (
+    tone in (
+      'technical',
+      'marketing',
+      'gaming',
+      'steam',
+      'discord',
+      'minimal'
+    )
+  ),
   repo_full_name text,
   commits_raw text not null,
   markdown text not null,
