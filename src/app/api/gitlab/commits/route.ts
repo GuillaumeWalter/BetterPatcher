@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { normalizeImportedCommitMessages } from "@/lib/commit-messages";
+import { filterImportedCommits } from "@/lib/commit-messages";
 import { getGitLabProjectCommits } from "@/lib/gitlab";
 import { getGitLabAccessToken } from "@/lib/supabase/users";
 
@@ -32,16 +32,17 @@ export async function GET(request: Request) {
     const commits = await getGitLabProjectCommits(
       token,
       projectId ?? project!,
+      50,
     );
-    const messages = normalizeImportedCommitMessages(
-      commits.map((entry) => entry.title || entry.message || ""),
-    );
-
-    return Response.json(
-      messages.map((message) => ({
-        message,
+    const filtered = filterImportedCommits(
+      commits.map((entry) => ({
+        sha: entry.short_id,
+        message: entry.title || entry.message || "",
+        date: entry.created_at,
       })),
     );
+
+    return Response.json(filtered);
   } catch {
     return Response.json(
       { error: "Failed to fetch GitLab commits." },

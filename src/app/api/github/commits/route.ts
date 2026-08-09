@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { normalizeImportedCommitMessages } from "@/lib/commit-messages";
+import { filterImportedCommits } from "@/lib/commit-messages";
 import { getRepoCommits, parseRepoFullName } from "@/lib/github";
 
 export async function GET(request: Request) {
@@ -22,16 +22,16 @@ export async function GET(request: Request) {
   const { owner, repo: name } = parseRepoFullName(repo);
 
   try {
-    const commits = await getRepoCommits(session.accessToken, owner, name);
-    const messages = normalizeImportedCommitMessages(
-      commits.map((entry) => entry.commit.message),
-    );
-
-    return Response.json(
-      messages.map((message) => ({
-        message,
+    const commits = await getRepoCommits(session.accessToken, owner, name, 50);
+    const filtered = filterImportedCommits(
+      commits.map((entry) => ({
+        sha: entry.sha.slice(0, 7),
+        message: entry.commit.message,
+        date: entry.commit.author.date,
       })),
     );
+
+    return Response.json(filtered);
   } catch {
     return Response.json(
       { error: "Failed to fetch commits." },

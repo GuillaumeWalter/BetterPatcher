@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2, LogIn, Unplug } from "lucide-react";
 import Link from "next/link";
 
+import { CommitRangePicker } from "@/components/commit-range-picker";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -13,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { ImportedCommit } from "@/lib/commit-messages";
 
 type RepoOption = {
   id: number;
@@ -33,6 +35,7 @@ export function GitLabCommitImport({
   const [configured, setConfigured] = useState(true);
   const [repos, setRepos] = useState<RepoOption[]>([]);
   const [selectedRepo, setSelectedRepo] = useState("");
+  const [commits, setCommits] = useState<ImportedCommit[]>([]);
   const [isLoadingStatus, setIsLoadingStatus] = useState(isAuthenticated);
   const [isLoadingRepos, setIsLoadingRepos] = useState(false);
   const [isLoadingCommits, setIsLoadingCommits] = useState(false);
@@ -96,6 +99,7 @@ export function GitLabCommitImport({
       const frame = requestAnimationFrame(() => {
         setRepos([]);
         setSelectedRepo("");
+        setCommits([]);
       });
       return () => cancelAnimationFrame(frame);
     }
@@ -116,6 +120,7 @@ export function GitLabCommitImport({
       setConnected(false);
       setRepos([]);
       setSelectedRepo("");
+      setCommits([]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to disconnect.");
     }
@@ -124,6 +129,7 @@ export function GitLabCommitImport({
   async function handleRepoChange(fullName: string) {
     const repo = repos.find((entry) => entry.fullName === fullName);
     setSelectedRepo(fullName);
+    setCommits([]);
     setIsLoadingCommits(true);
     setError(null);
 
@@ -132,7 +138,7 @@ export function GitLabCommitImport({
       if (repo) params.set("projectId", String(repo.id));
 
       const response = await fetch(`/api/gitlab/commits?${params.toString()}`);
-      const data = (await response.json()) as { message: string }[] & {
+      const data = (await response.json()) as ImportedCommit[] & {
         error?: string;
       };
 
@@ -140,8 +146,7 @@ export function GitLabCommitImport({
         throw new Error(data.error ?? "Could not load commits.");
       }
 
-      const commits = data.map((entry) => entry.message.trim()).join("\n");
-      onImport(commits, fullName);
+      setCommits(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load.");
     } finally {
@@ -153,7 +158,7 @@ export function GitLabCommitImport({
     return (
       <div className="rounded-xl border border-dashed border-primary/25 bg-primary/5 p-4">
         <p className="text-sm text-muted-foreground">
-          Sign in with GitHub to connect GitLab and import your last 30 commits.
+          Sign in with GitHub to connect GitLab and pick commits to import.
         </p>
         <Button asChild size="sm" className="mt-3">
           <Link href="/login?callbackUrl=%2Fdashboard%2Fgenerate">
@@ -203,7 +208,7 @@ export function GitLabCommitImport({
   }
 
   return (
-    <div className="space-y-2 rounded-xl border border-white/10 bg-background/40 p-4">
+    <div className="space-y-3 rounded-xl border border-white/10 bg-background/40 p-4">
       <div className="flex items-center justify-between gap-2">
         <Label htmlFor="gitlab-repo">Import from GitLab</Label>
         <Button
@@ -247,6 +252,14 @@ export function GitLabCommitImport({
           </span>
         ) : null}
       </div>
+
+      {selectedRepo && !isLoadingCommits ? (
+        <CommitRangePicker
+          commits={commits}
+          onConfirm={(text) => onImport(text, selectedRepo)}
+        />
+      ) : null}
+
       {error ? (
         <p className="text-sm text-destructive" role="alert">
           {error}
