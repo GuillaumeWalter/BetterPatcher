@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2, LogIn } from "lucide-react";
 import Link from "next/link";
 
+import { CommitRangePicker } from "@/components/commit-range-picker";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -13,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { ImportedCommit } from "@/lib/commit-messages";
 
 type RepoOption = {
   id: number;
@@ -33,6 +35,7 @@ export function GitHubCommitImport({
 }: GitHubCommitImportProps) {
   const [repos, setRepos] = useState<RepoOption[]>([]);
   const [selectedRepo, setSelectedRepo] = useState("");
+  const [commits, setCommits] = useState<ImportedCommit[]>([]);
   const [isLoadingRepos, setIsLoadingRepos] = useState(false);
   const [isLoadingCommits, setIsLoadingCommits] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,35 +43,36 @@ export function GitHubCommitImport({
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    async function loadRepos() {
-      setIsLoadingRepos(true);
-      setError(null);
+    const frame = requestAnimationFrame(() => {
+      void (async () => {
+        setIsLoadingRepos(true);
+        setError(null);
 
-      try {
-        const response = await fetch("/api/github/repos");
-        const data = (await response.json()) as RepoOption[] & {
-          error?: string;
-        };
+        try {
+          const response = await fetch("/api/github/repos");
+          const data = (await response.json()) as RepoOption[] & {
+            error?: string;
+          };
 
-        if (!response.ok) {
-          throw new Error(data.error ?? "Could not load your repositories.");
+          if (!response.ok) {
+            throw new Error(data.error ?? "Could not load your repositories.");
+          }
+
+          setRepos(data);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Failed to load.");
+        } finally {
+          setIsLoadingRepos(false);
         }
+      })();
+    });
 
-        setRepos(data);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load.",
-        );
-      } finally {
-        setIsLoadingRepos(false);
-      }
-    }
-
-    loadRepos();
+    return () => cancelAnimationFrame(frame);
   }, [isAuthenticated]);
 
   async function handleRepoChange(fullName: string) {
     setSelectedRepo(fullName);
+    setCommits([]);
     setIsLoadingCommits(true);
     setError(null);
 
@@ -76,7 +80,7 @@ export function GitHubCommitImport({
       const response = await fetch(
         `/api/github/commits?repo=${encodeURIComponent(fullName)}`,
       );
-      const data = (await response.json()) as { message: string }[] & {
+      const data = (await response.json()) as ImportedCommit[] & {
         error?: string;
       };
 
@@ -84,12 +88,9 @@ export function GitHubCommitImport({
         throw new Error(data.error ?? "Could not load commits.");
       }
 
-      const commits = data.map((entry) => entry.message.trim()).join("\n");
-      onImport(commits, fullName);
+      setCommits(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to load.",
-      );
+      setError(err instanceof Error ? err.message : "Failed to load.");
     } finally {
       setIsLoadingCommits(false);
     }
@@ -99,7 +100,7 @@ export function GitHubCommitImport({
     return (
       <div className="rounded-xl border border-dashed border-primary/25 bg-primary/5 p-4">
         <p className="text-sm text-muted-foreground">
-          Connect GitHub to import your last 30 commits without copy paste.
+          Connect GitHub to pick commits from a repository without copy paste.
         </p>
         <Button asChild size="sm" className="mt-3">
           <Link href={`/login?callbackUrl=${encodeURIComponent(loginCallbackUrl)}`}>
@@ -112,7 +113,7 @@ export function GitHubCommitImport({
   }
 
   return (
-    <div className="space-y-2 rounded-xl border border-white/10 bg-background/40 p-4">
+    <div className="space-y-3 rounded-xl border border-white/10 bg-background/40 p-4">
       <Label htmlFor="github-repo">Import from GitHub</Label>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <Select
@@ -145,9 +146,23 @@ export function GitHubCommitImport({
           </span>
         ) : null}
       </div>
+
+      {selectedRepo && !isLoadingCommits ? (
+        <CommitRangePicker
+          commits={commits}
+          repoFullName={selectedRepo}
+          onConfirm={(text) => onImport(text, selectedRepo)}
+        />
+      ) : null}
+
       {error ? (
         <p className="text-sm text-destructive" role="alert">
           {error}
+        </p>
+      ) : null}
+      {!isLoadingRepos && repos.length === 0 && !error ? (
+        <p className="text-sm text-muted-foreground">
+          No repositories found for this GitHub account.
         </p>
       ) : null}
     </div>

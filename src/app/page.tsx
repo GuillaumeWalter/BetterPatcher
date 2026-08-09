@@ -17,7 +17,7 @@ import {
 const features = [
   {
     icon: GitBranch,
-    label: "Commits → changelog",
+    label: "Commits to changelog",
     description: "GitHub / GitLab import, or paste Perforce / Plastic / SVN",
   },
   {
@@ -48,13 +48,17 @@ export default async function Home() {
 
         <div className="space-y-4">
           <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-foreground sm:text-5xl sm:leading-[1.15]">
-            From your commits to a{" "}
-            <span className="gradient-text">patch note</span>, without the headache
+            <span className="gradient-text">Easy Patch</span>
+            <span className="block sm:inline">
+              {" "}
+              turns commits into a patch note
+            </span>
           </h1>
           <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Easy Patch turns a raw log into a Markdown changelog and a social
-            post. Create an account, verify your card (€0), try{" "}
-            {BILLING.TRIAL_GENERATIONS} times, then pick Solo or Pro.
+            Import GitHub or GitLab, or paste any log. Get Markdown release notes
+            and a social post ready to publish. Create an account, verify your
+            card (€0), try {BILLING.TRIAL_GENERATIONS} times, then pick Solo or
+            Pro.
           </p>
         </div>
 
@@ -113,7 +117,7 @@ export default async function Home() {
               </p>
               <ul className="space-y-1.5">
                 <li>· {BILLING.TRIAL_GENERATIONS} free generations</li>
-                <li>· GitHub or manual paste</li>
+                <li>· GitHub / GitLab or manual paste</li>
                 <li>· History included</li>
               </ul>
             </CardContent>

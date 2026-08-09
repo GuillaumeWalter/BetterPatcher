@@ -1,7 +1,13 @@
+import { auth } from "@/auth";
 import { getAiProvider } from "@/lib/ai/model";
 
-/** Prod diagnostic: which variables are present (not their values). */
+/** Signed-in diagnostic: which variables are present (not their values). */
 export async function GET() {
+  const session = await auth();
+  if (!session?.user) {
+    return Response.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
   const provider = getAiProvider();
 
   return Response.json({

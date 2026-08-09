@@ -1,30 +1,32 @@
-# PROJECT CONTEXT: Easy Patch (Automated Patch Notes & Marketing Assets)
+# Easy Patch | Project context
 
-## 1. Vision & Objectif
-- **Concept :** SaaS B2B qui se branche sur les dépôts de code (GitHub/GitLab), analyse les commits et les Pull Requests via LLM, et génère automatiquement des patch notes structurés ainsi que des assets marketing (posts LinkedIn, carrousels, résumés Discord/Steam).
-- **Objectif :** Éliminer la corvée de rédaction pour les devs et donner du contenu clé en main pour les équipes marketing/produit et les studios indés.
-- **Workflow de Dev :** Vibe coding (Cursor + Antigravity). On cherche la simplicité, la vitesse de livraison et un code ultra-propre (Next.js / Tailwind CSS / TypeScript).
+## Vision
 
-## 2. Personas Cibles
-- **Alex (Lead Dev) :** Veut un changelog technique propre en Markdown en 1 clic pour vider sa To-Do list.
-- **Sarah (Product/Marketer) :** Veut une traduction du jargon technique en bénéfices clients et des templates de posts LinkedIn/Réseaux.
-- **Lucas (Studio de Jeu Indé) :** Veut un format "Devlog/Patch Note" engageant et structuré pour sa communauté Steam/Discord.
+SaaS that turns commits (and later tickets) into structured patch notes and ready-to-publish social posts for indies, studios, live ops, and eng / product marketers.
 
-## 3. Architecture Technique (MVP Target)
-- **Framework :** Next.js (App Router) - parfait pour le SEO de la landing page et la structure de l'application.
-- **Styling :** Tailwind CSS + Shadcn/ui (pour des composants d'interface pro et rapides à intégrer).
-- **IA :** Intégration des API Vercel AI SDK (pour interroger GPT-4o ou Claude 3.5 Sonnet de manière ultra-fluide).
-- **Déploiement :** Antigravity (Zéro config ops).
+## Stack
 
-## 4. Phase 1 : Le "Side-Project Marketing" (Outil Gratuit)
-Pour attirer nos premiers utilisateurs sans forcer la vente, on commence par une page unique :
-- Un champ texte où l'utilisateur colle ses messages de commits bruts.
-- Un sélecteur de "Tonalité" (Technique épuré, Start-up/Marketing, Gaming/Devlog).
-- Un bouton "Générer".
-- En sortie : Le patch note formaté + un post de réseau social prêt à copier.
-- Un call-to-action (CTA) vers la liste d'attente de la version automatisée (Easy Patch).
+- Next.js App Router + TypeScript + Tailwind + shadcn/ui
+- Auth.js (GitHub login) · optional GitLab OAuth link for import
+- Stripe (trial card verification + Solo / Pro subscriptions)
+- Supabase (profiles, quotas, patch note history, GitLab tokens)
+- Vercel AI SDK (Gemini / AI Gateway)
+- Hosting: Vercel
 
-## 5. Règles de Vibe Coding (Pour l'IA de Cursor)
-- Priorise toujours l'efficacité et la simplicité du code. Pas d'over-engineering.
-- Utilise des composants UI modernes, épurés et responsives.
-- Reste focus sur la tâche demandée sans réécrire des fichiers entiers si ce n'est pas nécessaire.
+## Pricing (summary)
+
+- Trial: €0, card required, 5 one-time generations
+- Solo: €4.99 / month, 25 generations, 1 user
+- Pro: €9.99 / month, 80 generations, team seats (copy ready; real invites later)
+
+## Current sources
+
+GitHub import · GitLab import · manual paste
+
+## Next
+
+Jira / Linear enrichment (Phase 2). Decisions: docs/open-questions.md
+
+## Copy rules
+
+English only. No dash punctuation in prose. Prefer `:`, `( )`, `/`, `|`, `·`. See docs/copywriting.md.

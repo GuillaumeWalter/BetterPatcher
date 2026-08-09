@@ -12,6 +12,12 @@ import {
   COMMITS_STORAGE_KEY,
   REPO_STORAGE_KEY,
 } from "@/lib/github-session";
+import { rememberGeneratedMessages } from "@/lib/import-memory";
+import {
+  listReferencePatches,
+  saveReferencePatch,
+  type SavedReferencePatch,
+} from "@/lib/reference-patches";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -67,24 +73,33 @@ export function PatchNoteGenerator({
   const [socialPost, setSocialPost] = useState("");
   const [platformDrafts, setPlatformDrafts] = useState<PlatformDraft[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [repoFullName, setRepoFullName] = useState<string | null>(null);
+  const [referencePatch, setReferencePatch] = useState("");
+  const [savedReferences, setSavedReferences] = useState<SavedReferencePatch[]>(
+    [],
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [markdownSaved, setMarkdownSaved] = useState(true);
   const [baselineMarkdown, setBaselineMarkdown] = useState("");
   const { quota, refreshQuota } = useBillingQuota();
 
   useEffect(() => {
-    const stored = sessionStorage.getItem(COMMITS_STORAGE_KEY);
-    if (stored) {
-      setCommits(stored);
-      sessionStorage.removeItem(COMMITS_STORAGE_KEY);
-    }
-    const storedRepo = sessionStorage.getItem(REPO_STORAGE_KEY);
-    if (storedRepo) {
-      setRepoFullName(storedRepo);
-      sessionStorage.removeItem(REPO_STORAGE_KEY);
-    }
+    const frame = requestAnimationFrame(() => {
+      const stored = sessionStorage.getItem(COMMITS_STORAGE_KEY);
+      if (stored) {
+        setCommits(stored);
+        sessionStorage.removeItem(COMMITS_STORAGE_KEY);
+      }
+      const storedRepo = sessionStorage.getItem(REPO_STORAGE_KEY);
+      if (storedRepo) {
+        setRepoFullName(storedRepo);
+        sessionStorage.removeItem(REPO_STORAGE_KEY);
+      }
+      setSavedReferences(listReferencePatches());
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   async function handleGenerate() {
@@ -95,13 +110,20 @@ export function PatchNoteGenerator({
     setSocialPost("");
     setPlatformDrafts([]);
     setError(null);
+    setErrorCode(null);
     setSavedId(null);
 
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ commits, tone, repoFullName, options }),
+        body: JSON.stringify({
+          commits,
+          tone,
+          repoFullName,
+          options,
+          referencePatch: referencePatch.trim() || undefined,
+        }),
       });
 
       const data = (await response.json()) as {
@@ -110,9 +132,11 @@ export function PatchNoteGenerator({
         platformDrafts?: PlatformDraft[];
         savedId?: string | null;
         error?: string;
+        code?: string;
       };
 
       if (!response.ok) {
+        setErrorCode(data.code ?? null);
         throw new Error(data.error ?? "Generation failed.");
       }
 
@@ -123,6 +147,10 @@ export function PatchNoteGenerator({
       setSocialPost(data.socialPost ?? "");
       setPlatformDrafts(data.platformDrafts ?? []);
       setSavedId(data.savedId ?? null);
+      rememberGeneratedMessages(repoFullName, commits);
+      if (referencePatch.trim()) {
+        setSavedReferences(saveReferencePatch(referencePatch));
+      }
       await refreshQuota();
     } catch (err) {
       setError(
@@ -162,6 +190,20 @@ export function PatchNoteGenerator({
     setInputMode("paste");
   }
 
+  const showBillingCta =
+    errorCode === "subscription_required" ||
+    errorCode === "quota_exceeded" ||
+    errorCode === "setup_required" ||
+    (error !== null &&
+      (error.includes("Trial ended") ||
+        error.includes("quota") ||
+        error.includes("card")));
+
+  const billingCtaLabel =
+    errorCode === "setup_required" || error?.includes("card")
+      ? "Activate trial"
+      : "View billing";
+
   const hasResult = Boolean(markdown || socialPost || platformDrafts.length);
 
   return (
@@ -182,34 +224,31 @@ export function PatchNoteGenerator({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
-            <div className="flex gap-1 rounded-lg border border-white/10 bg-muted/30 p-1">
-              <Button
-                type="button"
-                variant={inputMode === "paste" ? "default" : "ghost"}
-                size="sm"
-                className="flex-1"
-                onClick={() => setInputMode("paste")}
-              >
-                Paste
-              </Button>
-              <Button
-                type="button"
-                variant={inputMode === "github" ? "default" : "ghost"}
-                size="sm"
-                className="flex-1"
-                onClick={() => setInputMode("github")}
-              >
-                GitHub
-              </Button>
-              <Button
-                type="button"
-                variant={inputMode === "gitlab" ? "default" : "ghost"}
-                size="sm"
-                className="flex-1"
-                onClick={() => setInputMode("gitlab")}
-              >
-                GitLab
-              </Button>
+            <div
+              className="flex gap-1 rounded-lg border border-white/10 bg-muted/30 p-1"
+              role="tablist"
+              aria-label="Commit source"
+            >
+              {(
+                [
+                  ["paste", "Paste"],
+                  ["github", "GitHub"],
+                  ["gitlab", "GitLab"],
+                ] as const
+              ).map(([mode, label]) => (
+                <Button
+                  key={mode}
+                  type="button"
+                  role="tab"
+                  aria-selected={inputMode === mode}
+                  variant={inputMode === mode ? "default" : "ghost"}
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setInputMode(mode)}
+                >
+                  {label}
+                </Button>
+              ))}
             </div>
 
             {inputMode === "github" ? (
@@ -299,6 +338,65 @@ export function PatchNoteGenerator({
               </div>
             </div>
 
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Label htmlFor="reference-patch">Style reference (optional)</Label>
+                {referencePatch.trim() ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setReferencePatch("")}
+                  >
+                    Clear
+                  </Button>
+                ) : null}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Paste a real patch note written without Easy Patch. Generation
+                will copy its structure and voice.
+              </p>
+              {savedReferences.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {savedReferences.map((entry) => (
+                    <Button
+                      key={entry.id}
+                      type="button"
+                      variant={
+                        referencePatch.trim() === entry.body.trim()
+                          ? "default"
+                          : "outline"
+                      }
+                      size="sm"
+                      className="max-w-full truncate text-xs"
+                      onClick={() => setReferencePatch(entry.body)}
+                    >
+                      {entry.label}
+                    </Button>
+                  ))}
+                </div>
+              ) : null}
+              <Textarea
+                id="reference-patch"
+                placeholder="Paste an older Steam / Discord / changelog patch note here…"
+                value={referencePatch}
+                onChange={(event) => setReferencePatch(event.target.value)}
+                className="min-h-28 resize-y text-sm"
+              />
+              {referencePatch.trim() ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setSavedReferences(saveReferencePatch(referencePatch))
+                  }
+                >
+                  Save for quick reuse
+                </Button>
+              ) : null}
+            </div>
+
             <Button
               size="lg"
               className="w-full"
@@ -325,9 +423,9 @@ export function PatchNoteGenerator({
                 <p className="text-sm text-destructive" role="alert">
                   {error}
                 </p>
-                {error.includes("Trial ended") || error.includes("Quota") ? (
+                {showBillingCta ? (
                   <Button variant="outline" size="sm" asChild>
-                    <Link href="/dashboard/billing">View Pro subscription</Link>
+                    <Link href="/dashboard/billing">{billingCtaLabel}</Link>
                   </Button>
                 ) : null}
               </div>

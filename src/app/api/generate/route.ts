@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { generateText, Output } from "ai";
 
 import { getAiProvider, getGenerationModel } from "@/lib/ai/model";
-import { getSystemPrompt } from "@/lib/ai/prompts";
+import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
 import { generationSchema } from "@/lib/ai/schema";
 import { BILLING } from "@/lib/billing/constants";
 import {
@@ -85,6 +85,14 @@ export async function POST(request: Request) {
       ? parseGenerationOptions(body.options)
       : parseGenerationOptions(undefined);
 
+  const referencePatch =
+    typeof body === "object" &&
+    body !== null &&
+    "referencePatch" in body &&
+    typeof body.referencePatch === "string"
+      ? body.referencePatch.trim()
+      : "";
+
   if (!commits) {
     return Response.json(
       { error: "The commits field is required." },
@@ -110,6 +118,15 @@ export async function POST(request: Request) {
     return Response.json(
       {
         error: `Too many commits (${BILLING.MAX_COMMIT_LINES} lines max). Narrow your selection.`,
+      },
+      { status: 400 },
+    );
+  }
+
+  if (referencePatch.length > BILLING.MAX_REFERENCE_CHARS) {
+    return Response.json(
+      {
+        error: `Reference patch is too long (${BILLING.MAX_REFERENCE_CHARS.toLocaleString("en-US")} characters max).`,
       },
       { status: 400 },
     );
@@ -141,8 +158,13 @@ export async function POST(request: Request) {
   try {
     const { output } = await generateText({
       model: getGenerationModel(),
-      system: getSystemPrompt(tone, options, platforms),
-      prompt: `Turn these commit messages into a patch note:\n\n${commits}`,
+      system: getSystemPrompt(
+        tone,
+        options,
+        platforms,
+        referencePatch || null,
+      ),
+      prompt: getUserPrompt(commits, tone, referencePatch || null),
       output: Output.object({ schema: generationSchema }),
     });
 

@@ -69,7 +69,7 @@ Workspaces / seats: invite teammates to one company account, shared history and 
 ## Backlog
 
 - Team seats / workspaces (Pro)
-- Jira / Linear → ticket titles in patch notes
+- Jira / Linear ticket titles in patch notes (open decisions: `docs/open-questions.md`)
 - Auto-generate on tag / GitHub Release
 - Brand voice / studio tone memory
 - Multi-language patch notes
@@ -77,6 +77,8 @@ Workspaces / seats: invite teammates to one company account, shared history and 
 - Annual plan (15% off)
 - Bitbucket
 - Trello (nice to have)
+
+Ops checklists: `docs/env-setup.md` · open product questions: `docs/open-questions.md`.
 
 ## Phases
 

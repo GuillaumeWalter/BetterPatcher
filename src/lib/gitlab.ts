@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
+import { messagesForGenerator } from "@/lib/commit-messages";
 import { getAuthSecret } from "@/lib/env";
 import { getAppBaseUrl } from "@/lib/stripe";
 
@@ -174,5 +175,7 @@ export async function getGitLabProjectCommits(
 }
 
 export function formatGitLabCommitsForGenerator(commits: GitLabCommit[]): string {
-  return commits.map((entry) => entry.message.trim()).join("\n");
+  return messagesForGenerator(
+    commits.map((entry) => entry.title || entry.message),
+  );
 }
