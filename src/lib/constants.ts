@@ -18,7 +18,7 @@ export const TONE_OPTIONS: {
   {
     value: "gaming",
     label: "Gaming / Devlog",
-    description: "Engaging tone for Steam & Discord",
+    description: "Community tone for Steam & Discord (no fake host name)",
   },
 ];
 

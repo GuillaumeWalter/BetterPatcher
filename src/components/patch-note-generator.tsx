@@ -13,6 +13,11 @@ import {
   REPO_STORAGE_KEY,
 } from "@/lib/github-session";
 import { rememberGeneratedMessages } from "@/lib/import-memory";
+import {
+  listReferencePatches,
+  saveReferencePatch,
+  type SavedReferencePatch,
+} from "@/lib/reference-patches";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -70,6 +75,10 @@ export function PatchNoteGenerator({
   const [errorCode, setErrorCode] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [repoFullName, setRepoFullName] = useState<string | null>(null);
+  const [referencePatch, setReferencePatch] = useState("");
+  const [savedReferences, setSavedReferences] = useState<SavedReferencePatch[]>(
+    [],
+  );
   const { quota, refreshQuota } = useBillingQuota();
 
   useEffect(() => {
@@ -84,6 +93,7 @@ export function PatchNoteGenerator({
         setRepoFullName(storedRepo);
         sessionStorage.removeItem(REPO_STORAGE_KEY);
       }
+      setSavedReferences(listReferencePatches());
     });
     return () => cancelAnimationFrame(frame);
   }, []);
@@ -102,7 +112,13 @@ export function PatchNoteGenerator({
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ commits, tone, repoFullName, options }),
+        body: JSON.stringify({
+          commits,
+          tone,
+          repoFullName,
+          options,
+          referencePatch: referencePatch.trim() || undefined,
+        }),
       });
 
       const data = (await response.json()) as {
@@ -122,6 +138,9 @@ export function PatchNoteGenerator({
       setSocialPost(data.socialPost ?? "");
       setSavedId(data.savedId ?? null);
       rememberGeneratedMessages(repoFullName, commits);
+      if (referencePatch.trim()) {
+        setSavedReferences(saveReferencePatch(referencePatch));
+      }
       await refreshQuota();
     } catch (err) {
       setError(
@@ -281,6 +300,65 @@ export function PatchNoteGenerator({
                 </label>
               ))}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Label htmlFor="reference-patch">Style reference (optional)</Label>
+              {referencePatch.trim() ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setReferencePatch("")}
+                >
+                  Clear
+                </Button>
+              ) : null}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Paste a real patch note written without Easy Patch. Generation
+              will copy its structure and voice.
+            </p>
+            {savedReferences.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {savedReferences.map((entry) => (
+                  <Button
+                    key={entry.id}
+                    type="button"
+                    variant={
+                      referencePatch.trim() === entry.body.trim()
+                        ? "default"
+                        : "outline"
+                    }
+                    size="sm"
+                    className="max-w-full truncate text-xs"
+                    onClick={() => setReferencePatch(entry.body)}
+                  >
+                    {entry.label}
+                  </Button>
+                ))}
+              </div>
+            ) : null}
+            <Textarea
+              id="reference-patch"
+              placeholder="Paste an older Steam / Discord / changelog patch note here…"
+              value={referencePatch}
+              onChange={(event) => setReferencePatch(event.target.value)}
+              className="min-h-28 resize-y text-sm"
+            />
+            {referencePatch.trim() ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setSavedReferences(saveReferencePatch(referencePatch))
+                }
+              >
+                Save for quick reuse
+              </Button>
+            ) : null}
           </div>
 
           <Button

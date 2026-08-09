@@ -8,10 +8,12 @@ Shared rules:
 - Never invent a feature, fix, or breaking change that is not present in the commits.
 - Prefer user-facing outcomes over internal refactors unless the tone is technical.
 - Write readable, structured patch notes that are pleasant to scan (not a raw dump of commits).
+- Never invent a narrator, author name, persona, or signature (no "Alex here", "Sarah here", "Lucas here", "The Easy Patch Team", fake studio names, etc.). Write in a neutral editorial voice unless a style reference below says otherwise.
+- Do not claim the product rebranded, launched tiers, or shipped features that are not clearly implied by the commits.
 - Reply only via the requested structured schema (markdown + socialPost).`;
 
 const TONE_PROMPTS: Record<Tone, string> = {
-  technical: `Tone: TECHNICAL (for Alex, lead engineer).
+  technical: `Tone: TECHNICAL (audience: engineers / leads).
 
 For "markdown":
 - Professional changelog format in Markdown.
@@ -22,7 +24,7 @@ For "markdown":
 For "socialPost":
 - Short LinkedIn or X engineering update: 2 to 4 lines, professional and direct. No Slack-only slang.`,
 
-  marketing: `Tone: MARKETING / STARTUP (for Sarah, product marketer).
+  marketing: `Tone: MARKETING / STARTUP (audience: product marketers / customers).
 
 For "markdown":
 - Translate technical jargon into user or customer benefits.
@@ -33,12 +35,13 @@ For "socialPost":
 - Ready to publish LinkedIn post: hook on the first line, 3 to 5 bullet points, soft CTA.
 - Length: 800 characters max, spaced with line breaks.`,
 
-  gaming: `Tone: GAMING / DEVLOG (for Lucas, indie studio).
+  gaming: `Tone: GAMING / DEVLOG (audience: players / community).
 
 For "markdown":
 - Community patch note / devlog format suitable for Steam News, Discord, or itch.io.
-- Structure: epic or fun title, short community intro, then sections (New, Balance, Fixes, Quality of life) as content warrants.
+- Structure: clear title, short community intro (no fake first-person author name), then sections (New, Balance, Fixes, Quality of life) as content warrants.
 - Engaging, accessible, lightly narrative (without being cringe). Call out player-facing changes first.
+- Do not invent a host character or sign-off persona.
 
 For "socialPost":
 - Discord or X gaming announcement: moderate hype, 3 to 5 highlights, invite feedback.`,
@@ -80,24 +83,52 @@ function buildOptionsBlock(options: GenerationOptions): string {
   return lines.join("\n");
 }
 
+function buildReferenceBlock(referencePatch: string | null | undefined): string {
+  const reference = referencePatch?.trim();
+  if (!reference) return "";
+
+  return `Style reference (highest priority for voice and structure):
+The user pasted a real patch note written without Easy Patch. Match its writing style as closely as possible:
+- Section layout, heading depth, bullet density, and length feel
+- Formality, hype level, emoji habits, and sign-off style (only if the reference itself uses a real studio voice)
+- Still invent nothing: use only facts from the commits below
+- If the reference conflicts with the tone preset, prefer the reference for style; keep commit facts accurate
+
+Reference patch note:
+"""
+${reference}
+"""`;
+}
+
 export function getSystemPrompt(
   tone: Tone,
   options: GenerationOptions,
+  referencePatch?: string | null,
 ): string {
+  const referenceBlock = buildReferenceBlock(referencePatch);
+
   return `${BASE_RULES}
 
 ${TONE_PROMPTS[tone]}
 
-${buildOptionsBlock(options)}`;
+${buildOptionsBlock(options)}
+${referenceBlock ? `\n${referenceBlock}` : ""}`;
 }
 
-export function getUserPrompt(commits: string, tone: Tone): string {
-  return `Turn the following commit messages into a ${tone} patch note.
+export function getUserPrompt(
+  commits: string,
+  tone: Tone,
+  referencePatch?: string | null,
+): string {
+  const hasReference = Boolean(referencePatch?.trim());
 
+  return `Turn the following commit messages into a ${tone} patch note.
+${hasReference ? "Match the style of the style reference from the system instructions.\n" : ""}
 Requirements:
 - Deduplicate and group related changes.
 - Ignore noise commits.
 - Produce both markdown and socialPost per the system instructions.
+- Do not invent narrator names or fake team signatures.
 
 Commits:
 ${commits}`;
