@@ -10,7 +10,10 @@ import {
   parseGenerationOptions,
   type Tone,
 } from "@/lib/constants";
+import { defaultPlatformsForTone } from "@/lib/share/platforms";
+import { normalizePlatformDrafts } from "@/lib/share/normalize-drafts";
 import { savePatchNote } from "@/lib/supabase/patch-notes";
+import { replacePlatformDrafts } from "@/lib/supabase/platform-drafts";
 import {
   consumeGeneration,
   getUserQuota,
@@ -98,10 +101,7 @@ export async function POST(request: Request) {
   }
 
   if (!isTone(tone)) {
-    return Response.json(
-      { error: "Invalid tone." },
-      { status: 400 },
-    );
+    return Response.json({ error: "Invalid tone." }, { status: 400 });
   }
 
   if (commits.length > BILLING.MAX_COMMITS_CHARS) {
@@ -153,13 +153,25 @@ export async function POST(request: Request) {
     );
   }
 
+  const platforms = defaultPlatformsForTone(tone);
+
   try {
     const { output } = await generateText({
       model: getGenerationModel(),
-      system: getSystemPrompt(tone, options, referencePatch || null),
+      system: getSystemPrompt(
+        tone,
+        options,
+        platforms,
+        referencePatch || null,
+      ),
       prompt: getUserPrompt(commits, tone, referencePatch || null),
       output: Output.object({ schema: generationSchema }),
     });
+
+    const platformDrafts = normalizePlatformDrafts(
+      output?.platformDrafts,
+      platforms,
+    );
 
     const savedId =
       output &&
@@ -173,10 +185,16 @@ export async function POST(request: Request) {
         repoFullName,
       }));
 
+    if (savedId && platformDrafts.length > 0) {
+      await replacePlatformDrafts(savedId, platformDrafts);
+    }
+
     const updatedQuota = await getUserQuota(session.user.id);
 
     return Response.json({
-      ...output,
+      markdown: output?.markdown ?? "",
+      socialPost: output?.socialPost ?? "",
+      platformDrafts,
       savedId,
       quota: updatedQuota,
       generationsRemaining: consumed.generationsRemaining,

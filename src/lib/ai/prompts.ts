@@ -1,16 +1,21 @@
 import type { GenerationOptions, Tone } from "@/lib/constants";
+import {
+  defaultPlatformsForTone,
+  getPlatformWritingRules,
+  type SharePlatform,
+} from "@/lib/share/platforms";
 
 const BASE_RULES = `You are Easy Patch, an expert assistant for writing release notes.
 Shared rules:
 - Analyze raw commit messages (Conventional Commits, freeform messages, mixed languages). Prefer the subject line; use multi-line bodies only when they add real detail.
 - Group and deduplicate similar changes; ignore noise (merge commits, "wip", "tmp", pure formatting/typo commits unless they fix a user-visible bug).
-- Detect the dominant language of the commits and write both outputs in that language.
+- Detect the dominant language of the commits and write all outputs in that language.
 - Never invent a feature, fix, or breaking change that is not present in the commits.
 - Prefer user-facing outcomes over internal refactors unless the tone is technical.
 - Write readable, structured patch notes that are pleasant to scan (not a raw dump of commits).
 - Never invent a narrator, author name, persona, or signature (no "Alex here", "Sarah here", "Lucas here", "The Easy Patch Team", fake studio names, etc.). Write in a neutral editorial voice unless a style reference below says otherwise.
 - Do not claim the product rebranded, launched tiers, or shipped features that are not clearly implied by the commits.
-- Reply only via the requested structured schema (markdown + socialPost).`;
+- Reply only via the requested structured schema (markdown + socialPost + platformDrafts).`;
 
 const TONE_PROMPTS: Record<Tone, string> = {
   technical: `Tone: TECHNICAL (audience: engineers / leads).
@@ -66,21 +71,36 @@ function buildOptionsBlock(options: GenerationOptions): string {
 
   if (options.emojis) {
     lines.push(
-      "- Emojis: use relevant emojis sparingly for section titles (🚀 ✨ 🐛 ⚡ 🎮), key bullets, and the social post. Do not put an emoji on every word.",
+      "- Emojis: use relevant emojis sparingly for section titles (🚀 ✨ 🐛 ⚡ 🎮), key bullets, and social drafts. Do not put an emoji on every word.",
     );
   } else {
-    lines.push("- No emojis in the markdown or the social post.");
+    lines.push("- No emojis in the markdown or social drafts.");
   }
 
   if (options.hashtags) {
     lines.push(
-      "- Hashtags: end socialPost with 3 to 5 relevant hashtags (#ProductUpdate, industry, tech…).",
+      "- Hashtags: where the platform allows them, end with 3 to 5 relevant hashtags. Skip hashtags on Slack and Steam.",
     );
   } else {
-    lines.push("- No hashtags on the social post.");
+    lines.push(
+      "- No hashtags on social drafts (unless Instagram rules require a small niche set).",
+    );
   }
 
   return lines.join("\n");
+}
+
+function buildPlatformDraftsBlock(platforms: SharePlatform[]): string {
+  const list = platforms.join(", ");
+  return `For "platformDrafts":
+- Produce exactly one object per platform in this list: ${list}.
+- Adapt length, structure, and CTA to each platform (do not paste the same text everywhere).
+- Use empty string for title except Steam (and any platform that needs a title).
+- socialPost should match the primary social voice for this tone; platformDrafts go deeper per channel.
+- Same anti-persona rules as markdown: no invented host names or fake studio signatures.
+
+Platform rules:
+${getPlatformWritingRules(platforms)}`;
 }
 
 function buildReferenceBlock(referencePatch: string | null | undefined): string {
@@ -103,6 +123,7 @@ ${reference}
 export function getSystemPrompt(
   tone: Tone,
   options: GenerationOptions,
+  platforms: SharePlatform[] = defaultPlatformsForTone(tone),
   referencePatch?: string | null,
 ): string {
   const referenceBlock = buildReferenceBlock(referencePatch);
@@ -112,6 +133,8 @@ export function getSystemPrompt(
 ${TONE_PROMPTS[tone]}
 
 ${buildOptionsBlock(options)}
+
+${buildPlatformDraftsBlock(platforms)}
 ${referenceBlock ? `\n${referenceBlock}` : ""}`;
 }
 
@@ -127,9 +150,27 @@ ${hasReference ? "Match the style of the style reference from the system instruc
 Requirements:
 - Deduplicate and group related changes.
 - Ignore noise commits.
-- Produce both markdown and socialPost per the system instructions.
+- Produce markdown, socialPost, and platformDrafts per the system instructions.
 - Do not invent narrator names or fake team signatures.
 
 Commits:
 ${commits}`;
+}
+
+export function getPlatformRegeneratePrompt(
+  tone: Tone,
+  platform: SharePlatform,
+  options: GenerationOptions,
+): string {
+  return `You are Easy Patch. Rewrite a social draft for one platform from an existing patch note.
+Tone: ${tone}.
+Output language: same as the patch note.
+Never invent features absent from the patch note.
+Never invent a narrator, author name, persona, or fake studio signature.
+${buildOptionsBlock(options)}
+
+Target platform rules:
+${getPlatformWritingRules([platform])}
+
+Return only the structured title + body for this platform.`;
 }

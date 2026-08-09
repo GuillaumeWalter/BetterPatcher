@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Loader2, Save } from "lucide-react";
 
-import { CopyButton } from "@/components/copy-button";
 import { DashboardNav } from "@/components/dashboard-nav";
+import { ShareStudio } from "@/components/share-studio";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,10 +13,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { TONE_OPTIONS, type Tone } from "@/lib/constants";
+import {
+  seedDraftsFromSocialPost,
+  type PlatformDraft,
+} from "@/lib/share/platforms";
 
 type PatchNoteDetailProps = {
   id: string;
@@ -26,6 +27,7 @@ type PatchNoteDetailProps = {
   commitsRaw: string;
   markdown: string;
   socialPost: string;
+  platformDrafts: PlatformDraft[];
   createdAt: string;
   updatedAt: string;
 };
@@ -48,22 +50,27 @@ export function PatchNoteDetail({
   commitsRaw,
   markdown: initialMarkdown,
   socialPost: initialSocialPost,
+  platformDrafts: initialDrafts,
   createdAt,
   updatedAt,
 }: PatchNoteDetailProps) {
   const [markdown, setMarkdown] = useState(initialMarkdown);
   const [socialPost, setSocialPost] = useState(initialSocialPost);
+  const [baselineMarkdown, setBaselineMarkdown] = useState(initialMarkdown);
   const [isSaving, setIsSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isDirty =
-    markdown !== initialMarkdown || socialPost !== initialSocialPost;
+  const drafts = useMemo(
+    () =>
+      initialDrafts.length > 0
+        ? initialDrafts
+        : seedDraftsFromSocialPost(initialSocialPost, tone),
+    [initialDrafts, initialSocialPost, tone],
+  );
 
-  async function handleSave() {
+  async function handleSaveMarkdown() {
     setIsSaving(true);
     setError(null);
-    setSaved(false);
 
     try {
       const response = await fetch(`/api/patch-notes/${id}`, {
@@ -78,7 +85,7 @@ export function PatchNoteDetail({
         throw new Error(data.error ?? "Could not save.");
       }
 
-      setSaved(true);
+      setBaselineMarkdown(markdown);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed.");
     } finally {
@@ -97,15 +104,17 @@ export function PatchNoteDetail({
           </p>
           <p className="text-xs text-muted-foreground">
             Created {formatDate(createdAt)}
-            {updatedAt !== createdAt ? ` · Updated ${formatDate(updatedAt)}` : ""}
+            {updatedAt !== createdAt
+              ? ` · Updated ${formatDate(updatedAt)}`
+              : ""}
           </p>
         </div>
         <Button variant="outline" size="sm" asChild>
-          <Link href="/dashboard/history">Back to history</Link>
+          <Link href="/dashboard/history">← History</Link>
         </Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="mb-6">
         <Card className="surface-card gradient-border">
           <CardHeader>
             <CardTitle className="text-lg">Source commits</CardTitle>
@@ -115,93 +124,30 @@ export function PatchNoteDetail({
             <Textarea
               readOnly
               value={commitsRaw}
-              className="min-h-48 resize-none font-mono text-sm"
+              className="min-h-40 resize-none font-mono text-sm"
             />
           </CardContent>
         </Card>
-
-        <Card className="surface-card gradient-border">
-          <CardHeader>
-            <CardTitle className="text-lg">Editable content</CardTitle>
-            <CardDescription>
-              Adjust the Markdown and post before publishing
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Tabs defaultValue="markdown">
-              <TabsList className="w-full bg-muted/50">
-                <TabsTrigger value="markdown" className="flex-1">
-                  Markdown
-                </TabsTrigger>
-                <TabsTrigger value="social" className="flex-1">
-                  Social post
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="markdown" className="mt-4 space-y-3">
-                <Label htmlFor="markdown" className="sr-only">
-                  Markdown
-                </Label>
-                <Textarea
-                  id="markdown"
-                  value={markdown}
-                  onChange={(event) => {
-                    setMarkdown(event.target.value);
-                    setSaved(false);
-                  }}
-                  className="min-h-48 resize-y font-mono text-sm"
-                />
-                <CopyButton text={markdown} label="Copy" />
-              </TabsContent>
-
-              <TabsContent value="social" className="mt-4 space-y-3">
-                <Label htmlFor="social" className="sr-only">
-                  Social post
-                </Label>
-                <Textarea
-                  id="social"
-                  value={socialPost}
-                  onChange={(event) => {
-                    setSocialPost(event.target.value);
-                    setSaved(false);
-                  }}
-                  className="min-h-48 resize-y text-sm"
-                />
-                <CopyButton text={socialPost} label="Copy" />
-              </TabsContent>
-            </Tabs>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <Button
-                onClick={handleSave}
-                disabled={isSaving || !isDirty}
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="animate-spin" />
-                    Saving…
-                  </>
-                ) : (
-                  <>
-                    <Save />
-                    Save
-                  </>
-                )}
-              </Button>
-              {saved ? (
-                <span className="text-sm text-muted-foreground">
-                  Changes saved
-                </span>
-              ) : null}
-              {error ? (
-                <span className="text-sm text-destructive" role="alert">
-                  {error}
-                </span>
-              ) : null}
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      <ShareStudio
+        tone={tone}
+        patchNoteId={id}
+        markdown={markdown}
+        socialPost={socialPost}
+        initialDrafts={drafts}
+        onMarkdownChange={setMarkdown}
+        onSocialPostChange={setSocialPost}
+        onSaveMarkdown={handleSaveMarkdown}
+        markdownDirty={markdown !== baselineMarkdown}
+        isSavingMarkdown={isSaving}
+      />
+
+      {error ? (
+        <p className="mt-4 text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      ) : null}
     </>
   );
 }
