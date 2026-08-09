@@ -1,13 +1,18 @@
 import type { GenerationOptions, Tone } from "@/lib/constants";
+import {
+  defaultPlatformsForTone,
+  getPlatformWritingRules,
+  type SharePlatform,
+} from "@/lib/share/platforms";
 
 const BASE_RULES = `You are Easy Patch, an expert assistant for writing release notes.
 Shared rules:
 - Analyze raw commit messages (Conventional Commits, freeform messages, mixed languages).
 - Group and deduplicate similar changes; ignore noise (merge commits, "wip", commit typos).
-- Detect the dominant language of the commits and write both outputs in that language.
+- Detect the dominant language of the commits and write all outputs in that language.
 - Never invent a feature that is not present in the commits.
 - Write readable, structured patch notes that are pleasant to scan (not a raw dump of commits).
-- Reply only via the requested structured schema (markdown + socialPost).`;
+- Reply only via the requested structured schema (markdown + socialPost + platformDrafts).`;
 
 const TONE_PROMPTS: Record<Tone, string> = {
   technical: `Tone: TECHNICAL (for Alex, lead engineer).
@@ -62,30 +67,62 @@ function buildOptionsBlock(options: GenerationOptions): string {
 
   if (options.emojis) {
     lines.push(
-      "- Emojis: use relevant emojis sparingly for section titles (🚀 ✨ 🐛 ⚡ 🎮), key bullets, and the social post. Do not put an emoji on every word.",
+      "- Emojis: use relevant emojis sparingly for section titles (🚀 ✨ 🐛 ⚡ 🎮), key bullets, and social drafts. Do not put an emoji on every word.",
     );
   } else {
-    lines.push("- No emojis in the markdown or the social post.");
+    lines.push("- No emojis in the markdown or social drafts.");
   }
 
   if (options.hashtags) {
     lines.push(
-      "- Hashtags: end socialPost with 3 to 5 relevant hashtags (#ProductUpdate, industry, tech…).",
+      "- Hashtags: where the platform allows them, end with 3 to 5 relevant hashtags. Skip hashtags on Slack and Steam.",
     );
   } else {
-    lines.push("- No hashtags on the social post.");
+    lines.push("- No hashtags on social drafts (unless Instagram rules require a small niche set).");
   }
 
   return lines.join("\n");
 }
 
+function buildPlatformDraftsBlock(platforms: SharePlatform[]): string {
+  const list = platforms.join(", ");
+  return `For "platformDrafts":
+- Produce exactly one object per platform in this list: ${list}.
+- Adapt length, structure, and CTA to each platform (do not paste the same text everywhere).
+- Use empty string for title except Steam (and any platform that needs a title).
+- socialPost should match the primary social voice for this tone; platformDrafts go deeper per channel.
+
+Platform rules:
+${getPlatformWritingRules(platforms)}`;
+}
+
 export function getSystemPrompt(
   tone: Tone,
   options: GenerationOptions,
+  platforms: SharePlatform[] = defaultPlatformsForTone(tone),
 ): string {
   return `${BASE_RULES}
 
 ${TONE_PROMPTS[tone]}
 
-${buildOptionsBlock(options)}`;
+${buildOptionsBlock(options)}
+
+${buildPlatformDraftsBlock(platforms)}`;
+}
+
+export function getPlatformRegeneratePrompt(
+  tone: Tone,
+  platform: SharePlatform,
+  options: GenerationOptions,
+): string {
+  return `You are Easy Patch. Rewrite a social draft for one platform from an existing patch note.
+Tone: ${tone}.
+Output language: same as the patch note.
+Never invent features absent from the patch note.
+${buildOptionsBlock(options)}
+
+Target platform rules:
+${getPlatformWritingRules([platform])}
+
+Return only the structured title + body for this platform.`;
 }

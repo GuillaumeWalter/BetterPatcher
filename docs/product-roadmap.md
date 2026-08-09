@@ -6,7 +6,7 @@ Living doc. Re-read before product, billing, or integration work.
 
 ## Positioning
 
-Easy Patch turns a commit log (or pasted text) into a **Markdown patch note** plus a **social post** (LinkedIn, X, Discord, Steam-style by tone).
+Easy Patch turns a commit log (or pasted text) into a **Markdown patch note** plus **platform-ready social drafts** (LinkedIn, X, Discord, Steam-style, etc.). Share Studio (roadmap) adds edit → adapt → copy / publish / schedule.
 
 Audience: indies, game studios, live ops, eng leads, product marketers.
 
@@ -69,13 +69,11 @@ Workspaces / seats: invite teammates to one company account, shared history and 
 ## Backlog
 
 - Team seats / workspaces (Pro)
-- GitLab import
 - Jira / Linear → ticket titles in patch notes
 - Auto-generate on tag / GitHub Release
 - Brand voice / studio tone memory
 - Multi-language patch notes
-- Dedicated Steam News format
-- Discord publish (not only generate)
+- **Share & publish** (see `docs/share-and-publish.md`): Share Studio · per-platform drafts · Discord webhook then bot · schedule · Steam News format · Meta / X / LinkedIn OAuth later
 - Annual plan (15% off)
 - Bitbucket
 - Trello (nice to have)
@@ -103,11 +101,23 @@ Workspaces / seats: invite teammates to one company account, shared history and 
 ### Phase 2 (next)
 
 - Jira or Linear (ticket enrichment) | Solo + Pro
+- **Share Studio P0** (parallel track OK): editable markdown + per-platform social drafts + copy (Discord · X · LinkedIn · Threads · Instagram · Steam · Slack). Detail: `docs/share-and-publish.md`
+
+### Phase 2.5
+
+- Discord webhook publish + schedule (Share Studio P1)
+- Dedicated Steam News copy format (no Steam write API)
 
 ### Phase 3
 
 - Workspaces / multi-user invites (real Pro differentiator)
-- Bitbucket, Discord publish, auto-release, annual, etc.
+- Discord bot (channel map · slash helpers)
+- Bitbucket, auto-release, annual, etc.
+
+### Phase 4
+
+- Social OAuth publish where APIs allow (Meta FB/IG/Threads · LinkedIn · X with cost/BYOK decision)
+- Media uploads for platform rules (Instagram requires media)
 
 ## GTM (later)
 
@@ -121,7 +131,7 @@ Wait until the product is solid (trial → Solo/Pro smooth, generation reliable,
 | PWA “Install app” | When dashboard UI is stable |
 | GitHub Action (tag/release → patch note) | After core is reliable (best recurrence lever) |
 | Raycast / Alfred / browser extension | After core |
-| Discord / Slack bot | Later |
+| Discord / Slack bot | After Share Studio webhook path (see `docs/share-and-publish.md`) |
 
 ### Suggested ad mix
 
