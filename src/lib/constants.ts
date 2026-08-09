@@ -1,10 +1,4 @@
-export type Tone =
-  | "technical"
-  | "marketing"
-  | "gaming"
-  | "steam"
-  | "discord"
-  | "minimal";
+export type Tone = "technical" | "marketing" | "gaming";
 
 export const TONE_OPTIONS: {
   value: Tone;
@@ -24,24 +18,57 @@ export const TONE_OPTIONS: {
   {
     value: "gaming",
     label: "Gaming / Devlog",
-    description: "Friendly community update (faithful, not hype)",
-  },
-  {
-    value: "steam",
-    label: "Steam News",
-    description: "Store-style patch note sections for players",
-  },
-  {
-    value: "discord",
-    label: "Discord",
-    description: "Short announcement ready to post in chat",
-  },
-  {
-    value: "minimal",
-    label: "Minimal",
-    description: "Bare bullets, almost no intro",
+    description: "Friendly community update for players",
   },
 ];
+
+/** Voice / mood layered on top of the format tone. */
+export type Voice =
+  | "straight"
+  | "storytelling"
+  | "playful"
+  | "warm"
+  | "punchy"
+  | "apologetic";
+
+export const VOICE_OPTIONS: {
+  value: Voice;
+  label: string;
+  description: string;
+}[] = [
+  {
+    value: "straight",
+    label: "Straight",
+    description: "Neutral and clear (default)",
+  },
+  {
+    value: "storytelling",
+    label: "Storytelling",
+    description: "Light narrative framing around the changes",
+  },
+  {
+    value: "playful",
+    label: "Playful",
+    description: "Witty / funny, still accurate",
+  },
+  {
+    value: "warm",
+    label: "Warm",
+    description: "Friendly and upbeat",
+  },
+  {
+    value: "punchy",
+    label: "Punchy",
+    description: "Short, energetic, high signal",
+  },
+  {
+    value: "apologetic",
+    label: "Apologetic",
+    description: "Good for fix-heavy or incident updates",
+  },
+];
+
+export const DEFAULT_VOICE: Voice = "straight";
 
 export type GenerationOptions = {
   emojis: boolean;
@@ -97,4 +124,10 @@ export function parseGenerationOptions(value: unknown): GenerationOptions {
     hashtags: input.hashtags === true,
     highlights: input.highlights !== false,
   };
+}
+
+export function parseVoice(value: unknown): Voice {
+  if (typeof value !== "string") return DEFAULT_VOICE;
+  const match = VOICE_OPTIONS.find((option) => option.value === value);
+  return match?.value ?? DEFAULT_VOICE;
 }

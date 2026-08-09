@@ -1,4 +1,4 @@
-import type { GenerationOptions, Tone } from "@/lib/constants";
+import type { GenerationOptions, Tone, Voice } from "@/lib/constants";
 
 const BASE_RULES = `You are Easy Patch, an expert assistant for writing release notes.
 
@@ -17,73 +17,68 @@ Fidelity rules (non negotiable):
 - Reply only via the requested structured schema (markdown + socialPost).`;
 
 const TONE_PROMPTS: Record<Tone, string> = {
-  technical: `Tone: TECHNICAL (audience: engineers / leads).
+  technical: `Format tone: TECHNICAL (audience: engineers / leads).
 
 For "markdown":
-- Classic changelog Markdown. Title like "## Release notes" (no poetic metaphor titles).
+- Classic changelog Markdown. Title like "## Release notes" (no poetic metaphor titles unless voice asks for storytelling).
 - Sections only as needed: ### Added, ### Changed, ### Fixed, ### Removed. Omit empty ones.
 - Factual, concise, developer oriented. Keep module / API names from commits.
-- Short bullets, one idea each. No storytelling intro beyond optional summary option.
+- Short bullets, one idea each.
 
 For "socialPost":
-- 2 to 4 lines, professional LinkedIn / X update. No hype adjectives.`,
+- 2 to 4 lines, professional LinkedIn / X update.`,
 
-  marketing: `Tone: MARKETING / STARTUP (audience: customers / product readers).
+  marketing: `Format tone: MARKETING / STARTUP (audience: customers / product readers).
 
 For "markdown":
 - Translate jargon into customer benefits, but stay honest to commit scope.
-- Clear title (not clickbait), optional short summary, then themed sections.
-- Value oriented without over promising or inventing a launch narrative.
+- Clear title, optional short summary, then themed sections.
+- Value oriented without inventing a launch narrative.
 
 For "socialPost":
-- LinkedIn ready: hook, 3 to 5 bullets, soft CTA. Max ~800 characters.
-- Do not claim a full product launch unless commits say so.`,
+- LinkedIn ready: hook, 3 to 5 bullets, soft CTA. Max ~800 characters.`,
 
-  gaming: `Tone: GAMING / DEVLOG (audience: players / community).
+  gaming: `Format tone: GAMING / DEVLOG (audience: players / community).
 
-This is a community update, not a press launch.
 For "markdown":
-- Warm, readable patch note / devlog. Short friendly intro is OK (no fake host name).
+- Warm community patch note / devlog. Short friendly intro is OK (no fake host name).
 - Prefer sections like New, Improvements, Fixes, Quality of life (only if needed).
-- Keep energy light. No "massive update" framing for a handful of tooling commits.
-- If commits are product/tooling (imports, billing, UI), write for the product's users in plain community language, still faithful to each commit.
-- Do not invent a persona or sign-off.
+- If commits are product/tooling, write for that product's users in plain community language.
+- Still faithful to each commit; no fake persona or sign-off.
 
 For "socialPost":
-- Discord / X style: approachable, 3 to 5 concrete highlights, invite feedback. No fake author.`,
+- Discord / X style: approachable, 3 to 5 concrete highlights, invite feedback.`,
+};
 
-  steam: `Tone: STEAM NEWS (audience: players on a store page).
+const VOICE_PROMPTS: Record<Voice, string> = {
+  straight: `Voice: STRAIGHT
+- Neutral, clear, no affectation.
+- No jokes, no drama, no sentimental framing.`,
 
-For "markdown":
-- Steam News / patch layout: title, short blurb, then clear sections (e.g. New, Improvements, Fixes, Known issues if present).
-- Direct player language. Concrete changes over vibe.
-- No invented roadmap, no fake patch number unless present in commits.
-- Keep it scannable; avoid long essays.
+  storytelling: `Voice: STORYTELLING
+- Light narrative framing (before → after, what this unlocks).
+- Keep it short: a brief intro and connective tissue, not a novella.
+- Facts still come only from commits. No invented plot.`,
 
-For "socialPost":
-- Short Steam / Discord cross-post: title vibe + 3 highlights max.`,
+  playful: `Voice: PLAYFUL
+- Witty / lightly funny wording is welcome.
+- Never sacrifice accuracy for a joke. No meme spam. No mean sarcasm about users.
+- Avoid cringe forced humor on serious fixes.`,
 
-  discord: `Tone: DISCORD ANNOUNCEMENT (audience: server members).
+  warm: `Voice: WARM
+- Friendly, upbeat, encouraging.
+- Grateful tone without fake intimacy or invented team names.
+- Still concrete about what changed.`,
 
-For "markdown":
-- Write as a Discord announcement body (Markdown that pastes well in Discord).
-- Very short intro (1 line), then tight bullets. Prefer fewer sections.
-- Casual but precise. No essay, no fake @everyone theatrics unless reference style uses it.
-- Still no invented features.
+  punchy: `Voice: PUNCHY
+- Short sentences, high signal, energetic verbs.
+- Cut filler. Prefer tight bullets over long paragraphs.
+- Energy without fake "huge launch" claims.`,
 
-For "socialPost":
-- Even shorter chat blurb (2 to 5 lines) for a second channel or status update.`,
-
-  minimal: `Tone: MINIMAL (audience: anyone who wants zero fluff).
-
-For "markdown":
-- Almost no prose. Title + bullets only.
-- Prefer a flat list or very light Added / Fixed grouping.
-- No highlights theater, no metaphors, no "hey everyone".
-- If summary/highlights options are on, keep them extremely short or skip if empty of value.
-
-For "socialPost":
-- 1 to 3 plain lines. No hashtags unless that option is enabled.`,
+  apologetic: `Voice: APOLOGETIC
+- Useful for fix-heavy or incident-style updates.
+- Acknowledge friction briefly, then focus on what was fixed and what is better now.
+- No over-apology theater and no invented outage details.`,
 };
 
 function buildOptionsBlock(options: GenerationOptions): string {
@@ -91,10 +86,10 @@ function buildOptionsBlock(options: GenerationOptions): string {
 
   if (options.summary) {
     lines.push(
-      "- Intro summary: 1 to 2 factual sentences after the title. No metaphor fluff.",
+      "- Intro summary: 1 to 2 factual sentences after the title. No metaphor fluff unless voice is storytelling.",
     );
   } else {
-    lines.push("- No intro summary: go straight to sections.");
+    lines.push("- No intro summary: go straight to sections (unless voice needs one short line).");
   }
 
   if (options.highlights) {
@@ -126,12 +121,12 @@ function buildReferenceBlock(referencePatch: string | null | undefined): string 
   const reference = referencePatch?.trim();
   if (!reference) return "";
 
-  return `Style reference (voice and structure only):
+  return `Style reference (structure first, then voice):
 Match how this real patch note is written:
 - Heading pattern, section names, bullet density, length, formality, emoji habits
 - Sign-off only if the reference itself has one
 - Facts still come ONLY from the commits (never from the reference content)
-- If the reference is hype-heavy but commits are small fixes, keep the reference's shape but stay modest in claims
+- If reference style conflicts with the selected voice, blend lightly but keep fidelity
 
 Reference:
 """
@@ -143,12 +138,15 @@ export function getSystemPrompt(
   tone: Tone,
   options: GenerationOptions,
   referencePatch?: string | null,
+  voice: Voice = "straight",
 ): string {
   const referenceBlock = buildReferenceBlock(referencePatch);
 
   return `${BASE_RULES}
 
 ${TONE_PROMPTS[tone]}
+
+${VOICE_PROMPTS[voice]}
 
 ${buildOptionsBlock(options)}
 ${referenceBlock ? `\n${referenceBlock}` : ""}`;
@@ -158,17 +156,18 @@ export function getUserPrompt(
   commits: string,
   tone: Tone,
   referencePatch?: string | null,
+  voice: Voice = "straight",
 ): string {
   const hasReference = Boolean(referencePatch?.trim());
 
-  return `Write a ${tone} patch note from these commit subjects only.
-${hasReference ? "Match the style reference for voice/structure; keep facts from commits only.\n" : ""}
+  return `Write a ${tone} patch note with a ${voice} voice from these commit subjects only.
+${hasReference ? "Match the style reference for structure; keep facts from commits only.\n" : ""}
 Hard constraints:
 - One bullet ≈ one real change from the list (you may group near-duplicates).
 - Do not upgrade an improvement into a first-time launch.
 - Do not invent narrator names, team signatures, or version numbers.
 - Prefer understating over overselling.
-- Respect the selected tone's format, but never at the cost of fidelity.
+- Apply the voice to wording and rhythm, never to inventing facts.
 
 Commits:
 ${commits}`;

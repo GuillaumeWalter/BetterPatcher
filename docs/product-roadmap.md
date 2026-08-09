@@ -73,7 +73,7 @@ Workspaces / seats: invite teammates to one company account, shared history and 
 - Auto-generate on tag / GitHub Release
 - Brand voice / studio tone memory
 - Multi-language patch notes
-- Dedicated Steam News format (tone option shipped; deepen templates later)
+- Dedicated Steam News format
 - Discord publish (not only generate)
 - Annual plan (15% off)
 - Bitbucket

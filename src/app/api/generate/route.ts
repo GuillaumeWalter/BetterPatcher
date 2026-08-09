@@ -8,6 +8,7 @@ import { BILLING } from "@/lib/billing/constants";
 import {
   TONE_OPTIONS,
   parseGenerationOptions,
+  parseVoice,
   type Tone,
 } from "@/lib/constants";
 import { savePatchNote } from "@/lib/supabase/patch-notes";
@@ -68,6 +69,12 @@ export async function POST(request: Request) {
     typeof body === "object" && body !== null && "tone" in body
       ? body.tone
       : undefined;
+
+  const voice = parseVoice(
+    typeof body === "object" && body !== null && "voice" in body
+      ? body.voice
+      : undefined,
+  );
 
   const repoFullName =
     typeof body === "object" &&
@@ -156,8 +163,8 @@ export async function POST(request: Request) {
   try {
     const { output } = await generateText({
       model: getGenerationModel(),
-      system: getSystemPrompt(tone, options, referencePatch || null),
-      prompt: getUserPrompt(commits, tone, referencePatch || null),
+      system: getSystemPrompt(tone, options, referencePatch || null, voice),
+      prompt: getUserPrompt(commits, tone, referencePatch || null, voice),
       output: Output.object({ schema: generationSchema }),
     });
 

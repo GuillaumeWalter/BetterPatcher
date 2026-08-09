@@ -40,10 +40,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
   DEFAULT_GENERATION_OPTIONS,
+  DEFAULT_VOICE,
   GENERATION_OPTION_DEFS,
   TONE_OPTIONS,
+  VOICE_OPTIONS,
   type GenerationOptions,
   type Tone,
+  type Voice,
 } from "@/lib/constants";
 
 const PLACEHOLDER_COMMITS = `feat(auth): add OAuth GitHub login
@@ -64,7 +67,8 @@ export function PatchNoteGenerator({
     isAuthenticated ? "github" : "paste",
   );
   const [commits, setCommits] = useState("");
-  const [tone, setTone] = useState<Tone>("technical");
+  const [tone, setTone] = useState<Tone>("gaming");
+  const [voice, setVoice] = useState<Voice>(DEFAULT_VOICE);
   const [options, setOptions] = useState<GenerationOptions>(
     DEFAULT_GENERATION_OPTIONS,
   );
@@ -115,6 +119,7 @@ export function PatchNoteGenerator({
         body: JSON.stringify({
           commits,
           tone,
+          voice,
           repoFullName,
           options,
           referencePatch: referencePatch.trim() || undefined,
@@ -248,27 +253,52 @@ export function PatchNoteGenerator({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="tone">Tone</Label>
-            <Select
-              value={tone}
-              onValueChange={(value) => setTone(value as Tone)}
-            >
-              <SelectTrigger id="tone" className="w-full">
-                <SelectValue placeholder="Choose a tone" />
-              </SelectTrigger>
-              <SelectContent>
-                {TONE_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    <span className="font-medium">{option.label}</span>
-                    <span className="text-muted-foreground">
-                      {" "}
-                      : {option.description}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="tone">Format tone</Label>
+              <Select
+                value={tone}
+                onValueChange={(value) => setTone(value as Tone)}
+              >
+                <SelectTrigger id="tone" className="w-full">
+                  <SelectValue placeholder="Choose a tone" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TONE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <span className="font-medium">{option.label}</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        : {option.description}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="voice">Voice</Label>
+              <Select
+                value={voice}
+                onValueChange={(value) => setVoice(value as Voice)}
+              >
+                <SelectTrigger id="voice" className="w-full">
+                  <SelectValue placeholder="Choose a voice" />
+                </SelectTrigger>
+                <SelectContent>
+                  {VOICE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <span className="font-medium">{option.label}</span>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        : {option.description}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-3">

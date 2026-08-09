@@ -22,8 +22,8 @@ const features = [
   },
   {
     icon: Sparkles,
-    label: "Tone of your choice",
-    description: "Technical · Marketing · Gaming · Steam · Discord · Minimal",
+    label: "Tone + voice",
+    description: "Technical / Marketing / Gaming · plus storytelling, playful, warm…",
   },
   {
     icon: Zap,
