@@ -27,4 +27,10 @@ describe("email templates", () => {
     expect(subject.toLowerCase()).toContain("payment");
     expect(html).toContain("/dashboard/billing");
   });
+
+  it("solo quota low mentions remaining count", async () => {
+    const { soloQuotaLowEmail } = await import("@/lib/email/templates");
+    const { subject } = soloQuotaLowEmail(3, 25, "Alex");
+    expect(subject).toContain("3");
+  });
 });

@@ -178,3 +178,59 @@ export function inactiveTrialReminderEmail(name?: string | null) {
     }),
   };
 }
+
+export function soloQuotaLowEmail(
+  remaining: number,
+  limit: number,
+  name?: string | null,
+) {
+  const greeting = name ? `Hi ${name},` : "Hi,";
+
+  return {
+    subject: `${remaining} Solo generation${remaining === 1 ? "" : "s"} left this month`,
+    html: emailLayout({
+      preheader: "Your monthly quota resets on your next billing date.",
+      body: `
+        <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
+        <p style="margin:0 0 12px;">You have <strong>${remaining}</strong> of <strong>${limit}</strong> Solo generations left this month.</p>
+        <p style="margin:0 0 12px;">Need more headroom? Pro unlocks <strong>${BILLING.PRO_MONTHLY_GENERATIONS} generations/month</strong> for teams and live-ops.</p>
+        ${ctaButton("Open generator", appUrl("/dashboard/generate"))}
+      `,
+    }),
+  };
+}
+
+export function soloQuotaExhaustedEmail(
+  proPrice: string,
+  name?: string | null,
+) {
+  const greeting = name ? `Hi ${name},` : "Hi,";
+
+  return {
+    subject: "Monthly Solo quota reached",
+    html: emailLayout({
+      preheader: "Upgrade to Pro or wait for your next billing cycle.",
+      body: `
+        <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
+        <p style="margin:0 0 12px;">You've used all <strong>${BILLING.SOLO_MONTHLY_GENERATIONS} Solo generations</strong> for this billing period.</p>
+        <p style="margin:0 0 12px;">Your quota resets on your next invoice date — or upgrade to <strong>Pro</strong> (${proPrice}) for ${BILLING.PRO_MONTHLY_GENERATIONS} generations/month.</p>
+        ${ctaButton("View plans", appUrl("/dashboard/billing"))}
+      `,
+    }),
+  };
+}
+
+export function waitlistConfirmationEmail() {
+  return {
+    subject: "You're on the Easy Patch waitlist",
+    html: emailLayout({
+      preheader: "We'll email you when we open more spots.",
+      body: `
+        <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">Thanks for joining!</p>
+        <p style="margin:0 0 12px;">You're on the waitlist for Easy Patch. We'll let you know as soon as we're ready for more builders.</p>
+        <p style="margin:0 0 12px;">In the meantime, you can try the free demo on our homepage — no account required.</p>
+        ${ctaButton("Try the demo", appUrl("/#try"))}
+      `,
+    }),
+  };
+}

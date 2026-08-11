@@ -1,4 +1,5 @@
 import { createSupabaseAdmin } from "@/lib/supabase/server";
+import { sendWaitlistConfirmationEmail } from "@/lib/email";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -56,6 +57,8 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+
+  await sendWaitlistConfirmationEmail(email);
 
   return Response.json({ success: true });
 }

@@ -16,10 +16,14 @@ import { savePatchNote } from "@/lib/supabase/patch-notes";
 import { replacePlatformDrafts } from "@/lib/supabase/platform-drafts";
 import {
   consumeGeneration,
+  getUserProfile,
   getUserQuota,
   refundGeneration,
 } from "@/lib/supabase/users";
-import { maybeSendTrialLifecycleEmails } from "@/lib/email";
+import {
+  maybeSendPaidPlanLifecycleEmails,
+  maybeSendTrialLifecycleEmails,
+} from "@/lib/email";
 
 const VALID_TONES = new Set(TONE_OPTIONS.map((option) => option.value));
 
@@ -191,15 +195,31 @@ export async function POST(request: Request) {
     }
 
     const updatedQuota = await getUserQuota(session.user.id);
+    const profile = await getUserProfile(session.user.id);
 
-    if (consumed.plan === "trial" && session.user.email) {
-      await maybeSendTrialLifecycleEmails({
-        userId: session.user.id,
-        email: session.user.email,
-        name: session.user.name,
-        plan: consumed.plan,
-        generationsRemaining: consumed.generationsRemaining,
-      });
+    if (session.user.email) {
+      if (consumed.plan === "trial") {
+        await maybeSendTrialLifecycleEmails({
+          userId: session.user.id,
+          email: session.user.email,
+          name: session.user.name,
+          plan: consumed.plan,
+          generationsRemaining: consumed.generationsRemaining,
+        });
+      }
+
+      if (updatedQuota && consumed.plan === "solo") {
+        await maybeSendPaidPlanLifecycleEmails({
+          userId: session.user.id,
+          email: session.user.email,
+          name: session.user.name,
+          plan: consumed.plan,
+          generationsUsed: updatedQuota.generationsUsed,
+          generationsLimit: updatedQuota.generationsLimit,
+          generationsRemaining: updatedQuota.generationsRemaining,
+          billingPeriodStart: profile?.billingPeriodStart,
+        });
+      }
     }
 
     return Response.json({

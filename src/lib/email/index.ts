@@ -3,12 +3,15 @@ import { sendEmail } from "@/lib/email/client";
 import {
   inactiveTrialReminderEmail,
   paymentFailedEmail,
+  soloQuotaExhaustedEmail,
+  soloQuotaLowEmail,
   subscriptionCanceledEmail,
   subscriptionConfirmedEmail,
   trialActivatedEmail,
   trialExhaustedEmail,
   trialLowEmail,
   upgradeToProEmail,
+  waitlistConfirmationEmail,
   welcomeEmail,
 } from "@/lib/email/templates";
 
@@ -21,6 +24,26 @@ type UserEmailContext = {
 function idempotencyKey(userId: string, event: string) {
   const day = new Date().toISOString().slice(0, 10);
   return `${userId}-${event}-${day}`;
+}
+
+function periodIdempotencyKey(
+  userId: string,
+  event: string,
+  billingPeriodStart?: string | null,
+) {
+  const period = billingPeriodStart?.slice(0, 10) ?? "unknown";
+  return `${userId}-${event}-${period}`;
+}
+
+function weekIdempotencyKey(userId: string, event: string) {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const start = new Date(Date.UTC(year, 0, 1));
+  const week = Math.ceil(
+    ((now.getTime() - start.getTime()) / 86_400_000 + start.getUTCDay() + 1) /
+      7,
+  );
+  return `${userId}-${event}-${year}-w${week}`;
 }
 
 export async function sendWelcomeEmail(input: {
@@ -113,7 +136,10 @@ export async function sendSubscriptionCanceledEmail(ctx: UserEmailContext) {
   });
 }
 
-export async function sendUpgradeToProEmail(ctx: UserEmailContext) {
+export async function sendUpgradeToProEmail(
+  ctx: UserEmailContext,
+  billingPeriodStart?: string | null,
+) {
   const { subject, html } = upgradeToProEmail(
     BILLING.SOLO_PRICE_LABEL,
     BILLING.PRO_PRICE_LABEL,
@@ -123,7 +149,11 @@ export async function sendUpgradeToProEmail(ctx: UserEmailContext) {
     to: ctx.email,
     subject,
     html,
-    idempotencyKey: idempotencyKey(ctx.userId, "upgrade-pro-offer"),
+    idempotencyKey: periodIdempotencyKey(
+      ctx.userId,
+      "upgrade-pro-offer",
+      billingPeriodStart,
+    ),
   });
 }
 
@@ -133,7 +163,56 @@ export async function sendInactiveTrialReminderEmail(ctx: UserEmailContext) {
     to: ctx.email,
     subject,
     html,
-    idempotencyKey: idempotencyKey(ctx.userId, "inactive-trial"),
+    idempotencyKey: weekIdempotencyKey(ctx.userId, "inactive-trial"),
+  });
+}
+
+export async function sendSoloQuotaLowEmail(
+  ctx: UserEmailContext,
+  remaining: number,
+  limit: number,
+  billingPeriodStart?: string | null,
+) {
+  const { subject, html } = soloQuotaLowEmail(remaining, limit, ctx.name);
+  return sendEmail({
+    to: ctx.email,
+    subject,
+    html,
+    idempotencyKey: periodIdempotencyKey(
+      ctx.userId,
+      `solo-quota-low-${remaining}`,
+      billingPeriodStart,
+    ),
+  });
+}
+
+export async function sendSoloQuotaExhaustedEmail(
+  ctx: UserEmailContext,
+  billingPeriodStart?: string | null,
+) {
+  const { subject, html } = soloQuotaExhaustedEmail(
+    BILLING.PRO_PRICE_LABEL,
+    ctx.name,
+  );
+  return sendEmail({
+    to: ctx.email,
+    subject,
+    html,
+    idempotencyKey: periodIdempotencyKey(
+      ctx.userId,
+      "solo-quota-exhausted",
+      billingPeriodStart,
+    ),
+  });
+}
+
+export async function sendWaitlistConfirmationEmail(to: string) {
+  const { subject, html } = waitlistConfirmationEmail();
+  return sendEmail({
+    to,
+    subject,
+    html,
+    idempotencyKey: `waitlist-${to}`,
   });
 }
 
@@ -157,6 +236,57 @@ export async function maybeSendTrialLifecycleEmails(input: {
     await sendTrialLowEmail(ctx, 1);
   } else if (input.generationsRemaining === 0) {
     await sendTrialExhaustedEmail(ctx);
+  }
+}
+
+const SOLO_UPGRADE_THRESHOLD = 0.8;
+const SOLO_QUOTA_LOW_REMAINING = 5;
+
+/** After a successful generation — Solo paid plan lifecycle emails. */
+export async function maybeSendPaidPlanLifecycleEmails(input: {
+  userId: string;
+  email: string | null | undefined;
+  name?: string | null;
+  plan: string;
+  generationsUsed: number;
+  generationsLimit: number;
+  generationsRemaining: number;
+  billingPeriodStart?: string | null;
+}) {
+  if (!input.email || input.plan !== "solo" || input.generationsLimit <= 0) {
+    return;
+  }
+
+  const ctx: UserEmailContext = {
+    userId: input.userId,
+    email: input.email,
+    name: input.name,
+  };
+
+  const usageRatio = input.generationsUsed / input.generationsLimit;
+
+  if (
+    input.generationsRemaining > 0 &&
+    usageRatio >= SOLO_UPGRADE_THRESHOLD
+  ) {
+    await sendUpgradeToProEmail(ctx, input.billingPeriodStart);
+  }
+
+  if (
+    input.generationsRemaining > 0 &&
+    input.generationsRemaining <= SOLO_QUOTA_LOW_REMAINING &&
+    usageRatio < SOLO_UPGRADE_THRESHOLD
+  ) {
+    await sendSoloQuotaLowEmail(
+      ctx,
+      input.generationsRemaining,
+      input.generationsLimit,
+      input.billingPeriodStart,
+    );
+  }
+
+  if (input.generationsRemaining === 0) {
+    await sendSoloQuotaExhaustedEmail(ctx, input.billingPeriodStart);
   }
 }
 

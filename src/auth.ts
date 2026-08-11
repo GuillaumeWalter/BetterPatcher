@@ -31,7 +31,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email ?? null,
         });
         if (isNewUser && user.email) {
-          await sendWelcomeEmail({ to: user.email, name: user.name });
+          await sendWelcomeEmail({
+            to: user.email,
+            name: user.name,
+            userId: user.id,
+          });
         }
       }
     },

@@ -5,7 +5,7 @@ import {
   PAID_CURRENCIES,
 } from "@/lib/billing/currency";
 
-function readEnv(...keys: string[]): string | undefined {
+export function readEnv(...keys: string[]): string | undefined {
   for (const key of keys) {
     const value = process.env[key]?.trim();
     if (value) return value;

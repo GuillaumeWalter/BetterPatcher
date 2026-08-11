@@ -11,9 +11,10 @@
 |---|--------|-----|
 | 1 | Vérifier deploy Vercel ✅ | App Vercel ou PC |
 | 2 | `RESEND_API_KEY` + `RESEND_FROM_EMAIL` | Vercel env vars |
-| 3 | Activer **Customer Portal** | Stripe dashboard |
-| 4 | (Optionnel) `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Vercel |
-| 5 | Tester signup → emails reçus | Ta boîte mail |
+| 3 | `CRON_SECRET` (chaîne aléatoire) | Vercel env vars |
+| 4 | Activer **Customer Portal** | Stripe dashboard |
+| 5 | (Optionnel) `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Vercel |
+| 6 | Tester signup → emails reçus | Ta boîte mail |
 
 **Tu n’as pas besoin de merger une PR** — je push sur `master` pour toi.
 
@@ -28,6 +29,11 @@
 | 1 génération trial restante | Trial low |
 | Dernière gen trial | Trial exhausted + offre Solo/Pro |
 | Abo Solo/Pro confirmé | Subscription confirmed |
+| Solo ≥ 80% quota mensuel | Upgrade to Pro |
+| Solo ≤ 5 gen restantes | Solo quota low |
+| Dernière gen Solo du mois | Solo quota exhausted |
+| Trial activé mais inactif 3j+ | Inactive trial reminder (cron) |
+| Inscription waitlist | Waitlist confirmation |
 | Paiement échoué | Payment failed |
 | Annulation abo | Subscription canceled |
 
@@ -74,13 +80,14 @@ Personnaliser avant lancement public :
 
 ---
 
-## Ce que l’agent a fait (Phase B)
+## Ce que l’agent a livré
 
-- Générateur **gratuit sur la landing** (3 gen/h sans compte)
-- FAQ, Contact, Terms, Privacy
-- Footer + robots/sitemap
-- Email bienvenue (Resend, si configuré)
-- Stripe Customer Portal
-- UX : skeleton quota, past_due, gate onboarding
-- Analytics Plausible (si domaine configuré)
-- Tests unitaires (quotas, rate limit)
+### Phase B
+- Générateur gratuit landing, FAQ, Contact, légal, changelog
+- Stripe Customer Portal, analytics Plausible
+
+### Emails (nouveau)
+- 12 templates HTML brandés
+- Déclencheurs auto signup / trial / Solo / Stripe / waitlist
+- Cron quotidien trial inactif
+- Preview dev `/api/emails/preview`

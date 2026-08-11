@@ -305,6 +305,39 @@ export async function getUserIdByStripeCustomerId(
   return data?.user_id ?? null;
 }
 
+/** Trial activated but no generation yet — for reminder cron. */
+export async function listInactiveTrialCandidates(minAgeDays = 3): Promise<
+  Array<{ userId: string; email: string }>
+> {
+  const supabase = createSupabaseAdmin();
+  if (!supabase) return [];
+
+  const cutoff = new Date();
+  cutoff.setUTCDate(cutoff.getUTCDate() - minAgeDays);
+
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select("user_id, email")
+    .eq("payment_method_verified", true)
+    .eq("trial_generations_used", 0)
+    .neq("subscription_status", "active")
+    .is("last_generation_at", null)
+    .not("email", "is", null)
+    .lt("updated_at", cutoff.toISOString());
+
+  if (error) {
+    console.error("[listInactiveTrialCandidates]", error);
+    return [];
+  }
+
+  return (data ?? [])
+    .filter(
+      (row): row is { user_id: string; email: string } =>
+        typeof row.user_id === "string" && typeof row.email === "string",
+    )
+    .map((row) => ({ userId: row.user_id, email: row.email }));
+}
+
 export async function getGitLabAccessToken(
   userId: string,
 ): Promise<string | null> {

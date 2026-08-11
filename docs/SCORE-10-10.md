@@ -10,7 +10,7 @@
 | **Fonctionnel** | 8.5/10 | Webhooks release, multi-repo, streaming IA |
 | **UX/UI** | 8/10 | Beta testée, zero état silencieux |
 | **Marketing** | 7/10 | Démo vidéo, témoignages, analytics actif |
-| **Communication** | 8/10 | Emails auto + légal finalisé |
+| **Communication** | 8.5/10 | Emails auto + légal finalisé |
 | **Dev/Ops** | 7.5/10 | E2E, Sentry, monitoring coûts IA |
 | **Webdesign** | 8/10 | Screenshots prod, a11y WCAG AA |
 | **Gestion projet** | 7/10 | Beta structurée, changelog public |
@@ -18,22 +18,22 @@
 
 ---
 
-## Communication — 8 → 10
+## Communication — 8.5 → 10
 
 ### ✅ Fait (agent)
-- 9 templates email (bienvenue, trial, upgrade, paiement…)
-- Déclencheurs : signup, Stripe webhook, génération trial
+- 12 templates email (bienvenue, trial, Solo quota, upgrade, waitlist…)
+- Déclencheurs : signup, Stripe webhook, génération trial/Solo
+- Cron quotidien rappel trial inactif (`vercel.json` + `CRON_SECRET`)
 - Preview dev : `/api/emails/preview?template=welcome`
 - Doc : `docs/emails.md`
 
 ### 🔲 Toi (ce soir / demain)
 - [ ] Compte [Resend](https://resend.com) + `RESEND_API_KEY` sur Vercel
 - [ ] Vérifier domaine d’envoi + `RESEND_FROM_EMAIL`
-- [ ] Tester : signup → recevoir welcome + trial activated
+- [ ] `CRON_SECRET` sur Vercel (chaîne aléatoire longue)
+- [ ] Tester : signup → welcome + trial activated
 
 ### 🔲 Plus tard
-- [ ] Cron rappel inactifs (template prêt, pas câblé)
-- [ ] Email upgrade Solo→Pro après 80% quota mensuel
 - [ ] Légal finalisé par avocat
 
 ---

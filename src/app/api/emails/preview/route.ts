@@ -12,6 +12,9 @@ const TEMPLATE_NAMES = [
   "subscriptionCanceled",
   "upgradeToPro",
   "inactiveTrialReminder",
+  "soloQuotaLow",
+  "soloQuotaExhausted",
+  "waitlistConfirmation",
 ] as const;
 
 type TemplateName = (typeof TEMPLATE_NAMES)[number];
@@ -36,6 +39,12 @@ function renderTemplate(name: TemplateName) {
       return templates.upgradeToProEmail("€4.99 / month", "€9.99 / month", "Alex");
     case "inactiveTrialReminder":
       return templates.inactiveTrialReminderEmail("Alex");
+    case "soloQuotaLow":
+      return templates.soloQuotaLowEmail(3, 25, "Alex");
+    case "soloQuotaExhausted":
+      return templates.soloQuotaExhaustedEmail("€9.99 / month", "Alex");
+    case "waitlistConfirmation":
+      return templates.waitlistConfirmationEmail();
     default:
       return null;
   }
