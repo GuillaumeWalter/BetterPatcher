@@ -1,67 +1,42 @@
 # Ce que TU dois faire — Easy Patch
 
-> **Important :** l’agent (moi) peut **pousser du code sur GitHub**, mais je n’ai **pas accès** à ton compte Vercel, Stripe, Supabase, ni à ton téléphone.  
-> Toi seul peux cliquer « Merge » et configurer les dashboards.
+> **Bonne nouvelle :** je peux **pousser le code directement sur `master`** → Vercel redéploie tout seul.  
+> Je n’ai **pas accès** à tes dashboards Vercel / Stripe / Resend — seulement au repo GitHub.
 
 ---
 
-## C’est quoi « merger la PR » ? (explication simple)
+## Ce soir / demain (15 min max)
 
-Imagine deux versions du code :
+| # | Action | Où |
+|---|--------|-----|
+| 1 | Vérifier deploy Vercel ✅ | App Vercel ou PC |
+| 2 | `RESEND_API_KEY` + `RESEND_FROM_EMAIL` | Vercel env vars |
+| 3 | Activer **Customer Portal** | Stripe dashboard |
+| 4 | (Optionnel) `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Vercel |
+| 5 | Tester signup → emails reçus | Ta boîte mail |
 
-| Branche | Contenu |
-|---------|---------|
-| `master` | Ce qui tourne actuellement sur Vercel |
-| `cursor/phase-b-8b37` | Le nouveau code (Phase B) que j’ai écrit |
-
-Une **Pull Request (PR)** = une demande sur GitHub : « est-ce qu’on met ce nouveau code dans master ? »
-
-**Merger** = appuyer sur le bouton vert **Merge pull request** sur GitHub.
-
-**Ensuite :** si Vercel est déjà connecté au repo → il **redéploie tout seul** en 2–3 minutes. Tu n’as rien à faire sur Vercel sauf attendre.
-
-### Sur téléphone (3 minutes)
-
-1. Ouvre **GitHub** → repo `GuillaumeWalter/BetterPatcher`
-2. Onglet **Pull requests** → ouvre la PR la plus récente (`phase-b` ou `quick-polish`)
-3. Si GitHub dit **« conflicts »** → attends que l’agent les résolve, ou merge quand c’est vert
-4. Bouton vert **Merge pull request** → **Confirm merge**
-5. Onglet **Vercel** (app ou site) → vérifie que le dernier deploy est ✅
-
-**Tu n’as PAS besoin de :**
-- Reconnecter le repo Vercel
-- Ré-exécuter les SQL `user_profiles` / `patch_notes` (déjà faits)
-
-**Tu dois peut-être :**
-- Ajouter de **nouvelles** variables d’environnement (voir ci-dessous)
-- Activer le **Customer Portal** dans Stripe (1 clic)
+**Tu n’as pas besoin de merger une PR** — je push sur `master` pour toi.
 
 ---
 
-## Checklist après merge
+## Emails automatiques (déjà codés)
 
-### 1. Variables Vercel (5 min)
+| Moment | Email |
+|--------|-------|
+| Inscription GitHub | Welcome 👋 |
+| Carte vérifiée (€0) | Trial activated |
+| 1 génération trial restante | Trial low |
+| Dernière gen trial | Trial exhausted + offre Solo/Pro |
+| Abo Solo/Pro confirmé | Subscription confirmed |
+| Paiement échoué | Payment failed |
+| Annulation abo | Subscription canceled |
 
-Vercel → ton projet → **Settings → Environment Variables**
+Preview en local : `http://localhost:3000/api/emails/preview?template=welcome`  
+Doc complète : `docs/emails.md` · Roadmap 10/10 : `docs/SCORE-10-10.md`
 
-**Nouvelles (Phase B) — ajouter si absentes :**
+---
 
-| Variable | À quoi ça sert |
-|----------|----------------|
-| `RESEND_API_KEY` | Email de bienvenue (optionnel) |
-| `RESEND_FROM_EMAIL` | Ex: `Easy Patch <hello@tondomaine.com>` |
-| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Analytics (optionnel) — ton domaine sans `https://` |
-
-**Déjà là normalement — juste vérifier :**
-- `AUTH_*`, `SUPABASE_*`, `STRIPE_*`, `GOOGLE_GENERATIVE_AI_API_KEY`, `NEXT_PUBLIC_APP_URL`
-
-Après ajout → **Deployments → Redeploy**
-
-### 2. Stripe (5 min)
-
-[dashboard.stripe.com](https://dashboard.stripe.com) → **Settings → Billing → Customer portal** → **Activer**
-
-### 3. Resend emails (optionnel, 10 min)
+## Resend (10 min)
 
 1. Compte sur [resend.com](https://resend.com)
 2. Créer une API key → coller dans `RESEND_API_KEY` sur Vercel

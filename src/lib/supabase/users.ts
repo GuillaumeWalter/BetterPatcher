@@ -128,9 +128,21 @@ export async function setStripeCustomerId(
   return true;
 }
 
-export async function markPaymentMethodVerified(userId: string) {
+export async function markPaymentMethodVerified(
+  userId: string,
+): Promise<{ ok: boolean; newlyVerified: boolean }> {
   const supabase = createSupabaseAdmin();
-  if (!supabase) return false;
+  if (!supabase) return { ok: false, newlyVerified: false };
+
+  const { data: existing } = await supabase
+    .from("user_profiles")
+    .select("payment_method_verified")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (existing?.payment_method_verified) {
+    return { ok: true, newlyVerified: false };
+  }
 
   const { error } = await supabase
     .from("user_profiles")
@@ -139,10 +151,10 @@ export async function markPaymentMethodVerified(userId: string) {
 
   if (error) {
     console.error("[markPaymentMethodVerified]", error);
-    return false;
+    return { ok: false, newlyVerified: false };
   }
 
-  return true;
+  return { ok: true, newlyVerified: true };
 }
 
 export async function updateSubscriptionState(input: {

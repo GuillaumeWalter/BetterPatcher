@@ -11,9 +11,16 @@ import {
 import { getStripe } from "@/lib/stripe";
 import {
   getUserIdByStripeCustomerId,
+  getUserProfile,
   markPaymentMethodVerified,
   updateSubscriptionState,
 } from "@/lib/supabase/users";
+import {
+  sendPaymentFailedEmail,
+  sendSubscriptionCanceledEmail,
+  sendSubscriptionConfirmedEmail,
+  sendTrialActivatedEmail,
+} from "@/lib/email";
 
 function mapSubscriptionStatus(
   status: Stripe.Subscription.Status,
@@ -31,6 +38,16 @@ function getBillingPeriodStart(subscription: Stripe.Subscription): Date {
   }
 
   return new Date(subscription.billing_cycle_anchor * 1000);
+}
+
+async function emailContextForUser(userId: string) {
+  const profile = await getUserProfile(userId);
+  if (!profile?.email) return null;
+  return {
+    userId,
+    email: profile.email,
+    name: null as string | null,
+  };
 }
 
 function resolvePlanTier(
@@ -83,7 +100,11 @@ export async function POST(request: Request) {
           typeof session.customer === "string" ? session.customer : null;
 
         if (session.mode === "setup" && userId) {
-          await markPaymentMethodVerified(userId);
+          const { newlyVerified } = await markPaymentMethodVerified(userId);
+          if (newlyVerified) {
+            const ctx = await emailContextForUser(userId);
+            if (ctx) await sendTrialActivatedEmail(ctx);
+          }
         }
 
         if (session.mode === "subscription" && session.subscription) {
@@ -100,17 +121,22 @@ export async function POST(request: Request) {
             (customerId ? await getUserIdByStripeCustomerId(customerId) : null);
 
           if (resolvedUserId) {
+            const planTier = resolvePlanTier(
+              subscription,
+              session.metadata?.planTier,
+            );
             await updateSubscriptionState({
               userId: resolvedUserId,
               stripeSubscriptionId: subscription.id,
               subscriptionStatus: mapSubscriptionStatus(subscription.status),
-              planTier: resolvePlanTier(
-                subscription,
-                session.metadata?.planTier,
-              ),
+              planTier,
               billingPeriodStart: getBillingPeriodStart(subscription),
               resetPeriodUsage: true,
             });
+            const ctx = await emailContextForUser(resolvedUserId);
+            if (ctx && (planTier === "solo" || planTier === "pro")) {
+              await sendSubscriptionConfirmedEmail(ctx, planTier);
+            }
           }
         }
         break;
@@ -129,6 +155,8 @@ export async function POST(request: Request) {
             ? "canceled"
             : mapSubscriptionStatus(subscription.status);
 
+        const userId = await getUserIdByStripeCustomerId(customerId);
+
         await updateSubscriptionState({
           stripeCustomerId: customerId,
           stripeSubscriptionId:
@@ -140,6 +168,17 @@ export async function POST(request: Request) {
           resetPeriodUsage:
             event.type === "customer.subscription.updated" && status === "active",
         });
+
+        if (userId) {
+          const ctx = await emailContextForUser(userId);
+          if (ctx) {
+            if (event.type === "customer.subscription.deleted") {
+              await sendSubscriptionCanceledEmail(ctx);
+            } else if (status === "past_due") {
+              await sendPaymentFailedEmail(ctx);
+            }
+          }
+        }
         break;
       }
 

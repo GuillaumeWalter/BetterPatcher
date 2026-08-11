@@ -19,6 +19,7 @@ import {
   getUserQuota,
   refundGeneration,
 } from "@/lib/supabase/users";
+import { maybeSendTrialLifecycleEmails } from "@/lib/email";
 
 const VALID_TONES = new Set(TONE_OPTIONS.map((option) => option.value));
 
@@ -190,6 +191,16 @@ export async function POST(request: Request) {
     }
 
     const updatedQuota = await getUserQuota(session.user.id);
+
+    if (consumed.plan === "trial" && session.user.email) {
+      await maybeSendTrialLifecycleEmails({
+        userId: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+        plan: consumed.plan,
+        generationsRemaining: consumed.generationsRemaining,
+      });
+    }
 
     return Response.json({
       markdown: output?.markdown ?? "",

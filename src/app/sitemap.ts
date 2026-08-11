@@ -10,7 +10,7 @@ function baseUrl() {
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = baseUrl();
   const lastModified = new Date();
-  const pages = ["/", "/login", "/faq", "/contact", "/legal/terms", "/legal/privacy"];
+  const pages = ["/", "/login", "/faq", "/contact", "/changelog", "/legal/terms", "/legal/privacy"];
 
   return pages.map((path) => ({
     url: `${base}${path}`,

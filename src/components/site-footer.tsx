@@ -13,6 +13,9 @@ export function SiteFooter() {
             <Link href="/faq" className="hover:text-foreground hover:underline">
               FAQ
             </Link>
+            <Link href="/changelog" className="hover:text-foreground hover:underline">
+              Changelog
+            </Link>
             <Link href="/contact" className="hover:text-foreground hover:underline">
               Contact
             </Link>
