@@ -12,7 +12,7 @@ const DEMO_WINDOW_MS = 60 * 60 * 1000;
 
 export async function GET(request: Request) {
   const ip = getRequestIp(request);
-  const status = peekRateLimit(`demo:${ip}`, DEMO_LIMIT, DEMO_WINDOW_MS);
+  const status = peekRateLimit(`demo:${ip}`, DEMO_LIMIT);
   return Response.json({
     limit: status.limit,
     remaining: status.remaining,

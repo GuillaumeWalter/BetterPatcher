@@ -10,7 +10,6 @@ export type RateLimitResult = {
 export function peekRateLimit(
   key: string,
   limit: number,
-  _windowMs: number,
 ): Pick<RateLimitResult, "remaining" | "limit"> {
   const now = Date.now();
   const entry = buckets.get(key);
