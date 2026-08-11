@@ -160,3 +160,68 @@ export function StripeSubscribeButton({
     </div>
   );
 }
+
+export function StripePortalButton() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function openPortal() {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/billing", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "portal" }),
+      });
+
+      const raw = await response.text();
+      let data: { url?: string; error?: string } = {};
+      try {
+        data = raw ? (JSON.parse(raw) as { url?: string; error?: string }) : {};
+      } catch {
+        throw new Error(`Billing failed (${response.status}).`);
+      }
+
+      if (!response.ok || !data.url) {
+        throw new Error(data.error ?? "Could not open the billing portal.");
+      }
+
+      window.location.href = data.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unexpected error.");
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <Button
+        size="lg"
+        className="w-full"
+        variant="outline"
+        onClick={openPortal}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="animate-spin" />
+            Redirecting to Stripe…
+          </>
+        ) : (
+          <>
+            <CreditCard />
+            Manage subscription
+          </>
+        )}
+      </Button>
+      {error ? (
+        <p className="text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
+import { getUserQuota } from "@/lib/supabase/users";
 
 export default async function DashboardLayout({
   children,
@@ -11,6 +12,11 @@ export default async function DashboardLayout({
 
   if (!session?.user) {
     redirect("/login");
+  }
+
+  const quota = await getUserQuota(session.user.id!);
+  if (quota?.requiresSetup) {
+    redirect("/onboarding");
   }
 
   return (

@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { Sparkles, Users } from "lucide-react";
 
-import { StripeSubscribeButton } from "@/components/billing-actions";
+import { auth } from "@/auth";
+import { StripePortalButton, StripeSubscribeButton } from "@/components/billing-actions";
 import { BillingQuotaBanner } from "@/components/billing-quota-banner";
 import { DashboardNav } from "@/components/dashboard-nav";
 import { BILLING } from "@/lib/billing/constants";
 import { getLocalizedBillingLabels } from "@/lib/billing/localized-labels";
+import { getUserQuota } from "@/lib/supabase/users";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,14 +15,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Sparkles, Users } from "lucide-react";
 
 type BillingPageProps = {
   searchParams: Promise<{ success?: string; canceled?: string }>;
 };
 
 export default async function BillingPage({ searchParams }: BillingPageProps) {
+  const session = await auth();
+  const quota = session?.user?.id
+    ? await getUserQuota(session.user.id)
+    : null;
   const { success, canceled } = await searchParams;
   const { soloPriceLabel, proPriceLabel } = await getLocalizedBillingLabels();
+  const isSubscribed = quota?.plan === "solo" || quota?.plan === "pro";
 
   return (
     <>
@@ -40,7 +47,28 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
             Payment canceled. You can try again anytime.
           </p>
         ) : null}
+        {isSubscribed && !quota?.canGenerate && quota?.generationsRemaining === 0 ? (
+          <p className="rounded-xl border border-destructive/20 bg-destructive/10 p-4 text-sm">
+            Your subscription may have a payment issue. Update your card in the
+            Stripe portal below.
+          </p>
+        ) : null}
       </div>
+
+      {isSubscribed ? (
+        <Card className="surface-card gradient-border mb-6 max-w-3xl">
+          <CardHeader>
+            <CardTitle className="text-lg">Your plan: {quota?.plan === "solo" ? "Solo" : "Pro"}</CardTitle>
+            <CardDescription>
+              {quota?.generationsRemaining ?? 0} / {quota?.generationsLimit ?? 0}{" "}
+              generations left this month
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <StripePortalButton />
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div className="grid max-w-3xl gap-4 md:grid-cols-2">
         <Card className="surface-card gradient-border">
@@ -58,14 +86,16 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>✓ GitHub / GitLab import or manual paste</li>
               <li>✓ Patch note history</li>
-              <li>✓ Upcoming integrations (Jira…)</li>
+              <li>✓ Share Studio drafts</li>
               <li>✓ Cancel anytime</li>
             </ul>
-            <StripeSubscribeButton
-              plan="solo"
-              variant="outline"
-              priceLabel={soloPriceLabel}
-            />
+            {quota?.plan !== "solo" && quota?.plan !== "pro" ? (
+              <StripeSubscribeButton
+                plan="solo"
+                variant="outline"
+                priceLabel={soloPriceLabel}
+              />
+            ) : null}
           </CardContent>
         </Card>
 
@@ -82,21 +112,21 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
           </CardHeader>
           <CardContent className="space-y-5">
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>✓ Everything in Solo, larger quota</li>
-              <li>✓ Several users on one account (coming soon)</li>
+              <li>✓ Higher monthly quota</li>
+              <li>✓ Team seats (coming soon)</li>
               <li>✓ Ideal for studios &amp; live ops</li>
               <li>✓ Cancel anytime</li>
             </ul>
-            <StripeSubscribeButton plan="pro" priceLabel={proPriceLabel} />
+            {quota?.plan !== "pro" ? (
+              <StripeSubscribeButton plan="pro" priceLabel={proPriceLabel} />
+            ) : null}
           </CardContent>
         </Card>
       </div>
 
-      <div className="mt-6">
-        <Button variant="outline" asChild>
-          <Link href="/dashboard/generate">Back to generator</Link>
-        </Button>
-      </div>
+      <Button variant="outline" className="mt-6" asChild>
+        <Link href="/dashboard/generate">Back to generator</Link>
+      </Button>
     </>
   );
 }

@@ -48,7 +48,16 @@ export function BillingQuotaBanner() {
     load();
   }, []);
 
-  if (isLoading || !quota) return null;
+  if (isLoading) {
+    return (
+      <div
+        className="surface-card gradient-border mb-6 h-20 animate-pulse rounded-2xl"
+        aria-hidden
+      />
+    );
+  }
+
+  if (!quota) return null;
 
   const soloLabel = quota.soloPriceLabel ?? BILLING.SOLO_PRICE_LABEL;
   const proLabel = quota.proPriceLabel ?? BILLING.PRO_PRICE_LABEL;
@@ -78,6 +87,17 @@ export function BillingQuotaBanner() {
             Solo ({soloLabel}, {BILLING.SOLO_MONTHLY_GENERATIONS}/mo)
             or Pro ({proLabel}, {BILLING.PRO_MONTHLY_GENERATIONS}/mo
             | team).
+            {quota.canGenerate === false &&
+            quota.paymentMethodVerified &&
+            quota.generationsRemaining === 0 &&
+            quota.plan !== "blocked" ? (
+              <>
+                {" "}
+                <span className="text-destructive">
+                  Payment issue — update your card in the billing portal.
+                </span>
+              </>
+            ) : null}
           </p>
         ) : null}
       </div>
@@ -106,6 +126,11 @@ export function BillingQuotaBanner() {
               <Sparkles />
               Upgrade to Pro
             </Link>
+          </Button>
+        ) : null}
+        {quota.plan === "solo" || quota.plan === "pro" ? (
+          <Button asChild size="sm" variant="ghost">
+            <Link href="/dashboard/billing">Manage billing</Link>
           </Button>
         ) : null}
       </div>

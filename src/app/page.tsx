@@ -2,6 +2,7 @@ import Link from "next/link";
 import { GitBranch, CreditCard, Shield, Sparkles, Users, Zap } from "lucide-react";
 
 import { auth, signIn } from "@/auth";
+import { DemoPatchGenerator } from "@/components/demo-patch-generator";
 import { BILLING } from "@/lib/billing/constants";
 import { getLocalizedBillingLabels } from "@/lib/billing/localized-labels";
 import { Badge } from "@/components/ui/badge";
@@ -80,6 +81,9 @@ export default async function Home() {
             </form>
           )}
           <Button size="lg" variant="outline" asChild>
+            <Link href="#try">Try free</Link>
+          </Button>
+          <Button size="lg" variant="outline" asChild>
             <Link href="#pricing">See pricing</Link>
           </Button>
         </div>
@@ -100,6 +104,13 @@ export default async function Home() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section id="try" className="mb-14 scroll-mt-24">
+        <h2 className="mb-6 text-2xl font-semibold tracking-tight">
+          Try without an account
+        </h2>
+        <DemoPatchGenerator />
       </section>
 
       <section id="pricing" className="mb-14 scroll-mt-24">

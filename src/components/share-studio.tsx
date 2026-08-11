@@ -78,11 +78,14 @@ export function ShareStudio({
   const [instruction, setInstruction] = useState("");
 
   useEffect(() => {
-    if (initialDrafts && initialDrafts.length > 0) {
-      setDrafts(initialDrafts);
-      setSelected(initialDrafts.map((draft) => draft.platform));
-      setActivePlatform(initialDrafts[0].platform);
-    }
+    const frame = requestAnimationFrame(() => {
+      if (initialDrafts && initialDrafts.length > 0) {
+        setDrafts(initialDrafts);
+        setSelected(initialDrafts.map((draft) => draft.platform));
+        setActivePlatform(initialDrafts[0].platform);
+      }
+    });
+    return () => cancelAnimationFrame(frame);
   }, [initialDrafts]);
 
   const activeDraft = drafts.find((draft) => draft.platform === activePlatform);

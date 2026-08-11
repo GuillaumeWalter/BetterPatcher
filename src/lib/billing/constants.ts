@@ -94,6 +94,25 @@ export function buildQuotaSnapshot(
     };
   }
 
+  if (profile.subscriptionStatus === "past_due") {
+    const tier: PaidPlanTier =
+      profile.planTier === "solo" || profile.planTier === "pro"
+        ? profile.planTier
+        : "pro";
+    return {
+      plan: tier,
+      paymentMethodVerified: true,
+      generationsUsed: profile.periodGenerationsUsed,
+      generationsLimit:
+        profile.periodGenerationsLimit || monthlyGenerationsForTier(tier),
+      generationsRemaining: 0,
+      requiresSubscription: true,
+      requiresSetup: false,
+      canGenerate: false,
+      minSecondsBetweenGenerations: BILLING.MIN_SECONDS_BETWEEN_GENERATIONS,
+    };
+  }
+
   const isSubscribed = profile.subscriptionStatus === "active";
 
   if (isSubscribed) {

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { Analytics } from "@/components/analytics";
 
 import "./globals.css";
 
@@ -40,6 +42,8 @@ export default function RootLayout({
         </div>
         <SiteHeader />
         <main className="flex flex-1 flex-col">{children}</main>
+        <SiteFooter />
+        <Analytics />
       </body>
     </html>
   );

@@ -92,6 +92,19 @@ export async function POST(request: Request) {
     const baseUrl = getAppBaseUrl();
     const geoCurrency = resolveBillingCurrency(request.headers);
 
+    if (action === "portal") {
+      const portalSession = await stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: `${baseUrl}/dashboard/billing`,
+      });
+
+      if (!portalSession.url) {
+        return jsonError("Stripe did not return a portal URL.", 502);
+      }
+
+      return Response.json({ url: portalSession.url });
+    }
+
     if (action === "subscribe") {
       const plan =
         typeof body === "object" && body !== null && "plan" in body
