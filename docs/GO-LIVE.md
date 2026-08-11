@@ -164,24 +164,25 @@ Landing (/)
 
 ## 5. Checklist go-live
 
+> **Infra déjà en place ?** Voir `docs/VOTRE-TODO.md` — pas besoin de recréer Vercel/Supabase, seulement merger la PR, vérifier env vars et tester.
+
 ### P0 — Bloquants
 
-- [ ] Merger PR go-live sur `master`
-- [ ] Déployer Vercel + toutes les variables env
-- [ ] Exécuter SQL Supabase (`user_profiles`, `patch_notes`, `waitlist`)
-- [ ] GitHub OAuth callback prod
-- [ ] Stripe live : clés, prix, webhook, **Customer Portal**
-- [ ] `NEXT_PUBLIC_APP_URL` = domaine prod
-- [ ] Personnaliser pages `/legal/cgu` et `/legal/confidentialite`
-- [ ] Tester parcours complet : signup → carte → gen → abo → portal
+- [ ] Merger PR #1 sur `master` (Vercel redéploie auto)
+- [ ] Vérifier variables env Vercel (voir `docs/VOTRE-TODO.md`)
+- [ ] Confirmer tables Supabase ; `waitlist.sql` seulement si absent
+- [ ] Vérifier GitHub OAuth callback si connexion échoue
+- [ ] Vérifier Stripe : webhook + **Customer Portal** activé
+- [ ] Personnaliser `/legal/cgu` et `/legal/confidentialite`
+- [ ] Tester parcours complet
 
 ### P1 — Crédibilité launch
 
-- [ ] CI GitHub Actions (lint + build)
+- [x] CI GitHub Actions (lint + build)
 - [ ] Analytics (Plausible / PostHog)
-- [ ] `robots.txt` + `sitemap.xml`
-- [ ] Réconcilier messaging waitlist vs produit live
-- [ ] Rate limit `/api/waitlist`
+- [x] `robots.txt` + `sitemap.xml`
+- [x] Messaging waitlist vs produit live
+- [x] Rate limit `/api/waitlist`
 
 ### P2 — Post-launch
 
@@ -216,6 +217,8 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 ## 8. Contacts & liens
 
-- Repo : `GuillaumeWalter/BetterPatcher`
-- PR polish : #1
-- Support : à définir (email dans footer)
+| Fichier | Contenu |
+|---------|---------|
+| `docs/VOTRE-TODO.md` | **Actions Guillaume** (merge, vérif env, Stripe, légal) |
+| Repo | `GuillaumeWalter/BetterPatcher` |
+| PR | #1 |

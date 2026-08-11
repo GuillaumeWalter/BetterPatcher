@@ -1,8 +1,23 @@
 import { createSupabaseAdmin } from "@/lib/supabase/server";
+import { checkRateLimit, getRequestIp } from "@/lib/rate-limit";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const WAITLIST_LIMIT = 5;
+const WAITLIST_WINDOW_MS = 60 * 60 * 1000; // 5 req / heure / IP
 
 export async function POST(request: Request) {
+  const ip = getRequestIp(request);
+  const rate = checkRateLimit(`waitlist:${ip}`, WAITLIST_LIMIT, WAITLIST_WINDOW_MS);
+
+  if (!rate.allowed) {
+    return Response.json(
+      {
+        error: `Trop de tentatives. Réessayez dans ${rate.retryAfterSeconds ?? 60} secondes.`,
+      },
+      { status: 429 },
+    );
+  }
+
   let body: unknown;
 
   try {

@@ -53,10 +53,6 @@ export async function getRepoCommits(
   return response.json() as Promise<GitHubCommit[]>;
 }
 
-export function formatCommitsForGenerator(commits: GitHubCommit[]): string {
-  return commits.map((entry) => entry.commit.message.trim()).join("\n");
-}
-
 export function parseRepoFullName(fullName: string): {
   owner: string;
   repo: string;

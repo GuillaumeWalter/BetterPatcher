@@ -58,12 +58,12 @@ export function WaitlistSection() {
           <Rocket className="size-4" />
         </div>
         <CardTitle className="text-xl sm:mt-3">
-          Génération auto à chaque release — bientôt
+          Webhooks release — accès anticipé
         </CardTitle>
         <CardDescription className="max-w-2xl text-base">
-          Webhooks GitHub : dès qu&apos;un tag ou une release est poussé, vos
-          patch notes et posts réseaux seront générés automatiquement. Inscrivez-vous
-          pour être prévenu en premier.
+          L&apos;app est déjà disponible pour générer vos patch notes. Inscrivez-vous
+          pour être prévenu quand la génération automatique à chaque tag ou
+          release GitHub sera prête.
         </CardDescription>
       </CardHeader>
       <CardContent className="relative">

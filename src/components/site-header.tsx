@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
 import { AuthNav } from "@/components/auth-nav";
-import { Badge } from "@/components/ui/badge";
+import { HeaderPlanBadge } from "@/components/header-plan-badge";
 
 export function SiteHeader() {
   return (
@@ -20,12 +20,7 @@ export function SiteHeader() {
           </div>
         </Link>
         <div className="flex items-center gap-3">
-          <Badge
-            variant="secondary"
-            className="hidden border border-primary/15 bg-primary/8 text-primary sm:inline-flex"
-          >
-            Essai · 5 générations
-          </Badge>
+          <HeaderPlanBadge />
           <AuthNav />
         </div>
       </div>

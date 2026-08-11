@@ -1,6 +1,6 @@
 # 📋 RELEASE HUB - ROADMAP & TODO
 # Dernière mise à jour : août 2026
-# Analyse détaillée : docs/GO-LIVE.md
+# Analyse : docs/GO-LIVE.md · Actions Guillaume : docs/VOTRE-TODO.md
 
 ## 🚀 PHASE 1 : Marketing & validation
 
@@ -41,11 +41,18 @@
 
 ---
 
-## 🔧 Infra go-live (P0 opérationnel)
+## 🔧 Infra go-live
 
-- [ ] Merger PR sur master
-- [ ] Vercel + variables env
-- [ ] Supabase SQL (user_profiles, patch_notes, waitlist)
-- [ ] GitHub OAuth callback prod
-- [ ] Stripe live + webhook + activer Customer Portal
-- [ ] `NEXT_PUBLIC_APP_URL` + `ENV_CHECK_SECRET` en prod
+### Agent (code) — fait ou en PR
+- [x] P0 code (légal, portal, UX, docs)
+- [x] robots.txt + sitemap
+- [x] Rate limit waitlist
+- [x] Badge header dynamique
+- [x] docs/VOTRE-TODO.md
+
+### Guillaume — voir docs/VOTRE-TODO.md
+- [ ] Merger PR #1
+- [ ] Vérifier env Vercel (+ ENV_CHECK_SECRET)
+- [ ] Vérifier Stripe live + Customer Portal
+- [ ] Personnaliser légal
+- [ ] Test parcours prod

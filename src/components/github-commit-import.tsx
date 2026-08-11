@@ -150,6 +150,12 @@ export function GitHubCommitImport({
           {error}
         </p>
       ) : null}
+      {!isLoadingRepos && repos.length === 0 && !error ? (
+        <p className="text-sm text-muted-foreground">
+          Aucun dépôt accessible. Vérifiez les permissions GitHub ou créez un
+          dépôt.
+        </p>
+      ) : null}
     </div>
   );
 }

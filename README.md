@@ -4,7 +4,9 @@ SaaS qui transforme des messages de commit en patch notes Markdown et posts rés
 
 **Stack :** Next.js 16 · NextAuth (GitHub) · Supabase · Stripe · Vercel AI SDK
 
-**Documentation projet :** [docs/GO-LIVE.md](docs/GO-LIVE.md) — analyse go-live, checklist, gaps par domaine.
+**Documentation projet :**
+- [docs/GO-LIVE.md](docs/GO-LIVE.md) — analyse complète
+- [docs/VOTRE-TODO.md](docs/VOTRE-TODO.md) — **ce que tu dois faire** (merge, vérif env, Stripe…)
 
 ## Développement local
 
