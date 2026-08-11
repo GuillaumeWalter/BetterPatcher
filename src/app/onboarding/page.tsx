@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CheckCircle2, CreditCard } from "lucide-react";
+import { CreditCard } from "lucide-react";
 
 import { auth } from "@/auth";
 import { StripeSetupButton } from "@/components/billing-actions";
+import { OnboardingStatusBanner } from "@/components/onboarding-status-banner";
 import { BILLING } from "@/lib/billing/constants";
 import { getLocalizedBillingLabels } from "@/lib/billing/localized-labels";
+import { pageMetadata } from "@/lib/seo";
 import { getUserQuota } from "@/lib/supabase/users";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +17,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
+export const metadata = pageMetadata({
+  title: "Activate trial",
+  description: "Verify your card (€0) to unlock free trial generations on Easy Patch.",
+  path: "/onboarding",
+  noIndex: true,
+});
 
 type OnboardingPageProps = {
   searchParams: Promise<{ setup?: string }>;
@@ -32,7 +41,6 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
   }
 
   const { setup } = await searchParams;
-  const setupSuccess = setup === "success";
   const { soloPriceLabel, proPriceLabel } = await getLocalizedBillingLabels();
 
   return (
@@ -55,15 +63,7 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
-          {setupSuccess ? (
-            <div className="flex items-start gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm">
-              <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-400" />
-              <p>
-                Card saved. If Stripe is still confirming the webhook, refresh
-                in a few seconds or continue.
-              </p>
-            </div>
-          ) : null}
+          <OnboardingStatusBanner setup={setup} />
 
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>

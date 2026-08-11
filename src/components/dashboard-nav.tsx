@@ -26,6 +26,7 @@ export function DashboardNav() {
           <Link
             key={link.href}
             href={link.href}
+            aria-current={isActive ? "page" : undefined}
             className={cn(
               "rounded-lg px-4 py-2 text-sm font-medium transition-all",
               isActive

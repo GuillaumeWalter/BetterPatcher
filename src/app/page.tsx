@@ -3,8 +3,10 @@ import { GitBranch, CreditCard, Shield, Sparkles, Users, Zap } from "lucide-reac
 
 import { auth, signIn } from "@/auth";
 import { DemoPatchGenerator } from "@/components/demo-patch-generator";
+import { StructuredData } from "@/components/structured-data";
 import { BILLING } from "@/lib/billing/constants";
 import { getLocalizedBillingLabels } from "@/lib/billing/localized-labels";
+import { pageMetadata, siteUrl } from "@/lib/seo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,11 +35,40 @@ const features = [
   },
 ];
 
+export const metadata = pageMetadata({ path: "/" });
+
 export default async function Home() {
   const session = await auth();
   const { soloPriceLabel, proPriceLabel } = await getLocalizedBillingLabels();
 
   return (
+    <>
+      <StructuredData
+        data={{
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "Easy Patch",
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "Web",
+          url: siteUrl("/"),
+          offers: [
+            {
+              "@type": "Offer",
+              name: "Solo",
+              price: "4.99",
+              priceCurrency: "EUR",
+              description: `${BILLING.SOLO_MONTHLY_GENERATIONS} generations per month`,
+            },
+            {
+              "@type": "Offer",
+              name: "Pro",
+              price: "9.99",
+              priceCurrency: "EUR",
+              description: `${BILLING.PRO_MONTHLY_GENERATIONS} generations per month`,
+            },
+          ],
+        }}
+      />
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-16">
       <section className="relative mb-14 space-y-6 text-center sm:text-left">
         <Badge
@@ -181,5 +212,6 @@ export default async function Home() {
         </p>
       </section>
     </div>
+    </>
   );
 }

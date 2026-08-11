@@ -6,6 +6,7 @@ import { Loader2, Wand2 } from "lucide-react";
 
 import { GitHubCommitImport } from "@/components/github-commit-import";
 import { GitLabCommitImport } from "@/components/gitlab-commit-import";
+import { GenerationSkeleton } from "@/components/generation-skeleton";
 import { ShareStudio } from "@/components/share-studio";
 import { useBillingQuota } from "@/components/billing-quota-banner";
 import {
@@ -72,6 +73,7 @@ export function PatchNoteGenerator({
   const [markdown, setMarkdown] = useState("");
   const [socialPost, setSocialPost] = useState("");
   const [platformDrafts, setPlatformDrafts] = useState<PlatformDraft[]>([]);
+  const [liveMessage, setLiveMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
@@ -112,6 +114,7 @@ export function PatchNoteGenerator({
     setError(null);
     setErrorCode(null);
     setSavedId(null);
+    setLiveMessage("Generating patch note…");
 
     try {
       const response = await fetch("/api/generate", {
@@ -152,10 +155,12 @@ export function PatchNoteGenerator({
         setSavedReferences(saveReferencePatch(referencePatch));
       }
       await refreshQuota();
+      setLiveMessage("Patch note generated.");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Something went wrong.",
       );
+      setLiveMessage("");
     } finally {
       setIsLoading(false);
     }
@@ -208,6 +213,9 @@ export function PatchNoteGenerator({
 
   return (
     <div className="space-y-6">
+      <p className="sr-only" aria-live="polite" aria-atomic="true">
+        {liveMessage}
+      </p>
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="surface-card gradient-border">
           <CardHeader>
@@ -240,7 +248,9 @@ export function PatchNoteGenerator({
                   key={mode}
                   type="button"
                   role="tab"
+                  id={`tab-${mode}`}
                   aria-selected={inputMode === mode}
+                  aria-controls={`panel-${mode}`}
                   variant={inputMode === mode ? "default" : "ghost"}
                   size="sm"
                   className="flex-1"
@@ -252,18 +262,22 @@ export function PatchNoteGenerator({
             </div>
 
             {inputMode === "github" ? (
+              <div id="panel-github" role="tabpanel" aria-labelledby="tab-github">
               <GitHubCommitImport
                 isAuthenticated={isAuthenticated}
                 loginCallbackUrl="/dashboard/generate"
                 onImport={handleSourceImport}
               />
+              </div>
             ) : null}
 
             {inputMode === "gitlab" ? (
+              <div id="panel-gitlab" role="tabpanel" aria-labelledby="tab-gitlab">
               <GitLabCommitImport
                 isAuthenticated={isAuthenticated}
                 onImport={handleSourceImport}
               />
+              </div>
             ) : null}
 
             <div className="space-y-2">
@@ -453,7 +467,9 @@ export function PatchNoteGenerator({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {hasResult ? (
+            {isLoading ? (
+              <GenerationSkeleton />
+            ) : hasResult ? (
               <p className="text-sm text-muted-foreground">
                 {platformDrafts.length} platform draft
                 {platformDrafts.length === 1 ? "" : "s"} ready · scroll to Share

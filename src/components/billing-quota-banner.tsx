@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CreditCard, Sparkles } from "lucide-react";
+import { AlertCircle, CreditCard, RefreshCw, Sparkles } from "lucide-react";
 
 import { BILLING } from "@/lib/billing/constants";
 import type { QuotaSnapshot } from "@/lib/billing/constants";
@@ -32,21 +32,43 @@ type BillingPayload = QuotaSnapshot & {
 export function BillingQuotaBanner() {
   const [quota, setQuota] = useState<BillingPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function load() {
+      setIsLoading(true);
+      setLoadError(false);
       try {
         const response = await fetch("/api/billing", { credentials: "same-origin" });
+        if (cancelled) return;
         if (response.ok) {
           setQuota((await response.json()) as BillingPayload);
+        } else {
+          setQuota(null);
+          setLoadError(true);
+        }
+      } catch {
+        if (!cancelled) {
+          setQuota(null);
+          setLoadError(true);
         }
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     }
 
-    load();
-  }, []);
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadKey]);
+
+  function retry() {
+    setReloadKey((value) => value + 1);
+  }
 
   if (isLoading) {
     return (
@@ -57,7 +79,23 @@ export function BillingQuotaBanner() {
     );
   }
 
-  if (!quota) return null;
+  if (loadError || !quota) {
+    return (
+      <div
+        className="surface-card gradient-border mb-6 flex flex-col gap-3 rounded-2xl border-destructive/20 p-4 sm:flex-row sm:items-center sm:justify-between"
+        role="alert"
+      >
+        <div className="flex items-start gap-3 text-sm">
+          <AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" />
+          <p>Could not load your billing quota. Generations may still work.</p>
+        </div>
+        <Button type="button" size="sm" variant="outline" onClick={retry}>
+          <RefreshCw />
+          Retry
+        </Button>
+      </div>
+    );
+  }
 
   const soloLabel = quota.soloPriceLabel ?? BILLING.SOLO_PRICE_LABEL;
   const proLabel = quota.proPriceLabel ?? BILLING.PRO_PRICE_LABEL;

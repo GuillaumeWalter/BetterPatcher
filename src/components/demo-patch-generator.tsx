@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Copy, Loader2, Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { GenerationSkeleton } from "@/components/generation-skeleton";
 import {
   Card,
   CardContent,
@@ -35,6 +36,7 @@ export function DemoPatchGenerator() {
   const [markdown, setMarkdown] = useState("");
   const [socialPost, setSocialPost] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [liveMessage, setLiveMessage] = useState("");
   const [copied, setCopied] = useState<"markdown" | "social" | null>(null);
 
   async function handleGenerate() {
@@ -44,6 +46,7 @@ export function DemoPatchGenerator() {
     setMarkdown("");
     setSocialPost("");
     setError(null);
+    setLiveMessage("Generating demo patch note…");
 
     try {
       const response = await fetch("/api/generate/demo", {
@@ -64,8 +67,10 @@ export function DemoPatchGenerator() {
 
       setMarkdown(data.markdown ?? "");
       setSocialPost(data.socialPost ?? "");
+      setLiveMessage("Demo patch note ready.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
+      setLiveMessage("");
     } finally {
       setIsLoading(false);
     }
@@ -80,6 +85,9 @@ export function DemoPatchGenerator() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
+      <p className="sr-only lg:col-span-2" aria-live="polite" aria-atomic="true">
+        {liveMessage}
+      </p>
       <Card className="surface-card gradient-border">
         <CardHeader>
           <CardTitle className="text-lg">Try it free</CardTitle>
@@ -152,6 +160,9 @@ export function DemoPatchGenerator() {
           <CardDescription>Markdown + social post ready to copy</CardDescription>
         </CardHeader>
         <CardContent>
+          {isLoading ? (
+            <GenerationSkeleton />
+          ) : (
           <Tabs defaultValue="markdown">
             <TabsList className="w-full">
               <TabsTrigger value="markdown" className="flex-1">
@@ -196,6 +207,7 @@ export function DemoPatchGenerator() {
               </Button>
             </TabsContent>
           </Tabs>
+          )}
         </CardContent>
       </Card>
     </div>

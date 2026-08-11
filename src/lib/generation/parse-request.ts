@@ -13,6 +13,7 @@ export type GenerationRequestInput = {
   tone: Tone;
   options: GenerationOptions;
   referencePatch?: string;
+  repoFullName?: string | null;
 };
 
 export type ParseGenerationResult =
@@ -83,8 +84,16 @@ export function parseGenerationRequest(body: unknown): ParseGenerationResult {
     };
   }
 
+  const repoFullName =
+    typeof body === "object" &&
+    body !== null &&
+    "repoFullName" in body &&
+    typeof body.repoFullName === "string"
+      ? body.repoFullName.trim() || null
+      : null;
+
   return {
     ok: true,
-    data: { commits, tone, options, referencePatch },
+    data: { commits, tone, options, referencePatch, repoFullName },
   };
 }

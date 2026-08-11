@@ -8,10 +8,10 @@
 | Domaine | Score | 10/10 = |
 |---------|-------|---------|
 | **Fonctionnel** | 8.5/10 | Webhooks release, multi-repo, streaming IA |
-| **UX/UI** | 8/10 | Beta testée, zero état silencieux |
-| **Marketing** | 7/10 | Démo vidéo, témoignages, analytics actif |
-| **Communication** | 8.5/10 | Emails auto + légal finalisé |
-| **Dev/Ops** | 7.5/10 | E2E, Sentry, monitoring coûts IA |
+| **UX/UI** | 8.5/10 | Beta testée, zero état silencieux |
+| **Marketing** | 8/10 | Démo vidéo, témoignages, analytics actif |
+| **Communication** | 8.5/10 | Emails auto + légal template enrichi |
+| **Dev/Ops** | 8.5/10 | E2E Playwright, monitoring scaffold, tests |
 | **Webdesign** | 8/10 | Screenshots prod, a11y WCAG AA |
 | **Gestion projet** | 7/10 | Beta structurée, changelog public |
 | **Argent** | 6/10 | Stripe live, MRR, Stripe Tax |

@@ -1,9 +1,16 @@
 import Link from "next/link";
 
+import { StructuredData } from "@/components/structured-data";
 import { BILLING } from "@/lib/billing/constants";
+import { pageMetadata } from "@/lib/seo";
 import { Button } from "@/components/ui/button";
 
-export const metadata = { title: "FAQ" };
+export const metadata = pageMetadata({
+  title: "FAQ",
+  description:
+    "Answers about Easy Patch trial, quotas, GitLab import, AI usage, and billing.",
+  path: "/faq",
+});
 
 const faqs = [
   {
@@ -31,6 +38,20 @@ const faqs = [
 export default function FaqPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+      <StructuredData
+        data={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqs.map((item) => ({
+            "@type": "Question",
+            name: item.q,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: item.a,
+            },
+          })),
+        }}
+      />
       <h1 className="text-3xl font-semibold tracking-tight">FAQ</h1>
       <p className="mt-2 text-muted-foreground">
         Quick answers. Still stuck?{" "}

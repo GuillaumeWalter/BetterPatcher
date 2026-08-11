@@ -1,8 +1,13 @@
 import Link from "next/link";
 
+import { pageMetadata } from "@/lib/seo";
 import { Button } from "@/components/ui/button";
 
-export const metadata = { title: "Contact" };
+export const metadata = pageMetadata({
+  title: "Contact",
+  description: "Contact Easy Patch for support, billing questions, or partnerships.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (

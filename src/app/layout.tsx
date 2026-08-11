@@ -4,6 +4,7 @@ import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Analytics } from "@/components/analytics";
+import { pageMetadata } from "@/lib/seo";
 
 import "./globals.css";
 
@@ -18,11 +19,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Easy Patch | Patch notes & marketing assets",
-  description:
-    "Easy Patch turns GitHub, GitLab, or pasted commits into a Markdown patch note and a social post.",
-};
+export const metadata: Metadata = pageMetadata({});
 
 export default function RootLayout({
   children,
@@ -35,13 +32,18 @@ export default function RootLayout({
       className={`${plusJakarta.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans text-foreground">
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
           <div className="glow-orb -top-32 left-1/2 size-[550px] -translate-x-1/2 bg-[oklch(0.88_0.06_72)]" />
           <div className="glow-orb top-1/4 -right-24 size-[380px] bg-[oklch(0.91_0.05_58)]" />
           <div className="glow-orb -bottom-16 -left-16 size-[320px] bg-[oklch(0.93_0.04_82)]" />
         </div>
         <SiteHeader />
-        <main className="flex flex-1 flex-col">{children}</main>
+        <main id="main-content" className="flex flex-1 flex-col">
+          {children}
+        </main>
         <SiteFooter />
         <Analytics />
       </body>

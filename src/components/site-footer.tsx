@@ -25,6 +25,9 @@ export function SiteFooter() {
             <Link href="/legal/privacy" className="hover:text-foreground hover:underline">
               Privacy
             </Link>
+            <Link href="/legal/cookies" className="hover:text-foreground hover:underline">
+              Cookies
+            </Link>
           </nav>
         </div>
         <p className="text-center text-[11px] text-muted-foreground/80 sm:text-left">
