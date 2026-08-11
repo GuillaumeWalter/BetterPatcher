@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
-import { StripeSubscribeButton } from "@/components/billing-actions";
+import { auth } from "@/auth";
+import { StripePortalButton, StripeSubscribeButton } from "@/components/billing-actions";
 import { BillingQuotaBanner } from "@/components/billing-quota-banner";
 import { DashboardNav } from "@/components/dashboard-nav";
 import { BILLING } from "@/lib/billing/constants";
+import { getUserQuota } from "@/lib/supabase/users";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,7 +21,14 @@ type BillingPageProps = {
 };
 
 export default async function BillingPage({ searchParams }: BillingPageProps) {
+  const session = await auth();
+  const quota = session?.user?.id
+    ? await getUserQuota(session.user.id)
+    : null;
+
   const { success, canceled } = await searchParams;
+  const isPro = quota?.plan === "pro";
+  const isBlocked = quota?.plan === "blocked";
 
   return (
     <>
@@ -30,11 +39,12 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
             <Sparkles className="size-5 text-primary" />
-            Plan Pro
+            {isPro ? "Votre abonnement Pro" : "Plan Pro"}
           </CardTitle>
           <CardDescription>
-            {BILLING.PRO_PRICE_LABEL} · {BILLING.PRO_MONTHLY_GENERATIONS}{" "}
-            générations / mois · historique inclus
+            {isPro
+              ? `${BILLING.PRO_PRICE_LABEL} · ${quota?.generationsRemaining ?? 0} / ${quota?.generationsLimit ?? BILLING.PRO_MONTHLY_GENERATIONS} générations restantes ce mois`
+              : `${BILLING.PRO_PRICE_LABEL} · ${BILLING.PRO_MONTHLY_GENERATIONS} générations / mois · historique inclus`}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -50,14 +60,39 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
             </p>
           ) : null}
 
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>✓ Import GitHub ou collage manuel (Perforce, SVN, etc.)</li>
-            <li>✓ {BILLING.PRO_MONTHLY_GENERATIONS} générations IA / mois (plafond anti-surcoût)</li>
-            <li>✓ Historique et édition des patch notes</li>
-            <li>✓ Annulation à tout moment via Stripe</li>
-          </ul>
+          {isPro ? (
+            <p className="text-sm text-muted-foreground">
+              Vous êtes abonné au plan Pro. Gérez votre carte, vos factures ou
+              annulez votre abonnement via le portail Stripe.
+            </p>
+          ) : (
+            <>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>✓ Import GitHub ou collage manuel (Perforce, SVN, etc.)</li>
+                <li>
+                  ✓ {BILLING.PRO_MONTHLY_GENERATIONS} générations IA / mois
+                  (plafond anti-surcoût)
+                </li>
+                <li>✓ Historique et édition des patch notes</li>
+                <li>✓ Annulation à tout moment via Stripe</li>
+              </ul>
 
-          <StripeSubscribeButton />
+              {isBlocked ? (
+                <p className="rounded-xl border border-primary/15 bg-primary/8 p-4 text-sm text-primary">
+                  Votre essai gratuit est terminé. Passez au Pro pour continuer à
+                  générer des patch notes.
+                </p>
+              ) : null}
+            </>
+          )}
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            {isPro ? (
+              <StripePortalButton label="Gérer mon abonnement" />
+            ) : (
+              <StripeSubscribeButton />
+            )}
+          </div>
 
           <Button variant="outline" asChild>
             <Link href="/dashboard/generate">Retour au générateur</Link>

@@ -32,6 +32,7 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
 
   const { setup } = await searchParams;
   const setupSuccess = setup === "success";
+  const setupCanceled = setup === "canceled";
 
   return (
     <div className="mx-auto flex max-w-lg flex-1 items-center px-4 py-16">
@@ -60,6 +61,12 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
                 Carte enregistrée. Si Stripe confirme encore le webhook, actualisez
                 dans quelques secondes ou continuez.
               </p>
+            </div>
+          ) : null}
+          {setupCanceled ? (
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm">
+              Vérification annulée. Vous pouvez réessayer quand vous voulez — aucun
+              prélèvement n&apos;a été effectué.
             </div>
           ) : null}
 

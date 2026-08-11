@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { getRepoCommits, getUserRepos } from "@/lib/github";
+import { getUserRepos } from "@/lib/github";
 
 async function requireAccessToken() {
   const session = await auth();

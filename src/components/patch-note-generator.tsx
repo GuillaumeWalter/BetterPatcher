@@ -66,11 +66,15 @@ export function PatchNoteGenerator({
   const [error, setError] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [repoFullName, setRepoFullName] = useState<string | null>(null);
+  const [copiedField, setCopiedField] = useState<"markdown" | "social" | null>(
+    null,
+  );
   const { quota, refreshQuota } = useBillingQuota();
 
   useEffect(() => {
     const stored = sessionStorage.getItem(COMMITS_STORAGE_KEY);
     if (stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sessionStorage hydration
       setCommits(stored);
       sessionStorage.removeItem(COMMITS_STORAGE_KEY);
     }
@@ -121,9 +125,14 @@ export function PatchNoteGenerator({
     }
   }
 
-  async function copyToClipboard(text: string) {
+  async function copyToClipboard(
+    text: string,
+    field: "markdown" | "social",
+  ) {
     if (!text) return;
     await navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    window.setTimeout(() => setCopiedField(null), 2000);
   }
 
   function handleGitHubImport(text: string, repo: string) {
@@ -325,10 +334,11 @@ export function PatchNoteGenerator({
                 variant="outline"
                 size="sm"
                 disabled={!markdown}
-                onClick={() => copyToClipboard(markdown)}
+                onClick={() => copyToClipboard(markdown, "markdown")}
+                aria-live="polite"
               >
                 <Copy />
-                Copier le Markdown
+                {copiedField === "markdown" ? "Copié !" : "Copier le Markdown"}
               </Button>
             </TabsContent>
 
@@ -343,10 +353,11 @@ export function PatchNoteGenerator({
                 variant="outline"
                 size="sm"
                 disabled={!socialPost}
-                onClick={() => copyToClipboard(socialPost)}
+                onClick={() => copyToClipboard(socialPost, "social")}
+                aria-live="polite"
               >
                 <Copy />
-                Copier le post
+                {copiedField === "social" ? "Copié !" : "Copier le post"}
               </Button>
             </TabsContent>
           </Tabs>

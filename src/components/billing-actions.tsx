@@ -115,3 +115,65 @@ export function StripeSubscribeButton() {
     </div>
   );
 }
+
+export function StripePortalButton({
+  label = "Gérer mon abonnement",
+}: {
+  label?: string;
+}) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function openPortal() {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/billing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "portal" }),
+      });
+
+      const data = (await response.json()) as { url?: string; error?: string };
+
+      if (!response.ok || !data.url) {
+        throw new Error(data.error ?? "Impossible d'ouvrir le portail Stripe.");
+      }
+
+      window.location.href = data.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inattendue.");
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <Button
+        size="lg"
+        className="w-full"
+        variant="outline"
+        onClick={openPortal}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="animate-spin" />
+            Redirection Stripe…
+          </>
+        ) : (
+          <>
+            <CreditCard />
+            {label}
+          </>
+        )}
+      </Button>
+      {error ? (
+        <p className="text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}

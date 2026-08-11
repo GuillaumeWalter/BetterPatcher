@@ -168,9 +168,6 @@ export async function POST(request: Request) {
     await refundGeneration(session.user.id, consumed.plan);
     console.error("[/api/generate]", error);
 
-    const message =
-      error instanceof Error ? error.message : "Erreur inconnue.";
-
     return Response.json(
       { error: "La génération a échoué. Réessayez dans un instant." },
       { status: 500 },

@@ -1,7 +1,15 @@
 import { getAiProvider } from "@/lib/ai/model";
 
-/** Diagnostic prod — indique quelles variables sont présentes (pas leurs valeurs). */
-export async function GET() {
+/** Diagnostic — dev libre ; prod protégé par ENV_CHECK_SECRET (?secret=). */
+export async function GET(request: Request) {
+  const isDev = process.env.NODE_ENV === "development";
+  const secret = process.env.ENV_CHECK_SECRET?.trim();
+  const provided = new URL(request.url).searchParams.get("secret");
+
+  if (!isDev && (!secret || provided !== secret)) {
+    return Response.json({ error: "Non trouvé." }, { status: 404 });
+  }
+
   const provider = getAiProvider();
 
   return Response.json({

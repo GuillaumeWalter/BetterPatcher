@@ -1,55 +1,51 @@
 # 📋 RELEASE HUB - ROADMAP & TODO
-# Dernière mise à jour : juillet 2026
+# Dernière mise à jour : août 2026
+# Analyse détaillée : docs/GO-LIVE.md
 
-## 🚀 PHASE 1 : Le Side-Project Marketing (Outil Gratuit)
-*Objectif : outil gratuit pour valider l'intérêt et collecter des emails.*
+## 🚀 PHASE 1 : Marketing & validation
 
-### 🛠️ Étape 1.1 : Initialisation & Structure
-- [x] Initialiser le projet Next.js (App Router, TypeScript, Tailwind)
-- [x] Installer et configurer Shadcn/ui
-- [x] Setup du layout global
+### Fait
+- [x] Next.js + shadcn + layout
+- [x] Landing (hero, tarifs, waitlist)
+- [x] API `/api/generate` + prompts IA
+- [x] Waitlist Supabase
+- [x] SEO, OG image, favicon, 404
+- [x] `.env.example`, README, docs/GO-LIVE.md
+- [x] Pages légales (modèles à personnaliser)
 
-### 🎨 Étape 1.2 : L'Interface (Front-end Unique)
-- [x] Landing Page (hero, tarifs, features)
-- [x] Générateur (textarea, tonalités, tabs Markdown / Post réseaux) — **dans le dashboard, pas en public**
-- [x] Section liste d'attente (landing)
-- [ ] **Générateur gratuit sans compte sur la landing** (retiré au profit du funnel payant)
-
-### 🧠 Étape 1.3 : Logique & IA (Back-end)
-- [x] Route `/api/generate`
-- [x] Vercel AI SDK + Gemini
-- [x] 3 System Prompts (Technique, Marketing, Gaming)
-- [ ] Streaming de la réponse IA
-
-### 🌍 Étape 1.4 : Collecte de Leads & Déploiement
-- [x] Waitlist → Supabase (`/api/waitlist`)
-- [x] `.env.example` + README déploiement
-- [ ] Déployer en production (Vercel + secrets)
-- [ ] Tester en conditions réelles
+### Reste
+- [ ] Générateur gratuit sans compte sur landing (décision produit)
+- [ ] Déployer en production
+- [ ] Tester en conditions réelles (beta 5–10 users)
+- [ ] Streaming réponse IA
 
 ---
 
-## 🔒 PHASE 2 : Le SaaS Automatisé (B2B Payant)
+## 🔒 PHASE 2 : SaaS payant
 
-### 🔑 Étape 2.1 : Authentification & Connexion GitHub
-- [x] NextAuth.js + OAuth GitHub (scope repo)
-- [x] Import repos + 30 derniers commits
-
-### 🗄️ Étape 2.2 : Dashboard & Automatisation
+### Fait
+- [x] NextAuth GitHub + import commits
 - [x] Dashboard (générer, historique, billing)
-- [x] Historique patch notes éditables
-- [ ] Gestion multi-projets / repos persistants
-- [ ] Webhooks GitHub sur tag/release → génération auto
+- [x] Historique éditable
+- [x] Stripe setup 0 € + abo Pro + Customer Portal
+- [x] Quotas essai / Pro + past_due
+- [x] Gate onboarding sur tout le dashboard
+- [x] UX P0 (liens, labels, copy feedback)
 
-### 💳 Étape 2.3 : Monétisation
-- [x] Stripe (vérif CB 0 € + abonnement Pro ~10 €/mois)
-- [x] Quotas essai (5) / Pro (60/mois)
+### Reste
+- [ ] Webhooks GitHub release → génération auto
+- [ ] Multi-projets / repos persistants
+- [ ] CI GitHub Actions
+- [ ] Analytics
+- [ ] Personnaliser CGU / confidentialité (éditeur, SIRET)
 
 ---
 
-## 🔧 Polish & infra restant
-- [x] UX cohérente (badge, liens login)
-- [x] Meta SEO + image OG dynamique
-- [x] Footer avec lien diagnostic env (dev)
-- [ ] Page 404 custom
-- [ ] CI/CD (lint + build sur PR)
+## 🔧 Infra go-live (P0 opérationnel)
+
+- [ ] Merger PR sur master
+- [ ] Vercel + variables env
+- [ ] Supabase SQL (user_profiles, patch_notes, waitlist)
+- [ ] GitHub OAuth callback prod
+- [ ] Stripe live + webhook + activer Customer Portal
+- [ ] `NEXT_PUBLIC_APP_URL` + `ENV_CHECK_SECRET` en prod

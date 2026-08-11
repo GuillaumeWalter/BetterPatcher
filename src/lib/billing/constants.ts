@@ -63,6 +63,20 @@ export function buildQuotaSnapshot(
     };
   }
 
+  if (profile.subscriptionStatus === "past_due") {
+    return {
+      plan: "blocked",
+      paymentMethodVerified: true,
+      generationsUsed: profile.periodGenerationsUsed,
+      generationsLimit: profile.periodGenerationsLimit || BILLING.PRO_MONTHLY_GENERATIONS,
+      generationsRemaining: 0,
+      requiresSubscription: true,
+      requiresSetup: false,
+      canGenerate: false,
+      minSecondsBetweenGenerations: BILLING.MIN_SECONDS_BETWEEN_GENERATIONS,
+    };
+  }
+
   const isPro = profile.subscriptionStatus === "active";
 
   if (isPro) {

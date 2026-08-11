@@ -1,5 +1,7 @@
 # PROJECT CONTEXT: Release Hub (Automated Patch Notes & Marketing Assets)
 
+> État go-live et checklist : voir `docs/GO-LIVE.md` et `Todo.txt`.
+
 ## 1. Vision & Objectif
 - **Concept :** SaaS B2B qui se branche sur les dépôts de code (GitHub/GitLab), analyse les commits et les Pull Requests via LLM, et génère automatiquement des patch notes structurés ainsi que des assets marketing (posts LinkedIn, carrousels, résumés Discord/Steam).
 - **Objectif :** Éliminer la corvée de rédaction pour les devs et donner du contenu clé en main pour les équipes marketing/produit et les studios indés.

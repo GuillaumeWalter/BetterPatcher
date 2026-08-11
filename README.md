@@ -4,6 +4,8 @@ SaaS qui transforme des messages de commit en patch notes Markdown et posts rés
 
 **Stack :** Next.js 16 · NextAuth (GitHub) · Supabase · Stripe · Vercel AI SDK
 
+**Documentation projet :** [docs/GO-LIVE.md](docs/GO-LIVE.md) — analyse go-live, checklist, gaps par domaine.
+
 ## Développement local
 
 ```bash
@@ -17,6 +19,8 @@ Ouvrir [http://localhost:3000](http://localhost:3000).
 
 Pour les webhooks Stripe en local : `stripe listen --forward-to localhost:3000/api/stripe/webhook`
 
+Diagnostic env : [http://localhost:3000/api/env-check](http://localhost:3000/api/env-check)
+
 ## Mise en production (checklist)
 
 1. **Vercel** — importer le repo, build `npm run build`
@@ -26,9 +30,12 @@ Pour les webhooks Stripe en local : `stripe listen --forward-to localhost:3000/a
    - `supabase/waitlist.sql` (optionnel)
 3. **GitHub OAuth** — callback : `https://<domaine>/api/auth/callback/github`
 4. **Google AI Studio** — clé `GOOGLE_GENERATIVE_AI_API_KEY` (ou AI Gateway)
-5. **Stripe** — produit récurrent, webhook vers `https://<domaine>/api/stripe/webhook`
+5. **Stripe** — produit récurrent, webhook, **activer le Customer Portal** dans le dashboard Stripe
 6. **Variables d’environnement** sur Vercel (voir `.env.example`)
-7. **Vérifier** : `https://<domaine>/api/env-check` — tout doit être `true`
+7. **Personnaliser** `/legal/cgu` et `/legal/confidentialite`
+8. **Vérifier** : `https://<domaine>/api/env-check?secret=<ENV_CHECK_SECRET>`
+
+Voir [docs/GO-LIVE.md](docs/GO-LIVE.md) pour la checklist complète P0/P1/P2.
 
 ## Variables d’environnement
 
@@ -42,6 +49,7 @@ Voir [`.env.example`](.env.example) pour la liste complète.
 | `GOOGLE_GENERATIVE_AI_API_KEY` ou `AI_GATEWAY_API_KEY` | Oui |
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` / `STRIPE_PRO_PRICE_ID` | Oui |
 | `NEXT_PUBLIC_APP_URL` | Oui (sauf auto sur Vercel) |
+| `ENV_CHECK_SECRET` | Recommandé en prod |
 
 ## Scripts
 

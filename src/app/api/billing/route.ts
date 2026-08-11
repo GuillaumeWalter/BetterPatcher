@@ -65,6 +65,15 @@ export async function POST(request: Request) {
 
   const baseUrl = getAppBaseUrl();
 
+  if (action === "portal") {
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: `${baseUrl}/dashboard/billing`,
+    });
+
+    return Response.json({ url: portalSession.url });
+  }
+
   if (action === "subscribe") {
     const priceId = process.env.STRIPE_PRO_PRICE_ID?.trim();
     if (!priceId) {

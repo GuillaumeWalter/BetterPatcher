@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CreditCard, Loader2, Sparkles } from "lucide-react";
+import { CreditCard, Sparkles } from "lucide-react";
 
 import { BILLING } from "@/lib/billing/constants";
 import type { QuotaSnapshot } from "@/lib/billing/constants";
@@ -92,7 +92,7 @@ export function BillingQuotaBanner() {
 export function useBillingQuota() {
   const [quota, setQuota] = useState<QuotaSnapshot | null>(null);
 
-  async function refresh() {
+  async function refreshQuota() {
     const response = await fetch("/api/billing");
     if (response.ok) {
       setQuota((await response.json()) as QuotaSnapshot);
@@ -100,8 +100,15 @@ export function useBillingQuota() {
   }
 
   useEffect(() => {
-    refresh();
+    async function load() {
+      const response = await fetch("/api/billing");
+      if (response.ok) {
+        setQuota((await response.json()) as QuotaSnapshot);
+      }
+    }
+
+    load();
   }, []);
 
-  return { quota, refreshQuota: refresh };
+  return { quota, refreshQuota };
 }
