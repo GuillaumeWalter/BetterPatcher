@@ -10,6 +10,7 @@ const links = [
   { href: "/dashboard/generate", label: "Generator" },
   { href: "/dashboard/history", label: "History" },
   { href: "/dashboard/billing", label: "Billing" },
+  { href: "/dashboard/settings", label: "Settings" },
 ];
 
 export function DashboardNav() {

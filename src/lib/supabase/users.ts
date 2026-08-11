@@ -24,6 +24,9 @@ type UserProfileRow = {
   period_generations_limit: number;
   billing_period_start: string | null;
   last_generation_at: string | null;
+  github_access_token: string | null;
+  release_auto_repo: string | null;
+  discord_webhook_url: string | null;
 };
 
 function mapPlanTier(value: PlanTier | null | undefined): PlanTier {
@@ -46,6 +49,9 @@ function mapProfile(row: UserProfileRow): UserBillingProfile {
     periodGenerationsLimit: row.period_generations_limit,
     billingPeriodStart: row.billing_period_start,
     lastGenerationAt: row.last_generation_at,
+    githubAccessToken: row.github_access_token,
+    releaseAutoRepo: row.release_auto_repo,
+    discordWebhookUrl: row.discord_webhook_url,
   };
 }
 
@@ -379,4 +385,87 @@ export async function setGitLabAccessToken(
   }
 
   return true;
+}
+
+export async function setGitHubAccessToken(
+  userId: string,
+  token: string | null,
+): Promise<boolean> {
+  const supabase = createSupabaseAdmin();
+  if (!supabase) return false;
+
+  await ensureUserProfile({ userId, email: null });
+
+  const { error } = await supabase
+    .from("user_profiles")
+    .update({ github_access_token: token })
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("[setGitHubAccessToken]", error);
+    return false;
+  }
+
+  return true;
+}
+
+export async function getGitHubAccessToken(
+  userId: string,
+): Promise<string | null> {
+  const profile = await getUserProfile(userId);
+  const token = profile?.githubAccessToken;
+  return token && token.length > 0 ? token : null;
+}
+
+export async function updateUserIntegrations(
+  userId: string,
+  input: {
+    releaseAutoRepo?: string | null;
+    discordWebhookUrl?: string | null;
+  },
+): Promise<boolean> {
+  const supabase = createSupabaseAdmin();
+  if (!supabase) return false;
+
+  const patch: Record<string, unknown> = {};
+  if (input.releaseAutoRepo !== undefined) {
+    patch.release_auto_repo = input.releaseAutoRepo;
+  }
+  if (input.discordWebhookUrl !== undefined) {
+    patch.discord_webhook_url = input.discordWebhookUrl;
+  }
+
+  if (Object.keys(patch).length === 0) return true;
+
+  const { error } = await supabase
+    .from("user_profiles")
+    .update(patch)
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("[updateUserIntegrations]", error);
+    return false;
+  }
+
+  return true;
+}
+
+export async function findUserByReleaseRepo(
+  repoFullName: string,
+): Promise<UserBillingProfile | null> {
+  const supabase = createSupabaseAdmin();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select("*")
+    .eq("release_auto_repo", repoFullName)
+    .maybeSingle();
+
+  if (error || !data) {
+    if (error) console.error("[findUserByReleaseRepo]", error);
+    return null;
+  }
+
+  return mapProfile(data as UserProfileRow);
 }

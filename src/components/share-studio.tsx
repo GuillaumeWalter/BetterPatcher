@@ -52,6 +52,7 @@ export function ShareStudio({
   markdownDirty = false,
   isSavingMarkdown = false,
 }: ShareStudioProps) {
+  const [discordEnabled, setDiscordEnabled] = useState(false);
   const defaultPlatforms = useMemo(
     () => defaultPlatformsForTone(tone),
     [tone],
@@ -75,6 +76,8 @@ export function ShareStudio({
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPublishingDiscord, setIsPublishingDiscord] = useState(false);
+  const [discordPublished, setDiscordPublished] = useState(false);
   const [instruction, setInstruction] = useState("");
 
   useEffect(() => {
@@ -87,6 +90,17 @@ export function ShareStudio({
     });
     return () => cancelAnimationFrame(frame);
   }, [initialDrafts]);
+
+  useEffect(() => {
+    void (async () => {
+      const response = await fetch("/api/integrations", {
+        credentials: "same-origin",
+      });
+      if (!response.ok) return;
+      const data = (await response.json()) as { hasDiscordWebhook?: boolean };
+      setDiscordEnabled(Boolean(data.hasDiscordWebhook));
+    })();
+  }, []);
 
   const activeDraft = drafts.find((draft) => draft.platform === activePlatform);
   const activeMeta = PLATFORM_OPTIONS.find(
@@ -223,6 +237,36 @@ export function ShareStudio({
       setError(err instanceof Error ? err.message : "Regenerate failed.");
     } finally {
       setIsRegenerating(false);
+    }
+  }
+
+  async function publishToDiscord() {
+    if (!activeDraft?.body) return;
+    setIsPublishingDiscord(true);
+    setError(null);
+    setDiscordPublished(false);
+    try {
+      const content =
+        activeDraft.title.trim().length > 0
+          ? `**${activeDraft.title.trim()}**\n\n${activeDraft.body}`
+          : activeDraft.body;
+
+      const response = await fetch("/api/share/discord", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ content }),
+      });
+      const data = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(data.error ?? "Discord publish failed.");
+      }
+      setDiscordPublished(true);
+      window.setTimeout(() => setDiscordPublished(false), 2500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Discord publish failed.");
+    } finally {
+      setIsPublishingDiscord(false);
     }
   }
 
@@ -385,6 +429,19 @@ export function ShareStudio({
               {copied ? <Check /> : <Copy />}
               {copied ? "Copied" : "Copy draft"}
             </Button>
+            {discordEnabled && activePlatform === "discord" ? (
+              <Button
+                size="sm"
+                variant="secondary"
+                disabled={isPublishingDiscord || !activeDraft?.body}
+                onClick={() => void publishToDiscord()}
+              >
+                {isPublishingDiscord ? (
+                  <Loader2 className="animate-spin" />
+                ) : null}
+                {discordPublished ? "Posted!" : "Post to Discord"}
+              </Button>
+            ) : null}
             {patchNoteId ? (
               <>
                 <Button

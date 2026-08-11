@@ -1,13 +1,24 @@
-import { generateText, Output } from "ai";
-
-import { getAiProvider, getGenerationModel } from "@/lib/ai/model";
-import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
-import { generationSchema } from "@/lib/ai/schema";
+import { getAiProvider } from "@/lib/ai/model";
+import { runGeneration } from "@/lib/generation/run-generation";
 import { parseGenerationRequest } from "@/lib/generation/parse-request";
-import { checkRateLimit, getRequestIp } from "@/lib/rate-limit";
+import {
+  checkRateLimit,
+  getRequestIp,
+  peekRateLimit,
+} from "@/lib/rate-limit";
 
 const DEMO_LIMIT = 3;
 const DEMO_WINDOW_MS = 60 * 60 * 1000;
+
+export async function GET(request: Request) {
+  const ip = getRequestIp(request);
+  const status = peekRateLimit(`demo:${ip}`, DEMO_LIMIT, DEMO_WINDOW_MS);
+  return Response.json({
+    limit: status.limit,
+    remaining: status.remaining,
+    windowHours: DEMO_WINDOW_MS / 3_600_000,
+  });
+}
 
 export async function POST(request: Request) {
   const ip = getRequestIp(request);
@@ -17,6 +28,8 @@ export async function POST(request: Request) {
     return Response.json(
       {
         error: `Demo limit reached. Try again in ${rate.retryAfterSeconds ?? 60} seconds, or create a free account.`,
+        remaining: 0,
+        limit: rate.limit,
       },
       { status: 429 },
     );
@@ -47,17 +60,19 @@ export async function POST(request: Request) {
   const { commits, tone, options, referencePatch } = parsed.data;
 
   try {
-    const { output } = await generateText({
-      model: getGenerationModel(),
-      system: getSystemPrompt(tone, options),
-      prompt: getUserPrompt(commits, tone, referencePatch),
-      output: Output.object({ schema: generationSchema }),
+    const output = await runGeneration({
+      commits,
+      tone,
+      options,
+      referencePatch,
     });
 
     return Response.json({
       markdown: output?.markdown ?? "",
       socialPost: output?.socialPost ?? "",
       demo: true,
+      remaining: rate.remaining,
+      limit: rate.limit,
     });
   } catch (error) {
     console.error("[/api/generate/demo]", error);

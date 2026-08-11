@@ -6,7 +6,7 @@ import {
   getGitHubClientId,
   getGitHubClientSecret,
 } from "@/lib/env";
-import { ensureUserProfile } from "@/lib/supabase/users";
+import { ensureUserProfile, setGitHubAccessToken } from "@/lib/supabase/users";
 import { sendWelcomeEmail } from "@/lib/email";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -24,12 +24,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   events: {
-    async signIn({ user, isNewUser }) {
+    async signIn({ user, account, isNewUser }) {
       if (user.id) {
         await ensureUserProfile({
           userId: user.id,
           email: user.email ?? null,
         });
+        if (account?.provider === "github" && account.access_token) {
+          await setGitHubAccessToken(user.id, account.access_token);
+        }
         if (isNewUser && user.email) {
           await sendWelcomeEmail({
             to: user.email,

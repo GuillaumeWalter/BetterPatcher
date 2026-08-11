@@ -3,6 +3,8 @@ import { sendEmail } from "@/lib/email/client";
 import {
   inactiveTrialReminderEmail,
   paymentFailedEmail,
+  proQuotaExhaustedEmail,
+  proQuotaLowEmail,
   soloQuotaExhaustedEmail,
   soloQuotaLowEmail,
   subscriptionCanceledEmail,
@@ -206,6 +208,42 @@ export async function sendSoloQuotaExhaustedEmail(
   });
 }
 
+export async function sendProQuotaLowEmail(
+  ctx: UserEmailContext,
+  remaining: number,
+  limit: number,
+  billingPeriodStart?: string | null,
+) {
+  const { subject, html } = proQuotaLowEmail(remaining, limit, ctx.name);
+  return sendEmail({
+    to: ctx.email,
+    subject,
+    html,
+    idempotencyKey: periodIdempotencyKey(
+      ctx.userId,
+      `pro-quota-low-${remaining}`,
+      billingPeriodStart,
+    ),
+  });
+}
+
+export async function sendProQuotaExhaustedEmail(
+  ctx: UserEmailContext,
+  billingPeriodStart?: string | null,
+) {
+  const { subject, html } = proQuotaExhaustedEmail(ctx.name);
+  return sendEmail({
+    to: ctx.email,
+    subject,
+    html,
+    idempotencyKey: periodIdempotencyKey(
+      ctx.userId,
+      "pro-quota-exhausted",
+      billingPeriodStart,
+    ),
+  });
+}
+
 export async function sendWaitlistConfirmationEmail(to: string) {
   const { subject, html } = waitlistConfirmationEmail();
   return sendEmail({
@@ -241,8 +279,9 @@ export async function maybeSendTrialLifecycleEmails(input: {
 
 const SOLO_UPGRADE_THRESHOLD = 0.8;
 const SOLO_QUOTA_LOW_REMAINING = 5;
+const PRO_QUOTA_LOW_REMAINING = 10;
 
-/** After a successful generation — Solo paid plan lifecycle emails. */
+/** After a successful generation — Solo / Pro paid plan lifecycle emails. */
 export async function maybeSendPaidPlanLifecycleEmails(input: {
   userId: string;
   email: string | null | undefined;
@@ -253,9 +292,8 @@ export async function maybeSendPaidPlanLifecycleEmails(input: {
   generationsRemaining: number;
   billingPeriodStart?: string | null;
 }) {
-  if (!input.email || input.plan !== "solo" || input.generationsLimit <= 0) {
-    return;
-  }
+  if (!input.email || input.generationsLimit <= 0) return;
+  if (input.plan !== "solo" && input.plan !== "pro") return;
 
   const ctx: UserEmailContext = {
     userId: input.userId,
@@ -263,21 +301,40 @@ export async function maybeSendPaidPlanLifecycleEmails(input: {
     name: input.name,
   };
 
-  const usageRatio = input.generationsUsed / input.generationsLimit;
+  if (input.plan === "solo") {
+    const usageRatio = input.generationsUsed / input.generationsLimit;
 
-  if (
-    input.generationsRemaining > 0 &&
-    usageRatio >= SOLO_UPGRADE_THRESHOLD
-  ) {
-    await sendUpgradeToProEmail(ctx, input.billingPeriodStart);
+    if (
+      input.generationsRemaining > 0 &&
+      usageRatio >= SOLO_UPGRADE_THRESHOLD
+    ) {
+      await sendUpgradeToProEmail(ctx, input.billingPeriodStart);
+    }
+
+    if (
+      input.generationsRemaining > 0 &&
+      input.generationsRemaining <= SOLO_QUOTA_LOW_REMAINING &&
+      usageRatio < SOLO_UPGRADE_THRESHOLD
+    ) {
+      await sendSoloQuotaLowEmail(
+        ctx,
+        input.generationsRemaining,
+        input.generationsLimit,
+        input.billingPeriodStart,
+      );
+    }
+
+    if (input.generationsRemaining === 0) {
+      await sendSoloQuotaExhaustedEmail(ctx, input.billingPeriodStart);
+    }
+    return;
   }
 
   if (
     input.generationsRemaining > 0 &&
-    input.generationsRemaining <= SOLO_QUOTA_LOW_REMAINING &&
-    usageRatio < SOLO_UPGRADE_THRESHOLD
+    input.generationsRemaining <= PRO_QUOTA_LOW_REMAINING
   ) {
-    await sendSoloQuotaLowEmail(
+    await sendProQuotaLowEmail(
       ctx,
       input.generationsRemaining,
       input.generationsLimit,
@@ -286,7 +343,7 @@ export async function maybeSendPaidPlanLifecycleEmails(input: {
   }
 
   if (input.generationsRemaining === 0) {
-    await sendSoloQuotaExhaustedEmail(ctx, input.billingPeriodStart);
+    await sendProQuotaExhaustedEmail(ctx, input.billingPeriodStart);
   }
 }
 

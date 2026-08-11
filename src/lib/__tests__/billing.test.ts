@@ -50,5 +50,6 @@ describe("checkRateLimit", () => {
     expect(checkRateLimit(key, 2, 60_000).allowed).toBe(true);
     expect(checkRateLimit(key, 2, 60_000).allowed).toBe(true);
     expect(checkRateLimit(key, 2, 60_000).allowed).toBe(false);
+    expect(checkRateLimit(key, 2, 60_000).remaining).toBe(0);
   });
 });

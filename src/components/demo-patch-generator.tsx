@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Copy, Loader2, Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,19 @@ export function DemoPatchGenerator() {
   const [error, setError] = useState<string | null>(null);
   const [liveMessage, setLiveMessage] = useState("");
   const [copied, setCopied] = useState<"markdown" | "social" | null>(null);
+  const [demoRemaining, setDemoRemaining] = useState<number | null>(null);
+  const demoLimit = 3;
+
+  useEffect(() => {
+    void (async () => {
+      const response = await fetch("/api/generate/demo");
+      if (!response.ok) return;
+      const data = (await response.json()) as { remaining?: number };
+      if (typeof data.remaining === "number") {
+        setDemoRemaining(data.remaining);
+      }
+    })();
+  }, []);
 
   async function handleGenerate() {
     if (!commits.trim()) return;
@@ -59,6 +72,7 @@ export function DemoPatchGenerator() {
         markdown?: string;
         socialPost?: string;
         error?: string;
+        remaining?: number;
       };
 
       if (!response.ok) {
@@ -67,6 +81,9 @@ export function DemoPatchGenerator() {
 
       setMarkdown(data.markdown ?? "");
       setSocialPost(data.socialPost ?? "");
+      if (typeof data.remaining === "number") {
+        setDemoRemaining(data.remaining);
+      }
       setLiveMessage("Demo patch note ready.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -92,7 +109,9 @@ export function DemoPatchGenerator() {
         <CardHeader>
           <CardTitle className="text-lg">Try it free</CardTitle>
           <CardDescription>
-            3 demo generations per hour per IP. No account required.
+            {demoRemaining !== null
+              ? `${demoRemaining}/${demoLimit} demo generations left this hour · no account required`
+              : "3 demo generations per hour per IP. No account required."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

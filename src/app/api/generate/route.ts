@@ -1,13 +1,13 @@
 import { auth } from "@/auth";
-import { generateText, Output } from "ai";
-
-import { getAiProvider, getGenerationModel } from "@/lib/ai/model";
-import { getSystemPrompt, getUserPrompt } from "@/lib/ai/prompts";
-import { generationSchema } from "@/lib/ai/schema";
 import { BILLING } from "@/lib/billing/constants";
+import { runGeneration, normalizeGenerationOutput } from "@/lib/generation/run-generation";
 import { parseGenerationRequest } from "@/lib/generation/parse-request";
-import { defaultPlatformsForTone } from "@/lib/share/platforms";
-import { normalizePlatformDrafts } from "@/lib/share/normalize-drafts";
+import { getAiProvider } from "@/lib/ai/model";
+import {
+  maybeSendPaidPlanLifecycleEmails,
+  maybeSendTrialLifecycleEmails,
+} from "@/lib/email";
+import { captureException } from "@/lib/monitoring";
 import { savePatchNote } from "@/lib/supabase/patch-notes";
 import { replacePlatformDrafts } from "@/lib/supabase/platform-drafts";
 import {
@@ -16,11 +16,6 @@ import {
   getUserQuota,
   refundGeneration,
 } from "@/lib/supabase/users";
-import {
-  maybeSendPaidPlanLifecycleEmails,
-  maybeSendTrialLifecycleEmails,
-} from "@/lib/email";
-import { captureException } from "@/lib/monitoring";
 
 function quotaErrorMessage(code: string) {
   switch (code) {
@@ -83,40 +78,32 @@ export async function POST(request: Request) {
     );
   }
 
-  const platforms = defaultPlatformsForTone(tone);
-
   try {
-    const { output } = await generateText({
-      model: getGenerationModel(),
-      system: getSystemPrompt(
-        tone,
-        options,
-        platforms,
-        referencePatch || null,
-      ),
-      prompt: getUserPrompt(commits, tone, referencePatch || null),
-      output: Output.object({ schema: generationSchema }),
+    const output = await runGeneration({
+      commits,
+      tone,
+      options,
+      referencePatch,
     });
 
-    const platformDrafts = normalizePlatformDrafts(
-      output?.platformDrafts,
-      platforms,
-    );
+    if (!output) {
+      throw new Error("Empty generation result.");
+    }
 
-    const savedId =
-      output &&
-      (await savePatchNote({
-        userId: session.user.id,
-        userEmail: session.user.email,
-        tone,
-        commitsRaw: commits,
-        markdown: output.markdown,
-        socialPost: output.socialPost,
-        repoFullName: repoFullName ?? null,
-      }));
+    const normalized = normalizeGenerationOutput(output, tone)!;
 
-    if (savedId && platformDrafts.length > 0) {
-      await replacePlatformDrafts(savedId, platformDrafts);
+    const savedId = await savePatchNote({
+      userId: session.user.id,
+      userEmail: session.user.email,
+      tone,
+      commitsRaw: commits,
+      markdown: normalized.markdown,
+      socialPost: normalized.socialPost,
+      repoFullName: repoFullName ?? null,
+    });
+
+    if (savedId && normalized.platformDrafts.length > 0) {
+      await replacePlatformDrafts(savedId, normalized.platformDrafts);
     }
 
     const updatedQuota = await getUserQuota(session.user.id);
@@ -133,7 +120,10 @@ export async function POST(request: Request) {
         });
       }
 
-      if (updatedQuota && consumed.plan === "solo") {
+      if (
+        updatedQuota &&
+        (consumed.plan === "solo" || consumed.plan === "pro")
+      ) {
         await maybeSendPaidPlanLifecycleEmails({
           userId: session.user.id,
           email: session.user.email,
@@ -148,9 +138,7 @@ export async function POST(request: Request) {
     }
 
     return Response.json({
-      markdown: output?.markdown ?? "",
-      socialPost: output?.socialPost ?? "",
-      platformDrafts,
+      ...normalized,
       savedId,
       quota: updatedQuota,
       generationsRemaining: consumed.generationsRemaining,

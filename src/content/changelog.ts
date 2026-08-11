@@ -6,6 +6,18 @@ export type ChangelogRelease = {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: "0.3.0",
+    date: "August 2026",
+    items: [
+      "Streaming AI generation (text appears live)",
+      "Demo quota counter on landing (X/3 per hour)",
+      "Pro plan quota emails",
+      "GitHub Release webhook automation (Settings)",
+      "Discord webhook publish from Share Studio",
+      "Dashboard → Settings for integrations",
+    ],
+  },
+  {
     version: "0.2.1",
     date: "August 2026",
     items: [

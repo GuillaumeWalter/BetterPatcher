@@ -14,6 +14,7 @@ import {
   REPO_STORAGE_KEY,
 } from "@/lib/github-session";
 import { rememberGeneratedMessages } from "@/lib/import-memory";
+import { consumeGenerationStream } from "@/lib/generation/stream-client";
 import {
   listReferencePatches,
   saveReferencePatch,
@@ -117,7 +118,7 @@ export function PatchNoteGenerator({
     setLiveMessage("Generating patch note…");
 
     try {
-      const response = await fetch("/api/generate", {
+      const response = await fetch("/api/generate/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -129,27 +130,21 @@ export function PatchNoteGenerator({
         }),
       });
 
-      const data = (await response.json()) as {
-        markdown?: string;
-        socialPost?: string;
-        platformDrafts?: PlatformDraft[];
-        savedId?: string | null;
-        error?: string;
-        code?: string;
-      };
+      const result = await consumeGenerationStream(response, (partial) => {
+        if (partial.markdown !== undefined) setMarkdown(partial.markdown);
+        if (partial.socialPost !== undefined) setSocialPost(partial.socialPost);
+        if (partial.platformDrafts !== undefined) {
+          setPlatformDrafts(partial.platformDrafts);
+        }
+      });
 
-      if (!response.ok) {
-        setErrorCode(data.code ?? null);
-        throw new Error(data.error ?? "Generation failed.");
-      }
-
-      const nextMarkdown = data.markdown ?? "";
+      const nextMarkdown = result.markdown ?? "";
       setMarkdown(nextMarkdown);
       setBaselineMarkdown(nextMarkdown);
       setMarkdownSaved(true);
-      setSocialPost(data.socialPost ?? "");
-      setPlatformDrafts(data.platformDrafts ?? []);
-      setSavedId(data.savedId ?? null);
+      setSocialPost(result.socialPost ?? "");
+      setPlatformDrafts(result.platformDrafts ?? []);
+      setSavedId(result.savedId ?? null);
       rememberGeneratedMessages(repoFullName, commits);
       if (referencePatch.trim()) {
         setSavedReferences(saveReferencePatch(referencePatch));
@@ -157,6 +152,11 @@ export function PatchNoteGenerator({
       await refreshQuota();
       setLiveMessage("Patch note generated.");
     } catch (err) {
+      const code =
+        err instanceof Error
+          ? (err as Error & { code?: string }).code
+          : undefined;
+      setErrorCode(code ?? null);
       setError(
         err instanceof Error ? err.message : "Something went wrong.",
       );
@@ -468,7 +468,12 @@ export function PatchNoteGenerator({
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <GenerationSkeleton />
+              <div className="space-y-3">
+                <GenerationSkeleton />
+                <p className="text-xs text-muted-foreground">
+                  Streaming patch note…
+                </p>
+              </div>
             ) : hasResult ? (
               <p className="text-sm text-muted-foreground">
                 {platformDrafts.length} platform draft

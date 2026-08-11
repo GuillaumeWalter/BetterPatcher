@@ -220,6 +220,44 @@ export function soloQuotaExhaustedEmail(
   };
 }
 
+export function proQuotaLowEmail(
+  remaining: number,
+  limit: number,
+  name?: string | null,
+) {
+  const greeting = name ? `Hi ${name},` : "Hi,";
+
+  return {
+    subject: `${remaining} Pro generation${remaining === 1 ? "" : "s"} left this month`,
+    html: emailLayout({
+      preheader: "Your monthly Pro quota resets on your next billing date.",
+      body: `
+        <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
+        <p style="margin:0 0 12px;">You have <strong>${remaining}</strong> of <strong>${limit}</strong> Pro generations left this month.</p>
+        <p style="margin:0 0 12px;">Plan ahead for your next release — or wait for your quota to reset on your invoice date.</p>
+        ${ctaButton("Open generator", appUrl("/dashboard/generate"))}
+      `,
+    }),
+  };
+}
+
+export function proQuotaExhaustedEmail(name?: string | null) {
+  const greeting = name ? `Hi ${name},` : "Hi,";
+
+  return {
+    subject: "Monthly Pro quota reached",
+    html: emailLayout({
+      preheader: "Your quota resets on your next billing cycle.",
+      body: `
+        <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
+        <p style="margin:0 0 12px;">You've used all <strong>${BILLING.PRO_MONTHLY_GENERATIONS} Pro generations</strong> for this billing period.</p>
+        <p style="margin:0 0 12px;">Your quota resets on your next invoice date. Need more before then? Reply to this email and we'll help.</p>
+        ${ctaButton("View billing", appUrl("/dashboard/billing"))}
+      `,
+    }),
+  };
+}
+
 export function waitlistConfirmationEmail() {
   return {
     subject: "You're on the Easy Patch waitlist",

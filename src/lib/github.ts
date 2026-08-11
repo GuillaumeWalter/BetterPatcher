@@ -59,6 +59,29 @@ export function formatCommitsForGenerator(commits: GitHubCommit[]): string {
   return messagesForGenerator(commits.map((entry) => entry.commit.message));
 }
 
+export async function getCompareCommits(
+  accessToken: string,
+  owner: string,
+  repo: string,
+  base: string,
+  head: string,
+): Promise<string> {
+  const response = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/compare/${base}...${head}`,
+    { headers: GITHUB_HEADERS(accessToken), next: { revalidate: 0 } },
+  );
+
+  if (!response.ok) {
+    throw new Error("Could not compare release commits.");
+  }
+
+  const data = (await response.json()) as {
+    commits?: GitHubCommit[];
+  };
+
+  return formatCommitsForGenerator(data.commits ?? []);
+}
+
 export function parseRepoFullName(fullName: string): {
   owner: string;
   repo: string;

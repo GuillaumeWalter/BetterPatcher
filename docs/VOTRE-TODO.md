@@ -15,8 +15,19 @@
 | 4 | Activer **Customer Portal** | Stripe dashboard |
 | 5 | (Optionnel) `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Vercel |
 | 6 | Tester signup → emails reçus | Ta boîte mail |
+| 7 | Exécuter `supabase/integrations.sql` | Supabase SQL Editor |
 
 **Tu n’as pas besoin de merger une PR** — je push sur `master` pour toi.
+
+---
+
+## Intégrations (10 min, optionnel)
+
+1. **Supabase** → SQL Editor → coller `supabase/integrations.sql` → Run
+2. **Dashboard → Settings** → choisir un repo pour les releases auto
+3. Copier l’URL webhook → GitHub repo → Settings → Webhooks → Releases
+4. (Optionnel) Coller un **Discord webhook** → bouton « Post to Discord » dans Share Studio
+5. (Optionnel) `GITHUB_WEBHOOK_SECRET` sur Vercel si tu actives la signature HMAC GitHub
 
 ---
 
@@ -34,6 +45,8 @@
 | Dernière gen Solo du mois | Solo quota exhausted |
 | Trial activé mais inactif 3j+ | Inactive trial reminder (cron) |
 | Inscription waitlist | Waitlist confirmation |
+| Pro ≤ 10 gen restantes | Pro quota low |
+| Dernière gen Pro du mois | Pro quota exhausted |
 | Paiement échoué | Payment failed |
 | Annulation abo | Subscription canceled |
 

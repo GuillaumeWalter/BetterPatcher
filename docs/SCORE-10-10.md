@@ -7,7 +7,7 @@
 
 | Domaine | Score | 10/10 = |
 |---------|-------|---------|
-| **Fonctionnel** | 8.5/10 | Webhooks release, multi-repo, streaming IA |
+| **Fonctionnel** | 9/10 | Multi-repo favoris, streaming done |
 | **UX/UI** | 8.5/10 | Beta testée, zero état silencieux |
 | **Marketing** | 8/10 | Démo vidéo, témoignages, analytics actif |
 | **Communication** | 8.5/10 | Emails auto + légal template enrichi |
@@ -61,24 +61,34 @@
 
 ---
 
-## Fonctionnel — 8.5 → 10
+## Fonctionnel — 9 → 10
 
-### 🔲 Agent (prochaines sessions)
-- [ ] Webhooks GitHub release → génération auto
-- [ ] Streaming réponse IA
-- [ ] Multi-projets persistants
+### ✅ Fait (agent)
+- Streaming IA (NDJSON `/api/generate/stream`)
+- Webhook GitHub Release + page Settings
+- Discord publish depuis Share Studio
+
+### 🔲 Agent
+- [ ] Multi-projets / repos favoris persistants
+- [ ] Discord schedule (cron)
+
+### 🔲 Toi (Settings)
+- [ ] Exécuter `supabase/integrations.sql` dans Supabase SQL Editor
+- [ ] Dashboard → Settings → choisir repo + coller webhook GitHub
+- [ ] (Optionnel) `GITHUB_WEBHOOK_SECRET` sur Vercel si tu veux signature HMAC globale
 
 ---
 
-## Dev/Ops — 7.5 → 10
+## Dev/Ops — 8.5 → 10
 
 ### ✅ Fait
-- CI lint + test + build
-- Tests quotas + rate limit
+- CI lint + test + build + Playwright E2E
+- Tests quotas, rate limit, parse-request, commits, drafts
+- `captureException` scaffold + `instrumentation.ts`
+- Vitest + Playwright séparés
 
 ### 🔲 Agent
-- [ ] E2E Playwright (signup → generate)
-- [ ] Sentry (`SENTRY_DSN`)
+- [ ] Sentry SDK complet (`@sentry/nextjs`)
 - [ ] Alertes coût Gemini
 
 ### 🔲 Toi

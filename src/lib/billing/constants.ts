@@ -46,6 +46,9 @@ export type UserBillingProfile = {
   periodGenerationsLimit: number;
   billingPeriodStart: string | null;
   lastGenerationAt: string | null;
+  githubAccessToken: string | null;
+  releaseAutoRepo: string | null;
+  discordWebhookUrl: string | null;
 };
 
 export type QuotaSnapshot = {
