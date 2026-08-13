@@ -38,7 +38,7 @@ Voir **`docs/A-FAIRE-MAINTENANT.md`** (checklist complète).
 
 Résumé 15 min :
 
-1. Exécuter les **10** SQL Supabase (dont `rate_limits.sql`)
+1. Exécuter **2 SQL nouveaux** si pas fait (`rate_limits.sql`, `scheduled_posts.sql`)
 2. Vercel env vars obligatoires + redeploy
 3. Stripe Customer Portal + webhook + prices
 4. Resend + domaine
