@@ -75,7 +75,7 @@ Workspaces / seats: invite teammates, **shared quota and shared history** (read 
 - Social OAuth publish (Meta / X / LinkedIn) — see `docs/share-and-publish.md`
 - Bitbucket, Trello
 
-Ops checklists: `docs/A-FAIRE-MAINTENANT.md` · `docs/env-setup.md`
+Ops checklists: `TODO-GUILLAUME.md` (owner) · `docs/env-setup.md` (full reference)
 
 ## Phases
 

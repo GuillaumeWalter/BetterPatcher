@@ -1,7 +1,7 @@
 # Easy Patch | Living TODO
 
 Canonical product plan: docs/product-roadmap.md  
-**Your setup checklist:** docs/A-FAIRE-MAINTENANT.md  
+Owner setup checklist: TODO-GUILLAUME.md (Guillaume only)  
 Resolved decisions: docs/open-questions.md
 
 ## Done (core product v0.6)
@@ -20,15 +20,9 @@ Resolved decisions: docs/open-questions.md
 - [x] Rate limits: demo IP + draft regeneration (Supabase `rate_limits.sql`)
 - [x] Emails lifecycle, Sentry, PWA, RGPD delete
 
-## Your side (dashboards) — blocking go-live
+## Owner side (Guillaume — dashboards)
 
-See **docs/A-FAIRE-MAINTENANT.md** (sections 0–7):
-
-- [ ] Run all Supabase SQL files (including `rate_limits.sql`)
-- [ ] Vercel env vars + redeploy
-- [ ] Stripe Customer Portal + products/prices + webhook
-- [ ] Resend + domain
-- [ ] Prod smoke test + 5 beta testers
+See **TODO-GUILLAUME.md** (delta only; base Supabase + Vercel already done).
 
 ## Next product work (post-core, phase 3+)
 

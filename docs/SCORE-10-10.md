@@ -34,20 +34,17 @@
 
 ### 🔲 Toi (dashboards)
 
-Voir **`docs/A-FAIRE-MAINTENANT.md`** (checklist complète).
+Voir **`TODO-GUILLAUME.md`** (checklist owner — delta uniquement).
 
-Résumé 15 min :
+Résumé :
 
-1. Exécuter **2 SQL nouveaux** si pas fait (`rate_limits.sql`, `scheduled_posts.sql`)
-2. Vercel env vars obligatoires + redeploy
-3. Stripe Customer Portal + webhook + prices
-4. Resend + domaine
-5. Tester : signup → onboarding → 1 génération → Share Studio copy
+1. `CRON_SECRET` + Resend si schedule Discord / emails auto
+2. Stripe Customer Portal (+ Live quand prêt)
+3. Test prod : signup → gen → Share Studio → billing
+4. 5 beta testeurs
 
 ### 🔲 Plus tard (hors cœur produit)
 
-- Schedule Discord / cron publish
-- GitHub Action (tag → patch note)
 - Jira, OAuth social publish (Meta / X / LinkedIn)
 - Brand voice memory
 
@@ -114,4 +111,4 @@ Résumé 15 min :
 
 ---
 
-Voir aussi `docs/VOTRE-TODO.md` et `docs/A-FAIRE-MAINTENANT.md`.
+Voir **`TODO-GUILLAUME.md`**.

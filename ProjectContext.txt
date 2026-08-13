@@ -32,11 +32,11 @@ SaaS that turns commits (and ticket keys) into structured patch notes and ready-
 
 ## Next (post-core)
 
-- Discord schedule (cron)
-- GitHub Action on release/tag
 - Jira integration
 - Social OAuth publish (Meta, X, LinkedIn)
 - Brand voice memory
+
+Done in v0.7: Discord schedule (cron), GitHub Action on release/tag
 
 ## Copy rules
 
@@ -44,4 +44,4 @@ English only. No dash punctuation in prose. Prefer `:`, `( )`, `/`, `|`, `·`. S
 
 ## User setup
 
-All dashboard tasks: docs/A-FAIRE-MAINTENANT.md
+Owner dashboard tasks: TODO-GUILLAUME.md

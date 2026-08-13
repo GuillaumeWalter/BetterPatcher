@@ -59,4 +59,4 @@ Voir [`.env.example`](../.env.example) et [docs/env-setup.md](./env-setup.md)
 
 ## 4. Test
 
-Checklist section 4 de [A-FAIRE-MAINTENANT.md](./A-FAIRE-MAINTENANT.md)
+Checklist owner : [TODO-GUILLAUME.md](../TODO-GUILLAUME.md) section 3
