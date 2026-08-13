@@ -1,5 +1,7 @@
 # Ce que TU dois faire — Easy Patch
 
+> **Checklist cliquable (recommandé) :** [A-FAIRE-MAINTENANT.md](./A-FAIRE-MAINTENANT.md)
+
 > **Bonne nouvelle :** je peux **pousser le code directement sur `master`** → Vercel redéploie tout seul.  
 > Je n’ai **pas accès** à tes dashboards Vercel / Stripe / Resend — seulement au repo GitHub.
 
