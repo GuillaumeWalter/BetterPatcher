@@ -16,6 +16,11 @@ describe("buildQuotaSnapshot", () => {
     periodGenerationsLimit: 25,
     billingPeriodStart: null,
     lastGenerationAt: null,
+    githubAccessToken: null,
+    releaseAutoRepo: null,
+    discordWebhookUrl: null,
+    workspaceOwnerId: null,
+    favoriteRepos: [],
   };
 
   it("blocks generation when past_due", () => {

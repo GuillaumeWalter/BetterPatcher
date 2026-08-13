@@ -155,7 +155,7 @@ export function upgradeToProEmail(
         <ul style="margin:12px 0;padding-left:20px;color:#5c534a;">
           <li>${BILLING.PRO_MONTHLY_GENERATIONS} generations / month</li>
           <li>Built for studios & live-ops teams</li>
-          <li>Team seats (coming soon)</li>
+          <li>Invite up to ${BILLING.PRO_MAX_TEAM_SEATS - 1} teammates on one quota</li>
         </ul>
         ${ctaButton("Upgrade to Pro", appUrl("/dashboard/billing"))}
       `,

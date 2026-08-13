@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Loader2, LogIn } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Loader2, LogIn, Star } from "lucide-react";
 import Link from "next/link";
 
 import { CommitRangePicker } from "@/components/commit-range-picker";
@@ -10,11 +10,14 @@ import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import type { ImportedCommit } from "@/lib/commit-messages";
+import { cn } from "@/lib/utils";
 
 type RepoOption = {
   id: number;
@@ -34,11 +37,20 @@ export function GitHubCommitImport({
   loginCallbackUrl = "/",
 }: GitHubCommitImportProps) {
   const [repos, setRepos] = useState<RepoOption[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [selectedRepo, setSelectedRepo] = useState("");
   const [commits, setCommits] = useState<ImportedCommit[]>([]);
   const [isLoadingRepos, setIsLoadingRepos] = useState(false);
   const [isLoadingCommits, setIsLoadingCommits] = useState(false);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const sortedRepos = useMemo(() => {
+    const favoriteSet = new Set(favorites);
+    const fav = repos.filter((r) => favoriteSet.has(r.fullName));
+    const rest = repos.filter((r) => !favoriteSet.has(r.fullName));
+    return { fav, rest };
+  }, [repos, favorites]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -49,16 +61,25 @@ export function GitHubCommitImport({
         setError(null);
 
         try {
-          const response = await fetch("/api/github/repos");
-          const data = (await response.json()) as RepoOption[] & {
+          const [reposResponse, favResponse] = await Promise.all([
+            fetch("/api/github/repos"),
+            fetch("/api/favorites/repos", { credentials: "same-origin" }),
+          ]);
+
+          const data = (await reposResponse.json()) as RepoOption[] & {
             error?: string;
           };
 
-          if (!response.ok) {
+          if (!reposResponse.ok) {
             throw new Error(data.error ?? "Could not load your repositories.");
           }
 
           setRepos(data);
+
+          if (favResponse.ok) {
+            const favData = (await favResponse.json()) as { favorites?: string[] };
+            setFavorites(favData.favorites ?? []);
+          }
         } catch (err) {
           setError(err instanceof Error ? err.message : "Failed to load.");
         } finally {
@@ -96,6 +117,25 @@ export function GitHubCommitImport({
     }
   }
 
+  async function toggleFavorite() {
+    if (!selectedRepo) return;
+    setIsTogglingFavorite(true);
+    try {
+      const response = await fetch("/api/favorites/repos", {
+        method: "PATCH",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ toggle: selectedRepo }),
+      });
+      const data = (await response.json()) as { favorites?: string[] };
+      if (response.ok && data.favorites) {
+        setFavorites(data.favorites);
+      }
+    } finally {
+      setIsTogglingFavorite(false);
+    }
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="rounded-xl border border-dashed border-primary/25 bg-primary/5 p-4">
@@ -111,6 +151,8 @@ export function GitHubCommitImport({
       </div>
     );
   }
+
+  const isFavorite = favorites.includes(selectedRepo);
 
   return (
     <div className="space-y-3 rounded-xl border border-white/10 bg-background/40 p-4">
@@ -131,14 +173,50 @@ export function GitHubCommitImport({
             />
           </SelectTrigger>
           <SelectContent>
-            {repos.map((repo) => (
-              <SelectItem key={repo.id} value={repo.fullName}>
-                {repo.fullName}
-                {repo.private ? " (private)" : ""}
-              </SelectItem>
-            ))}
+            {sortedRepos.fav.length > 0 ? (
+              <SelectGroup>
+                <SelectLabel>Favorites</SelectLabel>
+                {sortedRepos.fav.map((repo) => (
+                  <SelectItem key={repo.id} value={repo.fullName}>
+                    ★ {repo.fullName}
+                    {repo.private ? " (private)" : ""}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            ) : null}
+            {sortedRepos.rest.length > 0 ? (
+              <SelectGroup>
+                {sortedRepos.fav.length > 0 ? (
+                  <SelectLabel>All repositories</SelectLabel>
+                ) : null}
+                {sortedRepos.rest.map((repo) => (
+                  <SelectItem key={repo.id} value={repo.fullName}>
+                    {repo.fullName}
+                    {repo.private ? " (private)" : ""}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            ) : null}
           </SelectContent>
         </Select>
+        {selectedRepo ? (
+          <Button
+            type="button"
+            size="icon"
+            variant="outline"
+            disabled={isTogglingFavorite}
+            onClick={toggleFavorite}
+            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          >
+            <Star
+              className={cn(
+                "size-4",
+                isFavorite ? "fill-primary text-primary" : "text-muted-foreground",
+              )}
+            />
+          </Button>
+        ) : null}
         {isLoadingCommits ? (
           <span className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin" />

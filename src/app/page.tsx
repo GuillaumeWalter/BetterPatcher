@@ -194,7 +194,7 @@ export default async function Home() {
                 {BILLING.PRO_MONTHLY_GENERATIONS} generations / month | team
               </p>
               <ul className="space-y-1.5">
-                <li>· Several users on one account (coming soon)</li>
+                <li>· Up to {BILLING.PRO_MAX_TEAM_SEATS} users on one Pro account</li>
                 <li>· Ideal for studios &amp; live ops</li>
                 <li>· Cancel anytime</li>
               </ul>

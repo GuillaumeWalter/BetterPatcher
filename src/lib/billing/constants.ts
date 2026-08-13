@@ -16,7 +16,13 @@ export const BILLING = {
   MAX_REFERENCE_CHARS: 12_000,
   SOLO_PRICE_LABEL: "€4.99 / month",
   PRO_PRICE_LABEL: "€9.99 / month",
+  /** Annual billing discount (shown on pricing). */
+  ANNUAL_DISCOUNT_PERCENT: 15,
+  /** Max seats on Pro (owner + invites). */
+  PRO_MAX_TEAM_SEATS: 5,
 } as const;
+
+export type BillingInterval = "monthly" | "annual";
 
 export type SubscriptionStatus = "none" | "active" | "past_due" | "canceled";
 
@@ -49,6 +55,8 @@ export type UserBillingProfile = {
   githubAccessToken: string | null;
   releaseAutoRepo: string | null;
   discordWebhookUrl: string | null;
+  workspaceOwnerId: string | null;
+  favoriteRepos: string[];
 };
 
 export type QuotaSnapshot = {
@@ -61,6 +69,8 @@ export type QuotaSnapshot = {
   requiresSetup: boolean;
   canGenerate: boolean;
   minSecondsBetweenGenerations: number;
+  /** Set when the user is on a Pro team (not the billing owner). */
+  teamOwnerId?: string | null;
 };
 
 export function monthlyGenerationsForTier(tier: PaidPlanTier): number {
@@ -80,8 +90,10 @@ export function isPaidPlan(plan: string | undefined): boolean {
 
 export function buildQuotaSnapshot(
   profile: UserBillingProfile,
+  options?: { teamOwnerId?: string | null },
 ): QuotaSnapshot {
-  const requiresSetup = !profile.paymentMethodVerified;
+  const teamOwnerId = options?.teamOwnerId ?? null;
+  const requiresSetup = !profile.paymentMethodVerified && !teamOwnerId;
 
   if (requiresSetup) {
     return {
@@ -94,6 +106,7 @@ export function buildQuotaSnapshot(
       requiresSetup: true,
       canGenerate: false,
       minSecondsBetweenGenerations: BILLING.MIN_SECONDS_BETWEEN_GENERATIONS,
+      teamOwnerId,
     };
   }
 
@@ -113,6 +126,7 @@ export function buildQuotaSnapshot(
       requiresSetup: false,
       canGenerate: false,
       minSecondsBetweenGenerations: BILLING.MIN_SECONDS_BETWEEN_GENERATIONS,
+      teamOwnerId,
     };
   }
 
@@ -138,6 +152,7 @@ export function buildQuotaSnapshot(
       requiresSetup: false,
       canGenerate: remaining > 0,
       minSecondsBetweenGenerations: BILLING.MIN_SECONDS_BETWEEN_GENERATIONS,
+      teamOwnerId,
     };
   }
 
@@ -156,5 +171,6 @@ export function buildQuotaSnapshot(
     requiresSetup: false,
     canGenerate: !trialExhausted,
     minSecondsBetweenGenerations: BILLING.MIN_SECONDS_BETWEEN_GENERATIONS,
+    teamOwnerId,
   };
 }

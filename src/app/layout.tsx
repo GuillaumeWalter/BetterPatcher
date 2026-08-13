@@ -4,6 +4,7 @@ import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Analytics } from "@/components/analytics";
+import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 import { pageMetadata } from "@/lib/seo";
 
 import "./globals.css";
@@ -19,7 +20,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = pageMetadata({});
+export const metadata: Metadata = {
+  ...pageMetadata({}),
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Easy Patch",
+    statusBarStyle: "black-translucent",
+  },
+};
 
 export default function RootLayout({
   children,
@@ -45,6 +54,7 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        <PwaInstallPrompt />
         <Analytics />
       </body>
     </html>

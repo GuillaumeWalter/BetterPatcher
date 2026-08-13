@@ -16,6 +16,9 @@
 | 5 | (Optionnel) `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Vercel |
 | 6 | Tester signup → emails reçus | Ta boîte mail |
 | 7 | Exécuter `supabase/integrations.sql` | Supabase SQL Editor |
+| 8 | Exécuter `supabase/go_live_gaps.sql` | Supabase SQL Editor |
+| 9 | Créer les **Prices annuels** Stripe + env vars `*_ANNUAL_*` | Stripe dashboard |
+| 10 | (Optionnel) `SENTRY_DSN` sur Vercel | Vercel env vars |
 
 **Tu n’as pas besoin de merger une PR** — je push sur `master` pour toi.
 

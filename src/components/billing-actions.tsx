@@ -6,6 +6,7 @@ import { CreditCard, Loader2, ShieldCheck } from "lucide-react";
 import {
   BILLING,
   priceLabelForTier,
+  type BillingInterval,
   type PaidPlanTier,
 } from "@/lib/billing/constants";
 import { Button } from "@/components/ui/button";
@@ -84,12 +85,14 @@ type StripeSubscribeButtonProps = {
   variant?: "default" | "outline" | "secondary";
   /** Localized label from geo (falls back to EUR). */
   priceLabel?: string;
+  interval?: BillingInterval;
 };
 
 export function StripeSubscribeButton({
   plan,
   variant = "default",
   priceLabel,
+  interval = "monthly",
 }: StripeSubscribeButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -105,7 +108,7 @@ export function StripeSubscribeButton({
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "subscribe", plan }),
+        body: JSON.stringify({ action: "subscribe", plan, interval }),
       });
 
       const raw = await response.text();

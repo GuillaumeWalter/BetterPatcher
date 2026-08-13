@@ -1,4 +1,4 @@
-import type { PaidPlanTier } from "@/lib/billing/constants";
+import type { PaidPlanTier, BillingInterval } from "@/lib/billing/constants";
 import {
   isPaidCurrency,
   type PaidCurrency,
@@ -42,32 +42,51 @@ export function getStripeProPriceId(): string | undefined {
   return readEnv("STRIPE_PRO_PRICE_ID");
 }
 
-function priceEnvKey(plan: PaidPlanTier, currency: PaidCurrency): string {
+function priceEnvKey(
+  plan: PaidPlanTier,
+  currency: PaidCurrency,
+  interval: BillingInterval,
+): string {
+  const planPart = plan === "solo" ? "STRIPE_SOLO" : "STRIPE_PRO";
+  const intervalPart = interval === "annual" ? "_ANNUAL" : "";
   if (currency === "eur") {
-    return plan === "solo" ? "STRIPE_SOLO_PRICE_ID" : "STRIPE_PRO_PRICE_ID";
+    return `${planPart}${intervalPart}_PRICE_ID`;
   }
-  const prefix = plan === "solo" ? "STRIPE_SOLO_PRICE_ID" : "STRIPE_PRO_PRICE_ID";
-  return `${prefix}_${currency.toUpperCase()}`;
+  return `${planPart}${intervalPart}_PRICE_ID_${currency.toUpperCase()}`;
 }
 
 /**
- * Resolve Stripe Price ID for plan + currency.
+ * Resolve Stripe Price ID for plan + currency + interval.
  * Falls back to EUR Price if the local currency env is missing.
+ * Annual falls back to monthly if annual price is not configured.
  */
 export function getStripePriceIdForCurrency(
   plan: PaidPlanTier,
   currency: string,
-): { priceId: string | undefined; currency: PaidCurrency } {
+  interval: BillingInterval = "monthly",
+): { priceId: string | undefined; currency: PaidCurrency; interval: BillingInterval } {
   const paid: PaidCurrency = isPaidCurrency(currency) ? currency : "eur";
 
+  const tryResolve = (
+    cur: PaidCurrency,
+    int: BillingInterval,
+  ): string | undefined => readEnv(priceEnvKey(plan, cur, int));
+
   if (paid !== "eur") {
-    const localId = readEnv(priceEnvKey(plan, paid));
-    if (localId) return { priceId: localId, currency: paid };
+    const localId = tryResolve(paid, interval);
+    if (localId) return { priceId: localId, currency: paid, interval };
   }
 
-  const eurId =
+  const eurId = tryResolve("eur", interval);
+  if (eurId) return { priceId: eurId, currency: "eur", interval };
+
+  if (interval === "annual") {
+    return getStripePriceIdForCurrency(plan, currency, "monthly");
+  }
+
+  const fallbackId =
     plan === "solo" ? getStripeSoloPriceId() : getStripeProPriceId();
-  return { priceId: eurId, currency: "eur" };
+  return { priceId: fallbackId, currency: "eur", interval: "monthly" };
 }
 
 /** All configured Price IDs (for webhook plan_tier mapping). */
@@ -77,13 +96,20 @@ export function listConfiguredStripePriceIds(): {
 } {
   const solo: string[] = [];
   const pro: string[] = [];
+  const intervals: BillingInterval[] = ["monthly", "annual"];
 
   for (const currency of PAID_CURRENCIES) {
-    const soloId = readEnv(priceEnvKey("solo", currency));
-    const proId = readEnv(priceEnvKey("pro", currency));
-    if (soloId) solo.push(soloId);
-    if (proId) pro.push(proId);
+    for (const interval of intervals) {
+      const soloId = readEnv(priceEnvKey("solo", currency, interval));
+      const proId = readEnv(priceEnvKey("pro", currency, interval));
+      if (soloId) solo.push(soloId);
+      if (proId) pro.push(proId);
+    }
   }
 
   return { solo, pro };
+}
+
+export function getSentryDsn(): string | undefined {
+  return readEnv("SENTRY_DSN", "NEXT_PUBLIC_SENTRY_DSN");
 }

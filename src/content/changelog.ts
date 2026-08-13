@@ -6,6 +6,18 @@ export type ChangelogRelease = {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: "0.4.0",
+    date: "August 2026",
+    items: [
+      "GDPR account deletion (Settings → Delete account)",
+      "Sentry error monitoring (@sentry/nextjs)",
+      "Favorite GitHub repos in the generator",
+      "Pro team seats — invite teammates by email",
+      "Annual billing (−15%) on Solo & Pro",
+      "PWA install prompt + web manifest",
+    ],
+  },
+  {
     version: "0.3.0",
     date: "August 2026",
     items: [

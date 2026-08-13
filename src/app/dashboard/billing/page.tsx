@@ -1,21 +1,16 @@
 import Link from "next/link";
 
 import { auth } from "@/auth";
-import { StripePortalButton, StripeSubscribeButton } from "@/components/billing-actions";
 import { BillingQuotaBanner } from "@/components/billing-quota-banner";
+import { BillingPlans } from "@/components/billing-plans";
 import { DashboardNav } from "@/components/dashboard-nav";
-import { BILLING } from "@/lib/billing/constants";
-import { getLocalizedBillingLabels } from "@/lib/billing/localized-labels";
 import { getUserQuota } from "@/lib/supabase/users";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Sparkles, Users } from "lucide-react";
+  billingLabelsForCurrency,
+  resolveBillingCurrency,
+} from "@/lib/billing/currency";
+import { headers } from "next/headers";
 
 type BillingPageProps = {
   searchParams: Promise<{ success?: string; canceled?: string }>;
@@ -27,7 +22,10 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
     ? await getUserQuota(session.user.id)
     : null;
   const { success, canceled } = await searchParams;
-  const { soloPriceLabel, proPriceLabel } = await getLocalizedBillingLabels();
+  const h = await headers();
+  const currency = resolveBillingCurrency(h);
+  const monthly = billingLabelsForCurrency(currency, "monthly");
+  const annual = billingLabelsForCurrency(currency, "annual");
   const isSubscribed = quota?.plan === "solo" || quota?.plan === "pro";
 
   return (
@@ -53,76 +51,21 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
             Stripe portal below.
           </p>
         ) : null}
+        {quota?.teamOwnerId ? (
+          <p className="rounded-xl border border-primary/20 bg-primary/10 p-4 text-sm">
+            You are on a Pro team — generations use the shared team quota.
+          </p>
+        ) : null}
       </div>
 
-      {isSubscribed ? (
-        <Card className="surface-card gradient-border mb-6 max-w-3xl">
-          <CardHeader>
-            <CardTitle className="text-lg">Your plan: {quota?.plan === "solo" ? "Solo" : "Pro"}</CardTitle>
-            <CardDescription>
-              {quota?.generationsRemaining ?? 0} / {quota?.generationsLimit ?? 0}{" "}
-              generations left this month
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <StripePortalButton />
-          </CardContent>
-        </Card>
-      ) : null}
-
-      <div className="grid max-w-3xl gap-4 md:grid-cols-2">
-        <Card className="surface-card gradient-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Sparkles className="size-5 text-primary" />
-              Solo
-            </CardTitle>
-            <CardDescription>
-              {soloPriceLabel} · {BILLING.SOLO_MONTHLY_GENERATIONS}{" "}
-              generations / month | 1 user
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>✓ GitHub / GitLab import or manual paste</li>
-              <li>✓ Patch note history</li>
-              <li>✓ Share Studio drafts</li>
-              <li>✓ Cancel anytime</li>
-            </ul>
-            {quota?.plan !== "solo" && quota?.plan !== "pro" ? (
-              <StripeSubscribeButton
-                plan="solo"
-                variant="outline"
-                priceLabel={soloPriceLabel}
-              />
-            ) : null}
-          </CardContent>
-        </Card>
-
-        <Card className="surface-card gradient-border border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Users className="size-5 text-primary" />
-              Pro
-            </CardTitle>
-            <CardDescription>
-              {proPriceLabel} · {BILLING.PRO_MONTHLY_GENERATIONS}{" "}
-              generations / month | team
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>✓ Higher monthly quota</li>
-              <li>✓ Team seats (coming soon)</li>
-              <li>✓ Ideal for studios &amp; live ops</li>
-              <li>✓ Cancel anytime</li>
-            </ul>
-            {quota?.plan !== "pro" ? (
-              <StripeSubscribeButton plan="pro" priceLabel={proPriceLabel} />
-            ) : null}
-          </CardContent>
-        </Card>
-      </div>
+      <BillingPlans
+        soloMonthlyLabel={monthly.soloPriceLabel}
+        proMonthlyLabel={monthly.proPriceLabel}
+        soloAnnualLabel={annual.soloPriceLabel}
+        proAnnualLabel={annual.proPriceLabel}
+        currentPlan={quota?.plan}
+        isSubscribed={isSubscribed}
+      />
 
       <Button variant="outline" className="mt-6" asChild>
         <Link href="/dashboard/generate">Back to generator</Link>

@@ -1,4 +1,5 @@
 import type { PaidPlanTier } from "@/lib/billing/constants";
+import { BILLING } from "@/lib/billing/constants";
 
 /** Presentment / subscription currency helpers. */
 
@@ -42,7 +43,7 @@ export type PaidCurrency = (typeof PAID_CURRENCIES)[number];
 
 const DEFAULT_CURRENCY: PaidCurrency = "eur";
 
-const PRICE_LABELS: Record<
+const MONTHLY_LABELS: Record<
   PaidCurrency,
   { solo: string; pro: string }
 > = {
@@ -51,6 +52,18 @@ const PRICE_LABELS: Record<
   gbp: { solo: "£4.99 / month", pro: "£9.99 / month" },
   jpy: { solo: "¥740 / month", pro: "¥1,480 / month" },
   krw: { solo: "₩6,900 / month", pro: "₩13,900 / month" },
+};
+
+/** Annual prices (~15% off vs 12× monthly). */
+const ANNUAL_LABELS: Record<
+  PaidCurrency,
+  { solo: string; pro: string }
+> = {
+  eur: { solo: "€50.88 / year", pro: "€101.88 / year" },
+  usd: { solo: "$50.88 / year", pro: "$101.88 / year" },
+  gbp: { solo: "£50.88 / year", pro: "£101.88 / year" },
+  jpy: { solo: "¥7,540 / year", pro: "¥15,080 / year" },
+  krw: { solo: "₩70,300 / year", pro: "₩141,600 / year" },
 };
 
 export function isPaidCurrency(value: string): value is PaidCurrency {
@@ -84,15 +97,22 @@ export function resolveSetupCurrency(request: Request): string {
 export function priceLabelForCurrency(
   tier: PaidPlanTier,
   currency: PaidCurrency = DEFAULT_CURRENCY,
+  interval: "monthly" | "annual" = "monthly",
 ): string {
-  return PRICE_LABELS[currency][tier];
+  const labels = interval === "annual" ? ANNUAL_LABELS : MONTHLY_LABELS;
+  return labels[currency][tier];
 }
 
-export function billingLabelsForCurrency(currency: PaidCurrency) {
+export function billingLabelsForCurrency(
+  currency: PaidCurrency,
+  interval: "monthly" | "annual" = "monthly",
+) {
   return {
     currency,
-    soloPriceLabel: PRICE_LABELS[currency].solo,
-    proPriceLabel: PRICE_LABELS[currency].pro,
+    interval,
+    soloPriceLabel: priceLabelForCurrency("solo", currency, interval),
+    proPriceLabel: priceLabelForCurrency("pro", currency, interval),
+    annualDiscountPercent: BILLING.ANNUAL_DISCOUNT_PERCENT,
   };
 }
 
@@ -103,4 +123,12 @@ export const STRIPE_PRICE_AMOUNTS = {
   gbp: { solo: "4.99", pro: "9.99", zeroDecimal: false },
   jpy: { solo: "740", pro: "1480", zeroDecimal: true },
   krw: { solo: "6900", pro: "13900", zeroDecimal: true },
+} as const;
+
+export const STRIPE_ANNUAL_PRICE_AMOUNTS = {
+  eur: { solo: "50.88", pro: "101.88", zeroDecimal: false },
+  usd: { solo: "50.88", pro: "101.88", zeroDecimal: false },
+  gbp: { solo: "50.88", pro: "101.88", zeroDecimal: false },
+  jpy: { solo: "7540", pro: "15080", zeroDecimal: true },
+  krw: { solo: "70300", pro: "141600", zeroDecimal: true },
 } as const;

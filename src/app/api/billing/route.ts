@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import {
+  type BillingInterval,
   type PaidPlanTier,
 } from "@/lib/billing/constants";
 import {
@@ -17,6 +18,10 @@ function parsePaidPlan(value: unknown): PaidPlanTier | null {
 
 function jsonError(message: string, status: number) {
   return Response.json({ error: message }, { status });
+}
+
+function parseBillingInterval(value: unknown): BillingInterval {
+  return value === "annual" ? "annual" : "monthly";
 }
 
 export async function GET(request: Request) {
@@ -111,6 +116,11 @@ export async function POST(request: Request) {
           ? parsePaidPlan(body.plan)
           : null;
 
+      const interval =
+        typeof body === "object" && body !== null && "interval" in body
+          ? parseBillingInterval(body.interval)
+          : "monthly";
+
       if (!plan) {
         return jsonError("Invalid plan. Choose solo or pro.", 400);
       }
@@ -118,6 +128,7 @@ export async function POST(request: Request) {
       const { priceId, currency } = getStripePriceIdForCurrency(
         plan,
         geoCurrency,
+        interval,
       );
 
       if (!priceId) {
@@ -142,6 +153,7 @@ export async function POST(request: Request) {
           userId: session.user.id,
           planTier: plan,
           currency,
+          billingInterval: interval,
         },
       });
 

@@ -9,6 +9,7 @@ import {
   type UserBillingProfile,
 } from "@/lib/billing/constants";
 import { createSupabaseAdmin } from "@/lib/supabase/server";
+import { resolveBillingUserId } from "@/lib/supabase/team";
 
 type UserProfileRow = {
   user_id: string;
@@ -27,6 +28,8 @@ type UserProfileRow = {
   github_access_token: string | null;
   release_auto_repo: string | null;
   discord_webhook_url: string | null;
+  workspace_owner_id: string | null;
+  favorite_repos: string[] | null;
 };
 
 function mapPlanTier(value: PlanTier | null | undefined): PlanTier {
@@ -52,6 +55,8 @@ function mapProfile(row: UserProfileRow): UserBillingProfile {
     githubAccessToken: row.github_access_token,
     releaseAutoRepo: row.release_auto_repo,
     discordWebhookUrl: row.discord_webhook_url,
+    workspaceOwnerId: row.workspace_owner_id,
+    favoriteRepos: row.favorite_repos ?? [],
   };
 }
 
@@ -108,10 +113,76 @@ export async function getUserProfile(
   return mapProfile(data as UserProfileRow);
 }
 
+export async function getFavoriteRepos(userId: string): Promise<string[]> {
+  const profile = await getUserProfile(userId);
+  return profile?.favoriteRepos ?? [];
+}
+
+export async function setFavoriteRepos(
+  userId: string,
+  repos: string[],
+): Promise<boolean> {
+  const supabase = createSupabaseAdmin();
+  if (!supabase) return false;
+
+  const unique = [...new Set(repos.map((r) => r.trim()).filter(Boolean))].slice(
+    0,
+    20,
+  );
+
+  const { error } = await supabase
+    .from("user_profiles")
+    .update({ favorite_repos: unique })
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("[setFavoriteRepos]", error);
+    return false;
+  }
+
+  return true;
+}
+
+export async function toggleFavoriteRepo(
+  userId: string,
+  repoFullName: string,
+): Promise<{ favorites: string[]; isFavorite: boolean } | null> {
+  const current = await getFavoriteRepos(userId);
+  const normalized = repoFullName.trim();
+  if (!normalized) return null;
+
+  const isFavorite = current.includes(normalized);
+  const next = isFavorite
+    ? current.filter((r) => r !== normalized)
+    : [normalized, ...current];
+
+  const ok = await setFavoriteRepos(userId, next);
+  if (!ok) return null;
+
+  return {
+    favorites: isFavorite ? current.filter((r) => r !== normalized) : next,
+    isFavorite: !isFavorite,
+  };
+}
+
 export async function getUserQuota(userId: string): Promise<QuotaSnapshot | null> {
   const profile = await getUserProfile(userId);
   if (!profile) return null;
-  return buildQuotaSnapshot(profile);
+
+  const billingUserId = await resolveBillingUserId(userId);
+  const billingProfile =
+    billingUserId === userId
+      ? profile
+      : await getUserProfile(billingUserId);
+
+  if (!billingProfile) return null;
+
+  const teamOwnerId =
+    profile.workspaceOwnerId && profile.workspaceOwnerId !== userId
+      ? profile.workspaceOwnerId
+      : null;
+
+  return buildQuotaSnapshot(billingProfile, { teamOwnerId });
 }
 
 export async function setStripeCustomerId(

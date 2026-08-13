@@ -7,6 +7,7 @@ import {
   getGitHubClientSecret,
 } from "@/lib/env";
 import { ensureUserProfile, setGitHubAccessToken } from "@/lib/supabase/users";
+import { acceptPendingTeamInvites } from "@/lib/supabase/team";
 import { sendWelcomeEmail } from "@/lib/email";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -32,6 +33,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
         if (account?.provider === "github" && account.access_token) {
           await setGitHubAccessToken(user.id, account.access_token);
+        }
+        if (user.email) {
+          await acceptPendingTeamInvites({
+            userId: user.id,
+            email: user.email,
+          });
         }
         if (isNewUser && user.email) {
           await sendWelcomeEmail({
