@@ -75,12 +75,13 @@ Discord webhook, GitHub/GitLab/Linear tokens stored as plaintext in Supabase.
 
 ### 6. Post-core priority order
 
-Confirm order for agent:
+Shipped: Discord schedule · GitHub Action.
 
-1. Discord schedule  
-2. GitHub Action  
-3. Jira  
-4. Social OAuth  
+Next for agent:
+
+1. Jira  
+2. Social OAuth  
+3. Brand voice memory
 
 ---
 

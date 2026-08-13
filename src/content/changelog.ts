@@ -6,6 +6,15 @@ export type ChangelogRelease = {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: "0.7.0",
+    date: "August 2026",
+    items: [
+      "Discord schedule — pick date/time in Share Studio, cron sends every 5 min",
+      "GitHub Action template + /api/action/generate for CI releases",
+      "Settings shows Action endpoint and auth header for repo secrets",
+    ],
+  },
+  {
     version: "0.6.1",
     date: "August 2026",
     items: [

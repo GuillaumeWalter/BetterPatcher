@@ -35,9 +35,11 @@ Tout est sur **`master`** — Vercel redéploie à chaque push.
 | 8 | `discord_bot.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/discord_bot.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/discord_bot.sql) |
 | 9 | `linear_token.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/linear_token.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/linear_token.sql) |
 | 10 | `rate_limits.sql` ⭐ | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/rate_limits.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/rate_limits.sql) |
+| 11 | `scheduled_posts.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/scheduled_posts.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/scheduled_posts.sql) |
 
 > ⭐ `go_live_gaps.sql` = team seats, repos favoris, quota partagé Pro.  
-> ⭐ `rate_limits.sql` = limites demo landing + régénération drafts (anti-abus Gemini).
+> ⭐ `rate_limits.sql` = limites demo landing + régénération drafts (anti-abus Gemini).  
+> `scheduled_posts.sql` = Discord schedule (cron toutes les 5 min).
 
 3. Récupère tes clés Supabase → [Project Settings → API](https://supabase.com/dashboard/project/_/settings/api)  
    - [ ] `SUPABASE_URL`  
@@ -75,7 +77,7 @@ Tout est sur **`master`** — Vercel redéploie à chaque push.
 |----------|-----|
 | `RESEND_API_KEY` | [Resend → API Keys](https://resend.com/api-keys) |
 | `RESEND_FROM_EMAIL` | Ex. `Easy Patch <hello@tondomaine.com>` — domaine vérifié sur [Resend Domains](https://resend.com/domains) |
-| `CRON_SECRET` | Chaîne aléatoire : `openssl rand -hex 32` |
+| `CRON_SECRET` | Chaîne aléatoire : `openssl rand -hex 32` *(requis pour schedule Discord + trial reminder)* |
 
 ### Optionnel (mais utile go-live)
 
@@ -170,6 +172,8 @@ Remplace `TON-DOMAINE` par ton URL Vercel.
 - [ ] [Vérifier config](https://TON-DOMAINE/api/env-check) *(connecté)* — tout doit être `true` pour les vars obligatoires  
 - [ ] (Pro) Inviter un coéquipier → vérifier **historique partagé**  
 - [ ] (Optionnel) [Linear](https://TON-DOMAINE/dashboard/generate) → Connect Linear → commits avec clés `ENG-42`  
+- [ ] (Optionnel) Discord **Schedule** dans Share Studio → vérifier post après l’heure choisie  
+- [ ] (Optionnel) [GitHub Action](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/docs/github-action.md) dans un repo test  
 - [ ] [FAQ](https://TON-DOMAINE/faq) · [Contact](https://TON-DOMAINE/contact) · [Privacy](https://TON-DOMAINE/legal/privacy)
 
 ---
@@ -238,4 +242,4 @@ Remplace `TON-DOMAINE` par ton URL Vercel.
 
 ---
 
-*Dernière mise à jour : août 2026 — v0.6.1 (rate limits durable, onboarding step-by-step, docs à jour).*
+*Dernière mise à jour : août 2026 — v0.7.0 (Discord schedule, GitHub Action).*

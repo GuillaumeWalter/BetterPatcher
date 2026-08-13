@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, Copy, Loader2, RefreshCw, Save } from "lucide-react";
 
+import { DiscordSchedulePanel } from "@/components/discord-schedule-panel";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -555,6 +557,19 @@ export function ShareStudio({
               <span className="text-sm text-muted-foreground">Draft saved</span>
             ) : null}
           </div>
+
+          {discordEnabled && activePlatform === "discord" ? (
+            <DiscordSchedulePanel
+              patchNoteId={patchNoteId}
+              content={
+                activeDraft?.title?.trim()
+                  ? `**${activeDraft.title.trim()}**\n\n${activeDraft.body}`
+                  : activeDraft?.body ?? ""
+              }
+              disabled={readOnly || !activeDraft?.body}
+              onScheduled={() => onShareInteract?.()}
+            />
+          ) : null}
 
           {error ? (
             <p className="text-sm text-destructive" role="alert">

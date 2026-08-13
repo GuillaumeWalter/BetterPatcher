@@ -20,6 +20,10 @@ export const BILLING = {
   ANNUAL_DISCOUNT_PERCENT: 15,
   /** Max seats on Pro (owner + invites). */
   PRO_MAX_TEAM_SEATS: 5,
+  /** Max pending Discord schedules on trial. */
+  SCHEDULE_MAX_PENDING_TRIAL: 1,
+  /** Max pending Discord schedules on Solo / Pro. */
+  SCHEDULE_MAX_PENDING_PAID: 20,
 } as const;
 
 export type BillingInterval = "monthly" | "annual";

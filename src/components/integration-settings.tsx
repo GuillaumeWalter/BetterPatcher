@@ -31,6 +31,8 @@ type IntegrationsPayload = {
   releaseAutoRepo: string | null;
   discordWebhookUrl: string | null;
   releaseWebhookUrl: string | null;
+  actionGenerateUrl: string | null;
+  actionAuthHint: string | null;
 };
 
 export function IntegrationSettings({ repos }: IntegrationSettingsProps) {
@@ -122,6 +124,57 @@ export function IntegrationSettings({ repos }: IntegrationSettingsProps) {
               </p>
             </div>
           ) : null}
+        </CardContent>
+      </Card>
+
+      <Card className="surface-card gradient-border">
+        <CardHeader>
+          <CardTitle className="text-lg">GitHub Action (CI)</CardTitle>
+          <CardDescription>
+            Generate patch notes from a workflow on tag push or release.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm">
+          <p className="text-muted-foreground">
+            Repo secrets: <code className="text-xs">EASYPATCH_USER_ID</code> +
+            <code className="text-xs"> EASYPATCH_TOKEN</code> (values below).
+            Workflow template:{" "}
+            <a
+              href="https://github.com/GuillaumeWalter/BetterPatcher/blob/master/examples/github-action-easypatch.yml"
+              className="text-primary underline-offset-4 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              github-action-easypatch.yml
+            </a>
+          </p>
+          {data?.actionGenerateUrl ? (
+            <div className="space-y-2">
+              <Label>POST endpoint</Label>
+              <Input readOnly value={data.actionGenerateUrl} />
+            </div>
+          ) : null}
+          {data?.actionAuthHint ? (
+            <div className="space-y-2">
+              <Label>Authorization header</Label>
+              <Input
+                readOnly
+                value={data.actionAuthHint}
+                onFocus={(event) => event.currentTarget.select()}
+              />
+            </div>
+          ) : null}
+          <p className="text-xs text-muted-foreground">
+            Guide:{" "}
+            <a
+              href="https://github.com/GuillaumeWalter/BetterPatcher/blob/master/docs/github-action.md"
+              className="text-primary underline-offset-4 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              docs/github-action.md
+            </a>
+          </p>
         </CardContent>
       </Card>
 

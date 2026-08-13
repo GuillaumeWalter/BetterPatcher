@@ -23,6 +23,10 @@ export async function GET() {
     releaseWebhookUrl: token
       ? `${baseUrl}/api/webhooks/github/release?userId=${encodeURIComponent(session.user.id)}&token=${token}`
       : null,
+    actionGenerateUrl: token ? `${baseUrl}/api/action/generate` : null,
+    actionAuthHint: token
+      ? `EasyPatch ${session.user.id}:${token}`
+      : null,
   });
 }
 

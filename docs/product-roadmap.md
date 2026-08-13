@@ -89,12 +89,12 @@ Trial / Solo / Pro, GitLab, English UI, Vercel hosting
 - **Share Studio P0** : editable markdown, per-platform drafts, copy, regenerate, Discord publish
 - Guided onboarding, team shared history, regenerate all drafts
 
-### Phase 2.5 (next)
+### Phase 2.5 (done — v0.7)
 
-- Discord schedule (Share Studio P1)
-- GitHub Action auto-generate on release
+- Discord **schedule** (Share Studio + cron every 5 min)
+- **GitHub Action** template + `/api/action/generate`
 
-### Phase 3
+### Phase 3 (next)
 
 - Jira
 - Social OAuth publish where APIs allow

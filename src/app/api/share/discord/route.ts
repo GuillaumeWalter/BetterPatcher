@@ -1,9 +1,5 @@
 import { auth } from "@/auth";
-import { postDiscordBotMessage } from "@/lib/discord/bot";
-import { getUserProfile } from "@/lib/supabase/users";
-
-const DISCORD_WEBHOOK_PATTERN =
-  /^https:\/\/discord(?:app)?\.com\/api\/webhooks\/\d+\/[\w-]+$/;
+import { publishDiscordForUser } from "@/lib/share/publish-discord";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -23,55 +19,15 @@ export async function POST(request: Request) {
     body !== null &&
     "content" in body &&
     typeof body.content === "string"
-      ? body.content.trim()
+      ? body.content
       : "";
 
-  if (!content) {
-    return Response.json({ error: "Content is required." }, { status: 400 });
+  const result = await publishDiscordForUser(session.user.id, content);
+
+  if (!result.ok) {
+    const status = result.error.includes("2000") ? 400 : 502;
+    return Response.json({ error: result.error }, { status });
   }
 
-  if (content.length > 2000) {
-    return Response.json(
-      { error: "Discord messages are limited to 2000 characters." },
-      { status: 400 },
-    );
-  }
-
-  const profile = await getUserProfile(session.user.id);
-
-  if (profile?.discordChannelId) {
-    const result = await postDiscordBotMessage(profile.discordChannelId, content);
-    if (result.ok) {
-      return Response.json({ success: true, via: "bot" });
-    }
-  }
-
-  const webhookUrl = profile?.discordWebhookUrl;
-
-  if (!webhookUrl || !DISCORD_WEBHOOK_PATTERN.test(webhookUrl)) {
-    return Response.json(
-      {
-        error:
-          "Link the Discord bot or add a webhook in Settings before publishing.",
-      },
-      { status: 400 },
-    );
-  }
-
-  const response = await fetch(webhookUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ content }),
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    console.error("[discord/publish]", response.status, text);
-    return Response.json(
-      { error: "Discord rejected the message. Check your webhook URL." },
-      { status: 502 },
-    );
-  }
-
-  return Response.json({ success: true, via: "webhook" });
+  return Response.json({ success: true, via: result.via });
 }

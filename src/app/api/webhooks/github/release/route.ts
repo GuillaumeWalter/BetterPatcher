@@ -4,17 +4,13 @@ import {
   verifyIntegrationToken,
 } from "@/lib/integrations/tokens";
 import { getCompareCommits, parseRepoFullName } from "@/lib/github";
-import { runGeneration } from "@/lib/generation/run-generation";
+import { generatePatchNoteForUser } from "@/lib/automation/generate-patch-note";
 import { getAiProvider } from "@/lib/ai/model";
 import { DEFAULT_GENERATION_OPTIONS } from "@/lib/constants";
-import { savePatchNote } from "@/lib/supabase/patch-notes";
-import { replacePlatformDrafts } from "@/lib/supabase/platform-drafts";
 import {
-  consumeGeneration,
   findUserByReleaseRepo,
   getGitHubAccessToken,
   getUserProfile,
-  refundGeneration,
 } from "@/lib/supabase/users";
 
 function getWebhookSecret(): string | undefined {
@@ -86,17 +82,8 @@ export async function POST(request: Request) {
     return Response.json({ error: "AI not configured." }, { status: 503 });
   }
 
-  const consumed = await consumeGeneration(profile.userId);
-  if (!consumed.ok) {
-    return Response.json(
-      { error: "Quota exceeded for release automation.", code: consumed.code },
-      { status: 402 },
-    );
-  }
-
   const accessToken = await getGitHubAccessToken(profile.userId);
   if (!accessToken) {
-    await refundGeneration(profile.userId, consumed.plan);
     return Response.json(
       { error: "GitHub token missing. Sign in again to refresh access." },
       { status: 400 },
@@ -106,61 +93,42 @@ export async function POST(request: Request) {
   const { owner, repo } = parseRepoFullName(repoFullName);
   const tone = "technical";
 
-  try {
-    let commits = `Release ${tagName}`;
-    if (event.release?.name) {
-      commits = `${event.release.name}\n${commits}`;
-    }
-
-    try {
-      const compared = await getCompareCommits(
-        accessToken,
-        owner,
-        repo,
-        `${tagName}^`,
-        tagName,
-      );
-      if (compared.trim()) commits = compared;
-    } catch {
-      // Fall back to release title only.
-    }
-
-    const output = await runGeneration({
-      commits,
-      tone,
-      options: DEFAULT_GENERATION_OPTIONS,
-    });
-
-    if (!output) {
-      throw new Error("Empty generation.");
-    }
-
-    const savedId = await savePatchNote({
-      userId: profile.userId,
-      userEmail: profile.email,
-      tone,
-      commitsRaw: commits,
-      markdown: output.markdown,
-      socialPost: output.socialPost,
-      repoFullName,
-    });
-
-    if (savedId && output.platformDrafts.length > 0) {
-      await replacePlatformDrafts(savedId, output.platformDrafts);
-    }
-
-    return Response.json({
-      ok: true,
-      savedId,
-      tag: tagName,
-      repo: repoFullName,
-    });
-  } catch (error) {
-    await refundGeneration(profile.userId, consumed.plan);
-    console.error("[webhooks/github/release]", error);
-    return Response.json(
-      { error: "Release generation failed." },
-      { status: 500 },
-    );
+  let commits = `Release ${tagName}`;
+  if (event.release?.name) {
+    commits = `${event.release.name}\n${commits}`;
   }
+
+  try {
+    const compared = await getCompareCommits(
+      accessToken,
+      owner,
+      repo,
+      `${tagName}^`,
+      tagName,
+    );
+    if (compared.trim()) commits = compared;
+  } catch {
+    // Fall back to release title only.
+  }
+
+  const result = await generatePatchNoteForUser({
+    profile,
+    commits,
+    tone,
+    options: DEFAULT_GENERATION_OPTIONS,
+    repoFullName,
+  });
+
+  if (!result.ok) {
+    const status = result.code === "quota_exceeded" ? 402 : 500;
+    return Response.json({ error: result.error, code: result.code }, { status });
+  }
+
+  return Response.json({
+    ok: true,
+    savedId: result.savedId,
+    tag: tagName,
+    repo: repoFullName,
+    historyUrl: `/dashboard/history/${result.savedId}`,
+  });
 }

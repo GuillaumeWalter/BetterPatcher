@@ -30,14 +30,17 @@ See **docs/A-FAIRE-MAINTENANT.md** (sections 0–7):
 - [ ] Resend + domain
 - [ ] Prod smoke test + 5 beta testers
 
-## Next product work (post-core, phase 2.5+)
+## Next product work (post-core, phase 3+)
 
-- [ ] Discord schedule (cron publish)
-- [ ] GitHub Action (tag/release → patch note)
 - [ ] Jira ticket enrichment
 - [ ] Social OAuth publish (Meta / X / LinkedIn)
 - [ ] Brand voice memory
 - [ ] Authenticated E2E tests in CI
+
+## Done (phase 2.5)
+
+- [x] Discord schedule (Share Studio + cron)
+- [x] GitHub Action workflow + API
 
 ## Later
 

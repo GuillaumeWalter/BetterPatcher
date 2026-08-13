@@ -2,7 +2,7 @@
 
 Product design for post-generation sharing: edit → adapt per platform → publish or schedule.
 
-**Status:** P0 **shipped** (Share Studio UI + per-platform drafts + regenerate/copy + Discord publish). P1 schedule + social OAuth not shipped yet.  
+**Status:** P0 shipped · P1 **Discord schedule shipped** (v0.7) · social OAuth not shipped yet.  
 **UI language:** English. **Hosting:** Vercel.
 
 ---
@@ -205,11 +205,12 @@ Migrate: on first open of Share Studio, seed drafts from existing `social_post` 
 - Persist `platform_drafts`; keep `social_post` as primary social for history
 - Pro team: shared history (read + copy drafts)
 
-### P1 | Discord publish + schedule
+### P1 | Discord publish + schedule ✅ (v0.7)
 
-- Webhook connection in Settings
-- Publish now + schedule from Share Studio
-- Cron worker + status UI
+- Webhook / bot connection in Settings
+- Publish now + **schedule** from Share Studio (Discord tab)
+- Cron worker `/api/cron/process-scheduled-posts` (every 5 min on Vercel)
+- SQL: `supabase/scheduled_posts.sql`
 
 ### P2 | Discord bot
 

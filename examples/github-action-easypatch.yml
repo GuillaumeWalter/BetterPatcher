@@ -1,0 +1,66 @@
+# Easy Patch — generate patch notes on release or tag push
+# Copy to your repo: .github/workflows/easypatch.yml
+# Secrets required: EASYPATCH_USER_ID, EASYPATCH_TOKEN (from Easy Patch → Settings)
+
+name: Easy Patch
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  generate-patch-note:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Collect commits
+        id: commits
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            TAG="${{ github.event.release.tag_name }}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          PREV=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || echo "")
+          if [ -n "$PREV" ]; then
+            git log --pretty=format:"%s" "${PREV}..${TAG}" > commits.txt
+          else
+            git log -30 --pretty=format:"%s" > commits.txt
+          fi
+          echo "Collected $(wc -l < commits.txt) commit lines"
+
+      - name: Generate patch note via Easy Patch
+        env:
+          EASYPATCH_URL: https://easypatch.app
+        run: |
+          COMMITS=$(cat commits.txt | head -c 14000)
+          if [ -z "$COMMITS" ]; then
+            echo "No commits found — skipping."
+            exit 0
+          fi
+          BODY=$(jq -n \
+            --arg commits "$COMMITS" \
+            --arg tag "${{ steps.commits.outputs.tag }}" \
+            --arg repo "${{ github.repository }}" \
+            '{commits: $commits, tag: $tag, repoFullName: $repo, tone: "technical"}')
+          RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST \
+            "${EASYPATCH_URL}/api/action/generate" \
+            -H "Authorization: EasyPatch ${{ secrets.EASYPATCH_USER_ID }}:${{ secrets.EASYPATCH_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "$BODY")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY_JSON=$(echo "$RESPONSE" | sed '$d')
+          echo "$BODY_JSON"
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "Easy Patch API error ($HTTP_CODE)"
+            exit 1
+          fi
+          echo "Patch note saved. Open Easy Patch → History to edit and publish."
