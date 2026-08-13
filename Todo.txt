@@ -1,37 +1,46 @@
 # Easy Patch | Living TODO
 
-Canonical product plan: docs/product-roadmap.md
-Env checklist: docs/env-setup.md
-Open decisions: docs/open-questions.md
+Canonical product plan: docs/product-roadmap.md  
+**Your setup checklist:** docs/A-FAIRE-MAINTENANT.md  
+Resolved decisions: docs/open-questions.md
 
-## Done
+## Done (core product v0.6)
 
 - [x] Next.js app + English UI + Easy Patch branding
-- [x] Trial / Solo / Pro billing (Stripe setup + quotas)
-- [x] GitHub OAuth login + commit import
+- [x] Trial / Solo / Pro billing (Stripe + annual + geo prices)
+- [x] GitHub OAuth login + commit import + favorite repos
 - [x] Manual paste (Perforce / Plastic / SVN / any log)
-- [x] GitLab OAuth link + commit import
-- [x] Patch note history
-- [x] Generation tones + formatting options
+- [x] GitLab OAuth + commit import
+- [x] Linear OAuth + ticket title enrichment (Solo + Pro)
+- [x] Patch note history + **Pro team shared history**
+- [x] Share Studio (edit, copy, regenerate one/all, Discord publish)
+- [x] Discord bot (`/easypatch link`)
+- [x] Pro team seats (invites, shared quota)
+- [x] Guided onboarding (step-by-step)
+- [x] Rate limits: demo IP + draft regeneration (Supabase `rate_limits.sql`)
+- [x] Emails lifecycle, Sentry, PWA, RGPD delete
 
-## Your side (dashboards)
+## Your side (dashboards) — blocking go-live
 
-- [ ] Confirm Vercel env vars (see docs/env-setup.md)
-- [ ] Stripe Prices per currency + webhook
-- [ ] Run Supabase SQL files
-- [ ] GitLab OAuth app if not live yet
+See **docs/A-FAIRE-MAINTENANT.md** (sections 0–7):
 
-## Next product work (needs your answers in docs/open-questions.md)
+- [ ] Run all Supabase SQL files (including `rate_limits.sql`)
+- [ ] Vercel env vars + redeploy
+- [ ] Stripe Customer Portal + products/prices + webhook
+- [ ] Resend + domain
+- [ ] Prod smoke test + 5 beta testers
 
-- [ ] Phase 2: Jira or Linear ticket enrichment
-- [ ] Phase 3: real Pro seats / workspaces
+## Next product work (post-core, phase 2.5+)
+
+- [ ] Discord schedule (cron publish)
+- [ ] GitHub Action (tag/release → patch note)
+- [ ] Jira ticket enrichment
+- [ ] Social OAuth publish (Meta / X / LinkedIn)
+- [ ] Brand voice memory
+- [ ] Authenticated E2E tests in CI
 
 ## Later
 
-- [ ] Auto-generate on GitHub tag / Release
-- [ ] Brand voice memory
-- [ ] Multi-language override
-- [ ] Dedicated Steam News format
-- [ ] Discord publish
-- [ ] Annual plan
-- [ ] Bitbucket
+- [ ] Bitbucket, Raycast extension, Product Hunt GTM
+- [ ] Encrypt integration tokens at rest (compliance)
+- [ ] History pagination + search

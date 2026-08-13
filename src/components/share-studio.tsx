@@ -38,6 +38,7 @@ type ShareStudioProps = {
   markdownDirty?: boolean;
   isSavingMarkdown?: boolean;
   readOnly?: boolean;
+  onShareInteract?: () => void;
 };
 
 export function ShareStudio({
@@ -53,6 +54,7 @@ export function ShareStudio({
   markdownDirty = false,
   isSavingMarkdown = false,
   readOnly = false,
+  onShareInteract,
 }: ShareStudioProps) {
   const [discordEnabled, setDiscordEnabled] = useState(false);
   const defaultPlatforms = useMemo(
@@ -169,6 +171,7 @@ export function ShareStudio({
         : activeDraft.body;
     await navigator.clipboard.writeText(text);
     setCopied(true);
+    onShareInteract?.();
     window.setTimeout(() => setCopied(false), 1500);
   }
 
@@ -304,6 +307,7 @@ export function ShareStudio({
         throw new Error(data.error ?? "Discord publish failed.");
       }
       setDiscordPublished(true);
+      onShareInteract?.();
       window.setTimeout(() => setDiscordPublished(false), 2500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Discord publish failed.");

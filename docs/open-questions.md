@@ -1,47 +1,91 @@
 # Easy Patch | Open questions
 
-Decisions still needed from you. Code can stay blocked or teaser-only until these are answered. No dashboards required to reply here.
+Decisions for **post-core** work. Core product (v0.6) decisions are recorded below as **resolved**.
 
-## Phase 2: Jira / Linear ticket enrichment
+---
 
-Roadmap: Solo + Pro (not Pro-gated as an exclusive feature). Trial currently gets GitLab; clarify Trial for tickets.
+## Resolved (shipped in code)
 
-1. **Provider order:** Jira first, Linear first, or both in parallel?
-2. **Auth model:** OAuth app (Connect button) or personal API token pasted by the user? (OAuth is nicer for teams; tokens are faster to ship for Solo.)
-3. **Match strategy:**
-   - Parse ticket keys in commit messages (`PROJ-123`, `ABC-9`) and fetch titles, or
-   - Pick a project / board and pull recent tickets into the note, or
-   - Both?
-4. **Enrichment depth:** Titles only (MVP) vs titles + status / epic / labels?
-5. **UI placement:** Separate “Jira / Linear” source tab, or auto-enrich whenever keys appear in pasted / imported commits?
-6. **Trial access:** Same as GitLab (yes), or Solo + Pro only?
+### Linear ticket enrichment ✅
 
-Suggested default if you want me to proceed without more debate:
+- **Provider:** Linear first (Jira later)
+- **Auth:** OAuth connect (same pattern as GitLab)
+- **Match:** Parse keys in commits (`ENG-42`, `PROJ-123`)
+- **Depth:** Titles (+ state in preview panel)
+- **UI:** Auto-enrich on generate + ticket preview panel in generator
+- **Trial access:** **Solo + Pro only** (trial sees keys, not titles until subscribe)
 
-- Linear first (simpler API than Jira Cloud)
-- OAuth connect linked to the existing account (same pattern as GitLab)
-- Parse keys in commits + optional project picker
-- Titles only for MVP
-- Auto-enrich on generate when keys are present
-- Solo + Pro only (keep Trial lighter)
+### Pro team seats ✅
 
-## Waitlist on the landing page
+- Invite by email → teammate signs in with matching GitHub email
+- Shared monthly quota + **shared history** (read/copy for teammates)
+- Seat cap: **5** on Pro (`BILLING.PRO_MAX_TEAM_SEATS`)
 
-`WaitlistSection` + `/api/waitlist` + `supabase/waitlist.sql` exist but the section is **not mounted**. GTM in the roadmap says wait until the product is solid.
+### Annual plan ✅
 
-- Keep hidden until trial → Solo / Pro feels smooth?
-- Or show a soft “notify me about team seats” waitlist under pricing?
+- −15% toggle in billing UI; Stripe yearly Price IDs in env
 
-## Pro seats (Phase 3)
+### Share Studio P0 ✅
 
-Copy already says “several users on one account (coming soon)”.
+- Editable markdown, per-platform drafts, copy, regenerate, Discord webhook publish
+- **Not shipped:** schedule, social OAuth publish
 
-- Invite by email into a shared workspace?
-- Shared history + shared monthly quota (current positioning)?
-- Seat cap on Pro (e.g. 5) vs unlimited?
+### Rate limits ✅
+
+- Demo: 3/hour/IP (durable via `supabase/rate_limits.sql` when applied)
+- Draft regeneration: 40 AI calls/hour/user (each platform in “regenerate all” = 1 call)
+
+---
+
+## Still open
+
+### 1. Jira vs Linear second provider
+
+Linear is live. Add Jira Cloud in parallel or wait for user demand?
+
+**Suggested default:** wait until 3+ beta users ask for Jira.
+
+### 2. Linear on Trial?
+
+Today trial users can connect Linear but enrichment runs only on Solo/Pro.
+
+- **Keep as is** (lighter trial, upgrade hook), or
+- **Allow titles on trial** (better demo, more API cost)
+
+### 3. Waitlist on landing
+
+`WaitlistSection` + `/api/waitlist` exist but section is **not mounted**.
+
+- Keep hidden until after beta?
+- Or soft “notify me” under pricing?
+
+### 4. Team invite UX
+
+Email-only invite is fragile (wrong GitHub email = stuck pending).
+
+- Add magic invite link later?
+- Or document clearly in Settings?
+
+### 5. Integration secrets at rest
+
+Discord webhook, GitHub/GitLab/Linear tokens stored as plaintext in Supabase.
+
+- OK for MVP?
+- Or encrypt with app secret before go-live in EU enterprise?
+
+### 6. Post-core priority order
+
+Confirm order for agent:
+
+1. Discord schedule  
+2. GitHub Action  
+3. Jira  
+4. Social OAuth  
+
+---
 
 ## Nice to confirm later (not blocking)
 
-- Dedicated Steam News format vs current gaming tone
-- Output language override (today: detect from commits)
-- Annual plan (15% off) when Stripe Prices exist
+- Dedicated Steam News BBCode export vs current paste format
+- Output language override (today: inferred from commits)
+- Mount or remove dormant `WaitlistSection`

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   CheckCircle2,
   Circle,
@@ -20,8 +20,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-const STORAGE_KEY = "easy-patch-onboarding-v1";
+import {
+  completedOnboardingCount,
+  dismissOnboardingGuide,
+  isOnboardingDismissed,
+  mergeOnboardingProgress,
+  type OnboardingProgress,
+  type OnboardingStepId,
+  onboardingStepsComplete,
+  readOnboardingProgress,
+} from "@/lib/onboarding-progress";
 
 type GuidedOnboardingProps = {
   welcome?: boolean;
@@ -29,10 +37,8 @@ type GuidedOnboardingProps = {
   variant?: "dashboard" | "generate";
 };
 
-type StepId = "import" | "generate" | "share" | "history";
-
 const STEPS: Array<{
-  id: StepId;
+  id: OnboardingStepId;
   label: string;
   description: string;
   icon: typeof Wand2;
@@ -41,7 +47,7 @@ const STEPS: Array<{
   {
     id: "import",
     label: "Import commits",
-    description: "GitHub, GitLab, or paste a log from any VCS.",
+    description: "GitHub, GitLab, paste, or Load sample commits.",
     icon: Sparkles,
   },
   {
@@ -53,34 +59,17 @@ const STEPS: Array<{
   {
     id: "share",
     label: "Edit in Share Studio",
-    description: "Polish Markdown and copy per-platform drafts.",
+    description: "Copy or edit a platform draft (Discord, Steam, X…).",
     icon: Share2,
   },
   {
     id: "history",
-    label: "Find it in history",
-    description: "Reopen, edit, or regenerate drafts anytime.",
+    label: "Open history",
+    description: "Find saved patch notes and reopen Share Studio.",
     icon: History,
     href: "/dashboard/history",
   },
 ];
-
-function readDismissed(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.localStorage.getItem(STORAGE_KEY) === "done";
-}
-
-function dismissOnboarding() {
-  window.localStorage.setItem(STORAGE_KEY, "done");
-}
-
-function stepComplete(id: StepId, hasGenerated: boolean): boolean {
-  if (id === "import") return hasGenerated;
-  if (id === "generate") return hasGenerated;
-  if (id === "share") return hasGenerated;
-  if (id === "history") return hasGenerated;
-  return false;
-}
 
 export function GuidedOnboarding({
   welcome = false,
@@ -89,45 +78,64 @@ export function GuidedOnboarding({
 }: GuidedOnboardingProps) {
   const [dismissed, setDismissed] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [progress, setProgress] = useState<OnboardingProgress>(() =>
+    readOnboardingProgress(),
+  );
+
+  const refreshProgress = useCallback(() => {
+    setProgress(readOnboardingProgress());
+    setDismissed(isOnboardingDismissed());
+  }, []);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       setMounted(true);
-      setDismissed(readDismissed());
+      mergeOnboardingProgress({ hasGenerated });
+      refreshProgress();
     });
     return () => cancelAnimationFrame(frame);
-  }, []);
+  }, [hasGenerated, refreshProgress]);
 
   useEffect(() => {
-    if (!hasGenerated || !mounted || readDismissed()) return;
+    const onProgress = () => refreshProgress();
+    window.addEventListener("easy-patch-onboarding-progress", onProgress);
+    return () => {
+      window.removeEventListener("easy-patch-onboarding-progress", onProgress);
+    };
+  }, [refreshProgress]);
+
+  useEffect(() => {
+    if (!mounted || dismissed || !onboardingStepsComplete(progress)) return;
     const frame = requestAnimationFrame(() => {
-      dismissOnboarding();
+      dismissOnboardingGuide();
       setDismissed(true);
     });
     return () => cancelAnimationFrame(frame);
-  }, [hasGenerated, mounted]);
+  }, [progress, mounted, dismissed]);
 
-  if (!mounted || dismissed) {
-    if (!welcome || dismissed) return null;
+  if (!mounted) return null;
+
+  if (dismissed) {
+    if (!welcome) return null;
 
     return (
       <WelcomeBanner
-        hasGenerated={hasGenerated}
+        progress={progress}
         onDismiss={() => {
-          dismissOnboarding();
+          dismissOnboardingGuide();
           setDismissed(true);
         }}
       />
     );
   }
 
-  const completedCount = STEPS.filter((step) =>
-    stepComplete(step.id, hasGenerated),
-  ).length;
+  const completedCount = completedOnboardingCount(progress);
 
-  if (variant === "dashboard" && hasGenerated) {
+  if (variant === "dashboard" && onboardingStepsComplete(progress)) {
     return null;
   }
+
+  const nextStep = STEPS.find((step) => !progress[step.id]);
 
   return (
     <Card className="surface-card gradient-border mb-6 border-primary/20">
@@ -140,7 +148,9 @@ export function GuidedOnboarding({
           <CardDescription>
             {welcome
               ? "Your card is saved (€0 charged). Follow these steps for your first patch note."
-              : `${completedCount}/${STEPS.length} steps done · finish one generation to unlock Share Studio.`}
+              : `${completedCount}/${STEPS.length} steps done${
+                  nextStep ? ` · next: ${nextStep.label.toLowerCase()}` : ""
+                }.`}
           </CardDescription>
         </div>
         <Button
@@ -149,7 +159,7 @@ export function GuidedOnboarding({
           size="icon-sm"
           aria-label="Dismiss getting started"
           onClick={() => {
-            dismissOnboarding();
+            dismissOnboardingGuide();
             setDismissed(true);
           }}
         >
@@ -159,7 +169,7 @@ export function GuidedOnboarding({
       <CardContent>
         <ol className="grid gap-3 sm:grid-cols-2">
           {STEPS.map((step, index) => {
-            const done = stepComplete(step.id, hasGenerated);
+            const done = progress[step.id];
             const Icon = step.icon;
             const content = (
               <>
@@ -185,12 +195,16 @@ export function GuidedOnboarding({
               </>
             );
 
-            if (step.href && done) {
+            if (step.href) {
               return (
                 <li key={step.id}>
                   <Link
                     href={step.href}
-                    className="flex gap-3 rounded-xl border border-white/10 bg-background/40 p-3 transition-colors hover:border-primary/30"
+                    className={`flex gap-3 rounded-xl border p-3 transition-colors ${
+                      done
+                        ? "border-white/10 bg-background/40 hover:border-primary/30"
+                        : "border-primary/25 bg-primary/5 hover:border-primary/40"
+                    }`}
                   >
                     {content}
                   </Link>
@@ -201,7 +215,11 @@ export function GuidedOnboarding({
             return (
               <li
                 key={step.id}
-                className="flex gap-3 rounded-xl border border-white/10 bg-background/40 p-3"
+                className={`flex gap-3 rounded-xl border p-3 ${
+                  done
+                    ? "border-white/10 bg-background/40"
+                    : "border-primary/25 bg-primary/5"
+                }`}
               >
                 {content}
               </li>
@@ -223,22 +241,27 @@ export function GuidedOnboarding({
 }
 
 function WelcomeBanner({
-  hasGenerated,
+  progress,
   onDismiss,
 }: {
-  hasGenerated: boolean;
+  progress: OnboardingProgress;
   onDismiss: () => void;
 }) {
+  const next = STEPS.find((step) => !progress[step.id]);
+
   return (
     <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="space-y-1 text-sm">
         <p className="font-medium text-foreground">
-          Trial unlocked — {hasGenerated ? "nice work on your first generation!" : "ready for your first patch note."}
+          Trial unlocked —{" "}
+          {progress.generate
+            ? "nice work on your first generation!"
+            : "ready for your first patch note."}
         </p>
         <p className="text-muted-foreground">
-          {hasGenerated
-            ? "Scroll to Share Studio to edit platform drafts, then copy where you publish."
-            : "Import commits on the left, pick a tone, then Generate."}
+          {next
+            ? `Next step: ${next.label.toLowerCase()}.`
+            : "All quick-start steps complete."}
         </p>
       </div>
       <Button type="button" size="sm" variant="outline" onClick={onDismiss}>

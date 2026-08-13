@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { auth } from "@/auth";
 import { DashboardNav } from "@/components/dashboard-nav";
+import { OnboardingHistoryMarker } from "@/components/onboarding-history-marker";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -32,6 +33,7 @@ export default async function HistoryPage() {
 
   return (
     <>
+      <OnboardingHistoryMarker />
       <DashboardNav />
       <p className="mb-8 max-w-2xl text-base leading-relaxed text-muted-foreground">
         Your generated patch notes are saved here. Click to view or edit.

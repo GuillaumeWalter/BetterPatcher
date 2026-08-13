@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { BillingQuotaBanner } from "@/components/billing-quota-banner";
 import { DashboardNav } from "@/components/dashboard-nav";
 import { GuidedOnboarding } from "@/components/guided-onboarding";
+import { OnboardingProgressSeeder } from "@/components/onboarding-progress-seeder";
 import { PatchNoteGenerator } from "@/components/patch-note-generator";
 import { countPatchNotesForUser } from "@/lib/supabase/patch-notes";
 import { getUserQuota } from "@/lib/supabase/users";
@@ -62,6 +63,7 @@ export default async function GeneratePage({ searchParams }: GeneratePageProps) 
     <>
       <DashboardNav />
       <BillingQuotaBanner />
+      <OnboardingProgressSeeder hasGenerated={hasGenerated} />
       <GuidedOnboarding
         welcome={welcome === "1"}
         hasGenerated={hasGenerated}

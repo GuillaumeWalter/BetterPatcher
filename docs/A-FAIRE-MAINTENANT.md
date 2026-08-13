@@ -34,8 +34,10 @@ Tout est sur **`master`** — Vercel redéploie à chaque push.
 | 7 | `go_live_gaps.sql` ⭐ | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/go_live_gaps.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/go_live_gaps.sql) |
 | 8 | `discord_bot.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/discord_bot.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/discord_bot.sql) |
 | 9 | `linear_token.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/linear_token.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/linear_token.sql) |
+| 10 | `rate_limits.sql` ⭐ | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/rate_limits.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/rate_limits.sql) |
 
-> ⭐ `go_live_gaps.sql` = team seats, repos favoris, quota partagé Pro.
+> ⭐ `go_live_gaps.sql` = team seats, repos favoris, quota partagé Pro.  
+> ⭐ `rate_limits.sql` = limites demo landing + régénération drafts (anti-abus Gemini).
 
 3. Récupère tes clés Supabase → [Project Settings → API](https://supabase.com/dashboard/project/_/settings/api)  
    - [ ] `SUPABASE_URL`  
@@ -223,6 +225,7 @@ Remplace `TON-DOMAINE` par ton URL Vercel.
 | Génération IA fail | `GOOGLE_GENERATIVE_AI_API_KEY` sur Vercel |
 | Team seats / favoris KO | Exécuter `go_live_gaps.sql` sur Supabase |
 | Cron trial inactif | `CRON_SECRET` sur Vercel (plan Pro Vercel pour crons) |
+| Demo / regenerate abus | Exécuter `rate_limits.sql` sur Supabase |
 
 ---
 
@@ -235,4 +238,4 @@ Remplace `TON-DOMAINE` par ton URL Vercel.
 
 ---
 
-*Dernière mise à jour : août 2026 — v0.6.0 (cœur produit 100 %, onboarding guidé, team history, regenerate all).*
+*Dernière mise à jour : août 2026 — v0.6.1 (rate limits durable, onboarding step-by-step, docs à jour).*

@@ -6,6 +6,15 @@ export type ChangelogRelease = {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: "0.6.1",
+    date: "August 2026",
+    items: [
+      "Durable rate limits — demo IP + draft regeneration (Supabase rate_limits.sql)",
+      "Onboarding tracks real steps (import → generate → share → history)",
+      "Docs refresh: Todo.txt, open-questions.md aligned with shipped code",
+    ],
+  },
+  {
     version: "0.6.0",
     date: "August 2026",
     items: [

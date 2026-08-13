@@ -1,7 +1,7 @@
 # Roadmap 10/10 — Easy Patch
 
 > What “10/10” means per area, current score, and who does what.  
-> Updated: August 2026 (v0.6.0 core product complete)
+> Updated: August 2026 (v0.6.1)
 
 ## Scores actuels
 
@@ -11,9 +11,9 @@
 | **UX/UI** | 9/10 | Onboarding guidé livré · beta testeurs à faire |
 | **Marketing** | 8/10 | Démo vidéo, témoignages, analytics actif |
 | **Communication** | 8.5/10 | Emails auto + légal template enrichi |
-| **Dev/Ops** | 9/10 | E2E, Sentry, CI · alertes coût Gemini à faire |
+| **Dev/Ops** | 9.5/10 | Rate limits Supabase · E2E public · beta testeurs |
 | **Webdesign** | 8/10 | Screenshots prod, a11y WCAG AA |
-| **Gestion projet** | 8/10 | Docs à jour · beta structurée côté toi |
+| **Gestion projet** | 9/10 | Todo + open-questions à jour · beta côté toi |
 | **Argent** | 6/10 | Stripe live, MRR (côté toi) |
 
 ---
@@ -38,7 +38,7 @@ Voir **`docs/A-FAIRE-MAINTENANT.md`** (checklist complète).
 
 Résumé 15 min :
 
-1. Exécuter les 9 SQL Supabase
+1. Exécuter les **10** SQL Supabase (dont `rate_limits.sql`)
 2. Vercel env vars obligatoires + redeploy
 3. Stripe Customer Portal + webhook + prices
 4. Resend + domaine
@@ -57,9 +57,10 @@ Résumé 15 min :
 
 ### ✅ Fait (agent)
 
-- Onboarding guidé post-trial
+- Onboarding guidé post-trial (**4 steps tracked** : import → generate → share → history)
 - Empty states + “Load sample commits”
 - Bannière welcome après activation carte
+- Rate limits demo + regenerate (anti-abus Gemini)
 
 ### 🔲 Toi
 
@@ -105,6 +106,7 @@ Résumé 15 min :
 
 - Sentry SDK, CI lint + test + build + Playwright E2E
 - Tests quotas, team, drafts, tickets
+- **Rate limits** Supabase (`rate_limits.sql`) + fallback mémoire
 
 ### 🔲 Toi
 

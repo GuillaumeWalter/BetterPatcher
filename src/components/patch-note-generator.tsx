@@ -15,6 +15,7 @@ import {
   REPO_STORAGE_KEY,
 } from "@/lib/github-session";
 import { rememberGeneratedMessages } from "@/lib/import-memory";
+import { markOnboardingStep } from "@/lib/onboarding-progress";
 import { consumeGenerationStream } from "@/lib/generation/stream-client";
 import {
   listReferencePatches,
@@ -155,6 +156,7 @@ export function PatchNoteGenerator({
       if (referencePatch.trim()) {
         setSavedReferences(saveReferencePatch(referencePatch));
       }
+      markOnboardingStep("generate");
       await refreshQuota();
       setLiveMessage("Patch note generated.");
     } catch (err) {
@@ -199,6 +201,19 @@ export function PatchNoteGenerator({
     setCommits(text);
     setRepoFullName(repo);
     setInputMode("paste");
+    markOnboardingStep("import");
+  }
+
+  function handleCommitsChange(value: string) {
+    setCommits(value);
+    if (value.trim().length >= 24) {
+      markOnboardingStep("import");
+    }
+  }
+
+  function handleLoadSampleCommits() {
+    setCommits(SAMPLE_COMMITS);
+    markOnboardingStep("import");
   }
 
   const showBillingCta =
@@ -296,7 +311,7 @@ export function PatchNoteGenerator({
                       variant="ghost"
                       size="sm"
                       className="h-7 text-xs"
-                      onClick={() => setCommits(SAMPLE_COMMITS)}
+                      onClick={handleLoadSampleCommits}
                     >
                       Load sample commits
                     </Button>
@@ -312,7 +327,7 @@ export function PatchNoteGenerator({
                 id="commits"
                 placeholder={PLACEHOLDER_COMMITS}
                 value={commits}
-                onChange={(event) => setCommits(event.target.value)}
+                onChange={(event) => handleCommitsChange(event.target.value)}
                 className="min-h-52 resize-y font-mono text-sm"
               />
             </div>
@@ -534,6 +549,7 @@ export function PatchNoteGenerator({
           }}
           onSocialPostChange={setSocialPost}
           onDraftsChange={setPlatformDrafts}
+          onShareInteract={() => markOnboardingStep("share")}
           onSaveMarkdown={savedId ? handleSaveMarkdown : undefined}
           markdownDirty={!markdownSaved}
           isSavingMarkdown={isSaving}

@@ -8,6 +8,8 @@ import {
   DEFAULT_GENERATION_OPTIONS,
   parseGenerationOptions,
 } from "@/lib/constants";
+import { RATE_LIMITS } from "@/lib/rate-limit-config";
+import { checkRateLimitDurable } from "@/lib/rate-limit-durable";
 import {
   isSharePlatform,
   SHARE_PLATFORMS,
@@ -59,6 +61,38 @@ async function regeneratePlatformDraft(input: {
 
   await upsertPlatformDraft(input.patchNoteId, draft);
   return draft;
+}
+
+function regenerateRateLimitResponse(rate: {
+  retryAfterSeconds?: number;
+  remaining: number;
+  limit: number;
+}) {
+  const retry = rate.retryAfterSeconds ?? 60;
+  return Response.json(
+    {
+      error: `Draft regeneration limit reached (${rate.limit}/hour). Try again in ${retry} seconds.`,
+      remaining: rate.remaining,
+      limit: rate.limit,
+      retryAfterSeconds: retry,
+    },
+    { status: 429 },
+  );
+}
+
+async function assertRegenerateQuota(userId: string, increment: number) {
+  const rate = await checkRateLimitDurable(
+    `regenerate:${userId}`,
+    RATE_LIMITS.REGENERATE_PER_USER_HOUR,
+    RATE_LIMITS.REGENERATE_WINDOW_MS,
+    increment,
+  );
+
+  if (!rate.allowed) {
+    return regenerateRateLimitResponse(rate);
+  }
+
+  return null;
 }
 
 export async function GET(_request: Request, { params }: RouteContext) {
@@ -234,6 +268,12 @@ export async function POST(request: Request, { params }: RouteContext) {
       return Response.json({ error: "No valid platforms." }, { status: 400 });
     }
 
+    const quotaError = await assertRegenerateQuota(
+      session.user.id,
+      platforms.length,
+    );
+    if (quotaError) return quotaError;
+
     try {
       const drafts = [];
       for (const platform of platforms) {
@@ -272,6 +312,9 @@ export async function POST(request: Request, { params }: RouteContext) {
   if (!platform) {
     return Response.json({ error: "Invalid platform." }, { status: 400 });
   }
+
+  const quotaError = await assertRegenerateQuota(session.user.id, 1);
+  if (quotaError) return quotaError;
 
   try {
     const draft = await regeneratePlatformDraft({

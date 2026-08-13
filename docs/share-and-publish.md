@@ -95,7 +95,7 @@ Roadmap already lists Discord publish and a Discord / Slack bot as later GTM. Fo
 
 ### Layer A: Site-integrated webhook (ship first)
 
-- User pastes an **incoming webhook URL** (or creates one via Discord channel settings) and stores it encrypted per workspace/user.
+- User pastes an **incoming webhook URL** (or creates one via Discord channel settings) and stores it on their profile (`discord_webhook_url` in Supabase; **plaintext at rest** today).
 - Easy Patch POSTs content (and optional embed) now or at `scheduled_at`.
 - Scheduling: Vercel Cron or queue table polled by a cron route (Discord has **no** native schedule API).
 - Pros: simple, no bot invite friction, fits Vercel. Cons: one channel per webhook; no slash commands.

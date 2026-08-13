@@ -1,18 +1,19 @@
 import { getAiProvider } from "@/lib/ai/model";
 import { runGeneration } from "@/lib/generation/run-generation";
 import { parseGenerationRequest } from "@/lib/generation/parse-request";
+import { RATE_LIMITS } from "@/lib/rate-limit-config";
 import {
-  checkRateLimit,
-  getRequestIp,
-  peekRateLimit,
-} from "@/lib/rate-limit";
+  checkRateLimitDurable,
+  peekRateLimitDurable,
+} from "@/lib/rate-limit-durable";
+import { getRequestIp } from "@/lib/rate-limit";
 
-const DEMO_LIMIT = 3;
-const DEMO_WINDOW_MS = 60 * 60 * 1000;
+const DEMO_LIMIT = RATE_LIMITS.DEMO_PER_IP_HOUR;
+const DEMO_WINDOW_MS = RATE_LIMITS.DEMO_WINDOW_MS;
 
 export async function GET(request: Request) {
   const ip = getRequestIp(request);
-  const status = peekRateLimit(`demo:${ip}`, DEMO_LIMIT);
+  const status = await peekRateLimitDurable(`demo:${ip}`, DEMO_LIMIT);
   return Response.json({
     limit: status.limit,
     remaining: status.remaining,
@@ -22,7 +23,11 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const ip = getRequestIp(request);
-  const rate = checkRateLimit(`demo:${ip}`, DEMO_LIMIT, DEMO_WINDOW_MS);
+  const rate = await checkRateLimitDurable(
+    `demo:${ip}`,
+    DEMO_LIMIT,
+    DEMO_WINDOW_MS,
+  );
 
   if (!rate.allowed) {
     return Response.json(
