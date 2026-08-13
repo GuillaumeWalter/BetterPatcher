@@ -4,6 +4,7 @@ import {
   createGenerationStream,
   normalizeGenerationOutput,
 } from "@/lib/generation/run-generation";
+import { resolveTicketsForGeneration } from "@/lib/generation/resolve-tickets";
 import { parseGenerationRequest } from "@/lib/generation/parse-request";
 import { getAiProvider } from "@/lib/ai/model";
 import {
@@ -82,11 +83,18 @@ export async function POST(request: Request) {
   const encoder = new TextEncoder();
 
   try {
+    const { ticketContext, resolution } = await resolveTicketsForGeneration({
+      userId: session.user.id,
+      commits,
+      plan: consumed.plan,
+    });
+
     const result = createGenerationStream({
       commits,
       tone,
       options,
       referencePatch,
+      ticketContext,
     });
 
     const stream = new ReadableStream({
@@ -164,6 +172,7 @@ export async function POST(request: Request) {
                   savedId,
                   quota: updatedQuota,
                   generationsRemaining: consumed.generationsRemaining,
+                  tickets: resolution,
                 },
               }) + "\n",
             ),

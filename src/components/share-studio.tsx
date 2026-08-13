@@ -427,7 +427,7 @@ export function ShareStudio({
               onClick={() => void copyActive()}
             >
               {copied ? <Check /> : <Copy />}
-              {copied ? "Copied" : "Copy draft"}
+              {copied ? "Copied" : activePlatform === "steam" ? "Copy for Steamworks" : "Copy draft"}
             </Button>
             {discordEnabled && activePlatform === "discord" ? (
               <Button

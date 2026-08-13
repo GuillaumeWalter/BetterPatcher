@@ -120,13 +120,25 @@ ${reference}
 """`;
 }
 
+function buildTicketContextBlock(ticketContext: string | null | undefined): string {
+  const block = ticketContext?.trim();
+  if (!block) return "";
+
+  return `Referenced work items (Linear / Jira keys found in commits):
+Use these titles only to clarify user-facing impact. Do not invent scope beyond commits + tickets.
+
+${block}`;
+}
+
 export function getSystemPrompt(
   tone: Tone,
   options: GenerationOptions,
   platforms: SharePlatform[] = defaultPlatformsForTone(tone),
   referencePatch?: string | null,
+  ticketContext?: string | null,
 ): string {
   const referenceBlock = buildReferenceBlock(referencePatch);
+  const ticketBlock = buildTicketContextBlock(ticketContext);
 
   return `${BASE_RULES}
 
@@ -135,19 +147,20 @@ ${TONE_PROMPTS[tone]}
 ${buildOptionsBlock(options)}
 
 ${buildPlatformDraftsBlock(platforms)}
-${referenceBlock ? `\n${referenceBlock}` : ""}`;
+${referenceBlock ? `\n${referenceBlock}` : ""}${ticketBlock ? `\n\n${ticketBlock}` : ""}`;
 }
 
 export function getUserPrompt(
   commits: string,
   tone: Tone,
   referencePatch?: string | null,
+  ticketContext?: string | null,
 ): string {
   const hasReference = Boolean(referencePatch?.trim());
+  const hasTickets = Boolean(ticketContext?.trim());
 
   return `Turn the following commit messages into a ${tone} patch note.
-${hasReference ? "Match the style of the style reference from the system instructions.\n" : ""}
-Requirements:
+${hasReference ? "Match the style of the style reference from the system instructions.\n" : ""}${hasTickets ? "Use the referenced work items from the system instructions when they help explain user-facing changes.\n" : ""}Requirements:
 - Deduplicate and group related changes.
 - Ignore noise commits.
 - Produce markdown, socialPost, and platformDrafts per the system instructions.

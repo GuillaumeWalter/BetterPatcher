@@ -9,7 +9,7 @@
 
 ## 0. Code en prod (2 min)
 
-v0.4.x est sur **`master`** (mergé). Il reste à merger la branche `cursor/discord-bot-polish-8b37` quand elle est prête (bot Discord + checklist dashboard).
+Tout est sur **`master`** — Vercel redéploie à chaque push.
 
 - [ ] Vérifier que **Vercel a redéployé** → [Dashboard Vercel](https://vercel.com/dashboard) → ton projet → **Deployments** → dernier deploy ✅
 
@@ -31,6 +31,7 @@ v0.4.x est sur **`master`** (mergé). Il reste à merger la branche `cursor/disc
 | 6 | `integrations.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/integrations.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/integrations.sql) |
 | 7 | `go_live_gaps.sql` ⭐ | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/go_live_gaps.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/go_live_gaps.sql) |
 | 8 | `discord_bot.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/discord_bot.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/discord_bot.sql) |
+| 9 | `linear_token.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/linear_token.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/linear_token.sql) |
 
 > ⭐ `go_live_gaps.sql` = team seats, repos favoris, quota partagé Pro.
 
@@ -80,6 +81,8 @@ v0.4.x est sur **`master`** (mergé). Il reste à merger la branche `cursor/disc
 | `SENTRY_DSN` | [sentry.io](https://sentry.io) → projet Next.js → Client Keys (DSN) |
 | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | [plausible.io](https://plausible.io) → ton domaine |
 | `GITHUB_WEBHOOK_SECRET` | Si tu actives le webhook GitHub Release (étape 5) |
+| `AUTH_LINEAR_ID` / `AUTH_LINEAR_SECRET` | [Linear OAuth](https://linear.app/settings/api) · [docs/linear.md](./linear.md) |
+| `DISCORD_BOT_TOKEN` + `DISCORD_APPLICATION_ID` + `DISCORD_PUBLIC_KEY` | [docs/discord-bot.md](./discord-bot.md) |
 
 **Liste complète :** [`.env.example`](../.env.example) · [docs/env-setup.md](./env-setup.md)
 
@@ -139,7 +142,8 @@ Dans l’app une fois connecté :
 | Action | Où dans l’app | Lien externe |
 |--------|---------------|--------------|
 | Release auto GitHub | [Dashboard → Settings](https://TON-DOMAINE/dashboard/settings) | [GitHub repo → Webhooks](https://github.com/settings/hooks) — event **Releases** |
-| Discord publish | Même page Settings | [Discord → channel → Integrations → Webhook](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) |
+| Discord publish | Settings ou bot `/easypatch link` | [docs/discord-bot.md](./discord-bot.md) |
+| Linear tickets | Generator → Connect Linear | [docs/linear.md](./linear.md) |
 | Team Pro (invites) | Settings → **Pro team seats** | — |
 | Supprimer compte RGPD | Settings → **Delete account** | — |
 

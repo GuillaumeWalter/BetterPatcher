@@ -13,6 +13,7 @@ export type GenerationInput = {
   tone: Tone;
   options: GenerationOptions;
   referencePatch?: string | null;
+  ticketContext?: string | null;
 };
 
 export async function runGeneration(
@@ -27,11 +28,13 @@ export async function runGeneration(
       input.options,
       platforms,
       input.referencePatch || null,
+      input.ticketContext || null,
     ),
     prompt: getUserPrompt(
       input.commits,
       input.tone,
       input.referencePatch || null,
+      input.ticketContext || null,
     ),
     output: Output.object({ schema: generationSchema }),
   });
@@ -59,11 +62,13 @@ export function createGenerationStream(input: GenerationInput) {
       input.options,
       platforms,
       input.referencePatch || null,
+      input.ticketContext || null,
     ),
     prompt: getUserPrompt(
       input.commits,
       input.tone,
       input.referencePatch || null,
+      input.ticketContext || null,
     ),
   });
 }

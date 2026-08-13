@@ -207,8 +207,8 @@ export default async function Home() {
         <h2 className="text-xl font-semibold">Where do your commits live?</h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Import from GitHub or GitLab, or paste a Perforce, Plastic (Unity
-          Version Control), SVN, or any other VCS log. Jira / Linear ticket
-          enrichment is coming next for every subscriber.
+          Version Control), SVN, or any other VCS log. **Solo + Pro:** connect
+          Linear to enrich patch notes with ticket titles from commit keys.
         </p>
       </section>
     </div>

@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { BILLING } from "@/lib/billing/constants";
 import { runGeneration, normalizeGenerationOutput } from "@/lib/generation/run-generation";
+import { resolveTicketsForGeneration } from "@/lib/generation/resolve-tickets";
 import { parseGenerationRequest } from "@/lib/generation/parse-request";
 import { getAiProvider } from "@/lib/ai/model";
 import {
@@ -79,11 +80,18 @@ export async function POST(request: Request) {
   }
 
   try {
+    const { ticketContext, resolution } = await resolveTicketsForGeneration({
+      userId: session.user.id,
+      commits,
+      plan: consumed.plan,
+    });
+
     const output = await runGeneration({
       commits,
       tone,
       options,
       referencePatch,
+      ticketContext,
     });
 
     if (!output) {
@@ -142,6 +150,7 @@ export async function POST(request: Request) {
       savedId,
       quota: updatedQuota,
       generationsRemaining: consumed.generationsRemaining,
+      tickets: resolution,
     });
   } catch (error) {
     await refundGeneration(session.user.id, consumed.plan);
