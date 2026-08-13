@@ -21,6 +21,8 @@ describe("buildQuotaSnapshot", () => {
     discordWebhookUrl: null,
     workspaceOwnerId: null,
     favoriteRepos: [],
+    discordGuildId: null,
+    discordChannelId: null,
   };
 
   it("blocks generation when past_due", () => {

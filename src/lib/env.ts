@@ -113,3 +113,15 @@ export function listConfiguredStripePriceIds(): {
 export function getSentryDsn(): string | undefined {
   return readEnv("SENTRY_DSN", "NEXT_PUBLIC_SENTRY_DSN");
 }
+
+export function getDiscordBotToken(): string | undefined {
+  return readEnv("DISCORD_BOT_TOKEN");
+}
+
+export function getDiscordApplicationId(): string | undefined {
+  return readEnv("DISCORD_APPLICATION_ID");
+}
+
+export function getDiscordPublicKey(): string | undefined {
+  return readEnv("DISCORD_PUBLIC_KEY");
+}

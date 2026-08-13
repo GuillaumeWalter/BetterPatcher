@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Loader2, Save } from "lucide-react";
 
+import { DiscordBotSettings } from "@/components/discord-bot-settings";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -125,7 +127,20 @@ export function IntegrationSettings({ repos }: IntegrationSettingsProps) {
 
       <Card className="surface-card gradient-border">
         <CardHeader>
-          <CardTitle className="text-lg">Discord webhook</CardTitle>
+          <CardTitle className="text-lg">Discord bot (recommended)</CardTitle>
+          <CardDescription>
+            Invite the Easy Patch bot and link a channel with a slash command.
+            Falls back to webhook below if the bot is not configured.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <DiscordBotSettings />
+        </CardContent>
+      </Card>
+
+      <Card className="surface-card gradient-border">
+        <CardHeader>
+          <CardTitle className="text-lg">Discord webhook (fallback)</CardTitle>
           <CardDescription>
             Post Share Studio drafts to a Discord channel from the generator.
           </CardDescription>

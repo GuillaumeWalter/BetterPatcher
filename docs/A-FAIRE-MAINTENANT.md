@@ -7,13 +7,11 @@
 
 ---
 
-## 0. Code en prod (2 min) — si pas déjà fait
+## 0. Code en prod (2 min)
 
-Le gros du travail est sur la branche `cursor/go-live-gaps-8b37` (emails, team seats, suppression compte, Sentry, PWA, etc.).
+v0.4.x est sur **`master`** (mergé). Il reste à merger la branche `cursor/discord-bot-polish-8b37` quand elle est prête (bot Discord + checklist dashboard).
 
-- [ ] **Merger sur `master`** → [Comparer & merger la PR](https://github.com/GuillaumeWalter/BetterPatcher/compare/master...cursor/go-live-gaps-8b37)  
-  *(ou merge manuel sur GitHub)*
-- [ ] Vérifier que **Vercel a redéployé** → [Dashboard Vercel](https://vercel.com/dashboard) → ton projet → onglet **Deployments** → dernier deploy ✅
+- [ ] Vérifier que **Vercel a redéployé** → [Dashboard Vercel](https://vercel.com/dashboard) → ton projet → **Deployments** → dernier deploy ✅
 
 ---
 
@@ -30,8 +28,9 @@ Le gros du travail est sur la branche `cursor/go-live-gaps-8b37` (emails, team s
 | 3 | `platform_drafts.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/platform_drafts.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/platform_drafts.sql) |
 | 4 | `plan_tiers.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/plan_tiers.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/plan_tiers.sql) |
 | 5 | `gitlab_token.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/gitlab_token.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/gitlab_token.sql) |
-| 6 | `integrations.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/cursor/go-live-gaps-8b37/supabase/integrations.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/cursor/go-live-gaps-8b37/supabase/integrations.sql) |
-| 7 | `go_live_gaps.sql` ⭐ | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/cursor/go-live-gaps-8b37/supabase/go_live_gaps.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/cursor/go-live-gaps-8b37/supabase/go_live_gaps.sql) |
+| 6 | `integrations.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/integrations.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/integrations.sql) |
+| 7 | `go_live_gaps.sql` ⭐ | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/go_live_gaps.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/go_live_gaps.sql) |
+| 8 | `discord_bot.sql` | [GitHub](https://github.com/GuillaumeWalter/BetterPatcher/blob/master/supabase/discord_bot.sql) · [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/discord_bot.sql) |
 
 > ⭐ `go_live_gaps.sql` = team seats, repos favoris, quota partagé Pro.
 

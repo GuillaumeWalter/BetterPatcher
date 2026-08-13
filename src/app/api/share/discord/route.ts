@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { postDiscordBotMessage } from "@/lib/discord/bot";
 import { getUserProfile } from "@/lib/supabase/users";
 
 const DISCORD_WEBHOOK_PATTERN =
@@ -37,13 +38,21 @@ export async function POST(request: Request) {
   }
 
   const profile = await getUserProfile(session.user.id);
+
+  if (profile?.discordChannelId) {
+    const result = await postDiscordBotMessage(profile.discordChannelId, content);
+    if (result.ok) {
+      return Response.json({ success: true, via: "bot" });
+    }
+  }
+
   const webhookUrl = profile?.discordWebhookUrl;
 
   if (!webhookUrl || !DISCORD_WEBHOOK_PATTERN.test(webhookUrl)) {
     return Response.json(
       {
         error:
-          "Add a Discord webhook in Settings before publishing.",
+          "Link the Discord bot or add a webhook in Settings before publishing.",
       },
       { status: 400 },
     );
@@ -64,5 +73,5 @@ export async function POST(request: Request) {
     );
   }
 
-  return Response.json({ success: true });
+  return Response.json({ success: true, via: "webhook" });
 }

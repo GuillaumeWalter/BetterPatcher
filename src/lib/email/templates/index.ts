@@ -272,3 +272,22 @@ export function waitlistConfirmationEmail() {
     }),
   };
 }
+
+export function teamInviteEmail(input: {
+  ownerEmail: string;
+  inviteeEmail: string;
+}) {
+  return {
+    subject: "You've been invited to an Easy Patch Pro team",
+    html: emailLayout({
+      preheader: "Join your team's shared patch note quota.",
+      body: `
+        <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">Team invite</p>
+        <p style="margin:0 0 12px;"><strong>${input.ownerEmail}</strong> invited you to their Easy Patch Pro team.</p>
+        <p style="margin:0 0 12px;">Sign in with GitHub using <strong>${input.inviteeEmail}</strong> to join automatically and share the team's monthly generation quota.</p>
+        ${ctaButton("Accept invite", appUrl("/login"))}
+        <p style="margin:20px 0 0;font-size:13px;color:#8a7f72;">No extra charge — you're covered by the team owner's Pro plan.</p>
+      `,
+    }),
+  };
+}

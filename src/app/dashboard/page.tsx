@@ -3,6 +3,7 @@ import { ArrowRight, History, Sparkles, Wand2 } from "lucide-react";
 
 import { BillingQuotaBanner } from "@/components/billing-quota-banner";
 import { DashboardNav } from "@/components/dashboard-nav";
+import { SetupChecklist } from "@/components/setup-checklist";
 import { BILLING } from "@/lib/billing/constants";
 import { getLocalizedBillingLabels } from "@/lib/billing/localized-labels";
 import { getUserQuota } from "@/lib/supabase/users";
@@ -27,6 +28,7 @@ export default async function DashboardPage() {
       <BillingQuotaBanner />
 
       <div className="grid gap-4 sm:grid-cols-2">
+      <SetupChecklist />
         <Card className="surface-card gradient-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">

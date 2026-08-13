@@ -1,5 +1,11 @@
 import { auth } from "@/auth";
 import { getAiProvider } from "@/lib/ai/model";
+import {
+  getDiscordApplicationId,
+  getDiscordBotToken,
+  getSentryDsn,
+} from "@/lib/env";
+import { isEmailConfigured } from "@/lib/email";
 
 /** Signed-in diagnostic: which variables are present (not their values). */
 export async function GET() {
@@ -30,6 +36,12 @@ export async function GET() {
       STRIPE_WEBHOOK_SECRET: Boolean(process.env.STRIPE_WEBHOOK_SECRET?.trim()),
       STRIPE_SOLO_PRICE_ID: Boolean(process.env.STRIPE_SOLO_PRICE_ID?.trim()),
       STRIPE_PRO_PRICE_ID: Boolean(process.env.STRIPE_PRO_PRICE_ID?.trim()),
+      STRIPE_SOLO_ANNUAL_PRICE_ID: Boolean(
+        process.env.STRIPE_SOLO_ANNUAL_PRICE_ID?.trim(),
+      ),
+      STRIPE_PRO_ANNUAL_PRICE_ID: Boolean(
+        process.env.STRIPE_PRO_ANNUAL_PRICE_ID?.trim(),
+      ),
       STRIPE_SOLO_PRICE_ID_USD: Boolean(
         process.env.STRIPE_SOLO_PRICE_ID_USD?.trim(),
       ),
@@ -60,6 +72,18 @@ export async function GET() {
       SUPABASE_SERVICE_ROLE_KEY: Boolean(
         process.env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
       ),
+    },
+    email: {
+      RESEND_API_KEY: isEmailConfigured(),
+      RESEND_FROM_EMAIL: Boolean(process.env.RESEND_FROM_EMAIL?.trim()),
+    },
+    ops: {
+      CRON_SECRET: Boolean(process.env.CRON_SECRET?.trim()),
+      SENTRY_DSN: Boolean(getSentryDsn()),
+      DISCORD_BOT_TOKEN: Boolean(getDiscordBotToken()),
+      DISCORD_APPLICATION_ID: Boolean(getDiscordApplicationId()),
+      DISCORD_PUBLIC_KEY: Boolean(process.env.DISCORD_PUBLIC_KEY?.trim()),
+      GITHUB_WEBHOOK_SECRET: Boolean(process.env.GITHUB_WEBHOOK_SECRET?.trim()),
     },
   });
 }

@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { sendTeamInviteEmail } from "@/lib/email";
 import {
   getTeamSnapshot,
   inviteTeamMember,
@@ -6,6 +7,7 @@ import {
   removeTeamMember,
   revokeTeamInvite,
 } from "@/lib/supabase/team";
+import { getUserProfile } from "@/lib/supabase/users";
 
 function jsonError(message: string, status: number) {
   return Response.json({ error: message }, { status });
@@ -64,6 +66,16 @@ export async function POST(request: Request) {
     if (!result.ok) {
       return jsonError(ERROR_MESSAGES[result.error] ?? "Invite failed.", 400);
     }
+
+    const owner = await getUserProfile(session.user.id);
+    if (owner?.email) {
+      await sendTeamInviteEmail({
+        to: email.trim().toLowerCase(),
+        ownerEmail: owner.email,
+        ownerUserId: session.user.id,
+      });
+    }
+
     return Response.json({ ok: true });
   }
 

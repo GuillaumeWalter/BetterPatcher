@@ -6,6 +6,16 @@ export type ChangelogRelease = {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: "0.4.1",
+    date: "August 2026",
+    items: [
+      "Discord bot — slash /easypatch link + channel posting",
+      "Dashboard setup checklist (env-check widget)",
+      "Team invite email when Pro owner invites a teammate",
+      "Docs: discord-bot.md + register-commands script",
+    ],
+  },
+  {
     version: "0.4.0",
     date: "August 2026",
     items: [

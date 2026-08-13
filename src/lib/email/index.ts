@@ -15,6 +15,7 @@ import {
   upgradeToProEmail,
   waitlistConfirmationEmail,
   welcomeEmail,
+  teamInviteEmail,
 } from "@/lib/email/templates";
 
 type UserEmailContext = {
@@ -251,6 +252,23 @@ export async function sendWaitlistConfirmationEmail(to: string) {
     subject,
     html,
     idempotencyKey: `waitlist-${to}`,
+  });
+}
+
+export async function sendTeamInviteEmail(input: {
+  to: string;
+  ownerEmail: string;
+  ownerUserId: string;
+}) {
+  const { subject, html } = teamInviteEmail({
+    ownerEmail: input.ownerEmail,
+    inviteeEmail: input.to,
+  });
+  return sendEmail({
+    to: input.to,
+    subject,
+    html,
+    idempotencyKey: `${input.ownerUserId}-team-invite-${input.to}`,
   });
 }
 

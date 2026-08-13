@@ -57,6 +57,8 @@ export type UserBillingProfile = {
   discordWebhookUrl: string | null;
   workspaceOwnerId: string | null;
   favoriteRepos: string[];
+  discordGuildId: string | null;
+  discordChannelId: string | null;
 };
 
 export type QuotaSnapshot = {

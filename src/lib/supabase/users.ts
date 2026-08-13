@@ -30,6 +30,8 @@ type UserProfileRow = {
   discord_webhook_url: string | null;
   workspace_owner_id: string | null;
   favorite_repos: string[] | null;
+  discord_guild_id: string | null;
+  discord_channel_id: string | null;
 };
 
 function mapPlanTier(value: PlanTier | null | undefined): PlanTier {
@@ -57,6 +59,8 @@ function mapProfile(row: UserProfileRow): UserBillingProfile {
     discordWebhookUrl: row.discord_webhook_url,
     workspaceOwnerId: row.workspace_owner_id,
     favoriteRepos: row.favorite_repos ?? [],
+    discordGuildId: row.discord_guild_id,
+    discordChannelId: row.discord_channel_id,
   };
 }
 
