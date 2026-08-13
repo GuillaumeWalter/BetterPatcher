@@ -30,6 +30,8 @@ export async function GET() {
       AUTH_GITHUB_SECRET: Boolean(process.env.AUTH_GITHUB_SECRET?.trim()),
       AUTH_GITLAB_ID: Boolean(process.env.AUTH_GITLAB_ID?.trim()),
       AUTH_GITLAB_SECRET: Boolean(process.env.AUTH_GITLAB_SECRET?.trim()),
+      AUTH_LINEAR_ID: Boolean(process.env.AUTH_LINEAR_ID?.trim()),
+      AUTH_LINEAR_SECRET: Boolean(process.env.AUTH_LINEAR_SECRET?.trim()),
     },
     stripe: {
       STRIPE_SECRET_KEY: Boolean(process.env.STRIPE_SECRET_KEY?.trim()),

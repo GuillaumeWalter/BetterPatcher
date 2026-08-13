@@ -6,6 +6,7 @@ import { Loader2, Wand2 } from "lucide-react";
 
 import { GitHubCommitImport } from "@/components/github-commit-import";
 import { GitLabCommitImport } from "@/components/gitlab-commit-import";
+import { TicketEnrichmentPanel } from "@/components/ticket-enrichment-panel";
 import { GenerationSkeleton } from "@/components/generation-skeleton";
 import { ShareStudio } from "@/components/share-studio";
 import { useBillingQuota } from "@/components/billing-quota-banner";
@@ -297,6 +298,11 @@ export function PatchNoteGenerator({
                 className="min-h-52 resize-y font-mono text-sm"
               />
             </div>
+
+            <TicketEnrichmentPanel
+              commits={commits}
+              isAuthenticated={isAuthenticated}
+            />
 
             <div className="space-y-2">
               <Label htmlFor="tone">Tone</Label>

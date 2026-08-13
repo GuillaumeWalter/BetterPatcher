@@ -32,6 +32,7 @@ type UserProfileRow = {
   favorite_repos: string[] | null;
   discord_guild_id: string | null;
   discord_channel_id: string | null;
+  linear_access_token: string | null;
 };
 
 function mapPlanTier(value: PlanTier | null | undefined): PlanTier {
@@ -519,6 +520,49 @@ export async function updateUserIntegrations(
 
   if (error) {
     console.error("[updateUserIntegrations]", error);
+    return false;
+  }
+
+  return true;
+}
+
+export async function getLinearAccessToken(
+  userId: string,
+): Promise<string | null> {
+  const supabase = createSupabaseAdmin();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select("linear_access_token")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("[getLinearAccessToken]", error);
+    return null;
+  }
+
+  const token = data?.linear_access_token;
+  return typeof token === "string" && token.length > 0 ? token : null;
+}
+
+export async function setLinearAccessToken(
+  userId: string,
+  token: string | null,
+): Promise<boolean> {
+  const supabase = createSupabaseAdmin();
+  if (!supabase) return false;
+
+  await ensureUserProfile({ userId, email: null });
+
+  const { error } = await supabase
+    .from("user_profiles")
+    .update({ linear_access_token: token })
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("[setLinearAccessToken]", error);
     return false;
   }
 

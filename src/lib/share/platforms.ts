@@ -125,7 +125,7 @@ export function getPlatformWritingRules(platforms: SharePlatform[]): string {
     facebook:
       "Facebook: Mid-length community post, clear benefit, optional question CTA. Link OK.",
     steam:
-      "Steam News / Patch Notes: Fill title with a clear update title. Body: plain bullets for New / Balance / Fixes / QoL as content warrants (paste-ready for Steamworks). No hashtags.",
+      "Steam News / Patch Notes (Steamworks paste format): Title field = clear update name (e.g. Patch 1.4 — Balance & Fixes). Body: short player-facing intro, then plain-text sections **New**, **Balance**, **Fixes**, **Quality of life** with hyphen bullets. No hashtags. No BBCode unless commits clearly use it. Ready to paste into Steamworks Events & Announcements.",
     slack:
       "Slack: 2 to 4 lines, professional and direct. What shipped and why it matters for the team.",
   };

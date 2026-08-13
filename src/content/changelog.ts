@@ -6,6 +6,15 @@ export type ChangelogRelease = {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: "0.5.0",
+    date: "August 2026",
+    items: [
+      "Linear OAuth — auto-enrich patch notes from ticket keys in commits",
+      "Ticket preview panel in generator (Solo + Pro)",
+      "Steamworks-oriented Steam draft rules in Share Studio",
+    ],
+  },
+  {
     version: "0.4.1",
     date: "August 2026",
     items: [
