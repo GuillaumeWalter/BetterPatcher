@@ -13,7 +13,7 @@ Coche mentalement — **pas besoin de recommencer** :
 
 | Zone | Statut |
 |------|--------|
-| Supabase SQL de base (profiles, patch_notes, drafts, plan_tiers, gitlab, integrations, go_live_gaps, discord_bot, linear_token) | ✅ Fait par toi |
+| Supabase SQL de base + `rate_limits.sql` + `scheduled_posts.sql` | ✅ Fait |
 | Vercel env vars core (`AUTH_*`, `SUPABASE_*`, `STRIPE_*`, `GOOGLE_GENERATIVE_AI_API_KEY`, `NEXT_PUBLIC_APP_URL`, GitLab) | ✅ En place (screenshot juillet) |
 | GitHub OAuth callback | ✅ (si login marche, c’est bon) |
 | Stripe Products Solo/Pro + webhook secret sur Vercel | ✅ En place |
@@ -22,40 +22,32 @@ Coche mentalement — **pas besoin de recommencer** :
 
 ---
 
-## 🎯 Ce qui reste — à faire une seule fois
+## 🎯 Ce qui reste
 
-### 1. SQL **nouveau** depuis v0.6 / v0.7 (2 min)
+### 1. ~~SQL nouveau~~ — ✅ déjà fait
 
-**Uniquement si pas encore exécuté** — pas les 11 scripts, juste ceux-ci :
+`rate_limits.sql` et `scheduled_posts.sql` : **OK, ne plus toucher.**
 
-| Fichier | Pourquoi | Lien Raw |
-|---------|----------|----------|
-| `rate_limits.sql` | Anti-abus demo + regenerate | [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/rate_limits.sql) |
-| `scheduled_posts.sql` | Discord schedule (v0.7) | [Raw](https://raw.githubusercontent.com/GuillaumeWalter/BetterPatcher/master/supabase/scheduled_posts.sql) |
+### 2. Vercel — vars **optionnelles** (où les obtenir)
 
-→ [Supabase SQL Editor](https://supabase.com/dashboard/project/_/sql/new) · Run · si « already exists », c’est OK.
+Guide détaillé : **[docs/ou-obtenir-les-cles.md](./ou-obtenir-les-cles.md)** ← liens directs + commandes
 
-- [ ] `rate_limits.sql` exécuté
-- [ ] `scheduled_posts.sql` exécuté
+| Variable | Tu la crées où ? | En 1 ligne |
+|----------|------------------|------------|
+| **`CRON_SECRET`** | **Toi** — terminal : `openssl rand -hex 32` | Pas de site · colle sur Vercel |
+| **`RESEND_API_KEY`** | [resend.com/api-keys](https://resend.com/api-keys) | Create API Key → `re_…` |
+| **`RESEND_FROM_EMAIL`** | [resend.com/domains](https://resend.com/domains) | Après vérif domaine, ex. `Easy Patch <hello@…>` |
+| **`STRIPE_*_ANNUAL_*`** | [Stripe Products](https://dashboard.stripe.com/products) | Prices yearly → `price_…` |
+| **`SENTRY_DSN`** | [sentry.io](https://sentry.io) → projet Next.js → DSN | |
+| **`AUTH_LINEAR_*`** | [linear.app/settings/api](https://linear.app/settings/api) | OAuth app |
+| **`DISCORD_BOT_*`** | [Discord Developer Portal](https://discord.com/developers/applications) | Bot token + App ID + Public Key |
 
-### 2. Vercel — **seulement ce qui manque peut‑être**
+**Coller sur Vercel :** [Settings → Environment Variables](https://vercel.com/dashboard) → Production + Preview → **Redeploy**.
 
-Tu as déjà le core. Vérifie **uniquement** ces vars **si** la feature t’intéresse :
+- [ ] `CRON_SECRET` *(si schedule Discord ou cron emails)*
+- [ ] Resend *(si emails auto)*
 
-| Variable | Obligatoire ? | Si absent, quoi ? |
-|----------|---------------|-------------------|
-| `CRON_SECRET` | Pour schedule Discord + email trial inactif | Schedule Discord ne part pas · cron trial KO |
-| `RESEND_API_KEY` + `RESEND_FROM_EMAIL` | Non (emails auto) | Pas d’emails bienvenue / billing |
-| `STRIPE_SOLO_ANNUAL_PRICE_ID` / `STRIPE_PRO_ANNUAL_PRICE_ID` | Non | Toggle Annual dans billing sans checkout |
-| `SENTRY_DSN` | Non | Pas de monitoring erreurs |
-| `AUTH_LINEAR_ID` / `AUTH_LINEAR_SECRET` | Non | Linear connect KO |
-| `DISCORD_BOT_*` (×3) | Non | Bot Discord KO (webhook fallback OK) |
-
-- [ ] `CRON_SECRET` ajouté *(si tu veux schedule + cron emails)*
-- [ ] Resend configuré *(si tu veux les emails)*
-
-**Vérifier en prod (connecté)** : `https://TON-DOMAINE/api/env-check`  
-Le widget **Setup checklist** sur le dashboard te dit ce qui manque encore — **sans refaire toute la config**.
+**Vérifier ce qui manque :** dashboard → widget **Setup checklist** ou `https://TON-DOMAINE/api/env-check`
 
 ### 3. Stripe — une fois
 
