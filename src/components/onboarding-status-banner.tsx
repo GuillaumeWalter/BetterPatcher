@@ -21,7 +21,7 @@ export function OnboardingStatusBanner({ setup }: OnboardingStatusBannerProps) {
       if (response.ok) {
         const data = (await response.json()) as { paymentMethodVerified?: boolean };
         if (data.paymentMethodVerified) {
-          router.push("/dashboard/generate");
+          router.push("/dashboard/generate?welcome=1");
           router.refresh();
           return;
         }

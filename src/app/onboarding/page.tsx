@@ -77,6 +77,14 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
 
           <StripeSetupButton />
 
+          {setup === "success" ? (
+            <Button className="w-full" asChild>
+              <Link href="/dashboard/generate?welcome=1">
+                Continue to generator
+              </Link>
+            </Button>
+          ) : null}
+
           <Button variant="ghost" className="w-full" asChild>
             <Link href="/">Back to home</Link>
           </Button>

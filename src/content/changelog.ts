@@ -6,6 +6,17 @@ export type ChangelogRelease = {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: "0.6.0",
+    date: "August 2026",
+    items: [
+      "Guided onboarding — 4-step quick start after trial activation",
+      "Pro team shared history (view + copy teammates' patch notes)",
+      "Share Studio — Regenerate all platform drafts in one click",
+      "Generator — Load sample commits for instant first try",
+      "Core product docs updated (roadmap, SCORE-10-10, ProjectContext)",
+    ],
+  },
+  {
     version: "0.5.0",
     date: "August 2026",
     items: [

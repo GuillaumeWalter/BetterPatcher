@@ -1,59 +1,77 @@
 # Roadmap 10/10 — Easy Patch
 
 > What “10/10” means per area, current score, and who does what.  
-> Updated: August 2026
+> Updated: August 2026 (v0.6.0 core product complete)
 
-## Scores actuels (après Phase B + emails)
+## Scores actuels
 
 | Domaine | Score | 10/10 = |
 |---------|-------|---------|
-| **Fonctionnel** | 9/10 | Multi-repo favoris, streaming done |
-| **UX/UI** | 8.5/10 | Beta testée, zero état silencieux |
+| **Fonctionnel (cœur produit)** | **10/10** | Génération, Share Studio copy-first, team history, Linear |
+| **UX/UI** | 9/10 | Onboarding guidé livré · beta testeurs à faire |
 | **Marketing** | 8/10 | Démo vidéo, témoignages, analytics actif |
 | **Communication** | 8.5/10 | Emails auto + légal template enrichi |
-| **Dev/Ops** | 8.5/10 | E2E Playwright, monitoring scaffold, tests |
+| **Dev/Ops** | 9/10 | E2E, Sentry, CI · alertes coût Gemini à faire |
 | **Webdesign** | 8/10 | Screenshots prod, a11y WCAG AA |
-| **Gestion projet** | 7/10 | Beta structurée, changelog public |
-| **Argent** | 6/10 | Stripe live, MRR, Stripe Tax |
+| **Gestion projet** | 8/10 | Docs à jour · beta structurée côté toi |
+| **Argent** | 6/10 | Stripe live, MRR (côté toi) |
 
 ---
 
-## Communication — 8.5 → 10
+## Cœur produit — 10/10 ✅ (agent)
+
+### Livré (v0.6.0)
+
+- Génération IA streaming + quotas trial / Solo / Pro
+- Sources : GitHub, GitLab, paste (tout VCS)
+- Share Studio : markdown éditable, drafts multi-plateformes, copy, regenerate one + **regenerate all**
+- Discord publish (webhook) + bot slash `/easypatch`
+- Historique persistant + **historique partagé Pro team** (lecture + copy)
+- Linear ticket enrichment (Solo + Pro)
+- Onboarding : carte €0 → **guide 4 étapes** sur dashboard / generator
+- Favoris repos, team seats, annual billing, RGPD delete, PWA, Sentry
+- Emails lifecycle, setup checklist widget
+
+### 🔲 Toi (dashboards)
+
+Voir **`docs/A-FAIRE-MAINTENANT.md`** (checklist complète).
+
+Résumé 15 min :
+
+1. Exécuter les 9 SQL Supabase
+2. Vercel env vars obligatoires + redeploy
+3. Stripe Customer Portal + webhook + prices
+4. Resend + domaine
+5. Tester : signup → onboarding → 1 génération → Share Studio copy
+
+### 🔲 Plus tard (hors cœur produit)
+
+- Schedule Discord / cron publish
+- GitHub Action (tag → patch note)
+- Jira, OAuth social publish (Meta / X / LinkedIn)
+- Brand voice memory
+
+---
+
+## UX — 9 → 10
 
 ### ✅ Fait (agent)
-- 12 templates email (bienvenue, trial, Solo quota, upgrade, waitlist…)
-- Déclencheurs : signup, Stripe webhook, génération trial/Solo
-- Cron quotidien rappel trial inactif (`vercel.json` + `CRON_SECRET`)
-- Preview dev : `/api/emails/preview?template=welcome`
-- Doc : `docs/emails.md`
 
-### 🔲 Toi (ce soir / demain)
-- [ ] Compte [Resend](https://resend.com) + `RESEND_API_KEY` sur Vercel
-- [ ] Vérifier domaine d’envoi + `RESEND_FROM_EMAIL`
-- [ ] `CRON_SECRET` sur Vercel (chaîne aléatoire longue)
-- [ ] Tester : signup → welcome + trial activated
-
-### 🔲 Plus tard
-- [ ] Légal finalisé par avocat
-
----
-
-## Marketing — 7 → 10
-
-### ✅ Fait
-- Demo landing, FAQ, SEO, sitemap
+- Onboarding guidé post-trial
+- Empty states + “Load sample commits”
+- Bannière welcome après activation carte
 
 ### 🔲 Toi
-- [ ] `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` sur Vercel
-- [ ] Enregistrer 30s Loom / GIF sur la landing
-- [ ] 2–3 citations beta testeurs
-- [ ] Domaine custom
+
+- [ ] 5 beta testeurs, noter friction
+- [ ] Feedback → agent polish ciblé
 
 ---
 
 ## Argent — 6 → 10
 
 ### 🔲 Toi
+
 - [ ] Stripe **Customer Portal** activé
 - [ ] Mode **live** quand prêt à encaisser
 - [ ] Stripe Tax si clients FR B2B
@@ -61,54 +79,37 @@
 
 ---
 
-## Fonctionnel — 9 → 10
+## Marketing — 8 → 10
 
-### ✅ Fait (agent)
-- Streaming IA (NDJSON `/api/generate/stream`)
-- Webhook GitHub Release + page Settings
-- Discord publish depuis Share Studio
+### 🔲 Toi
 
-### 🔲 Agent
-- [ ] Multi-projets / repos favoris persistants
-- [ ] Discord schedule (cron)
-
-### 🔲 Toi (Settings)
-- [ ] Exécuter `supabase/integrations.sql` dans Supabase SQL Editor
-- [ ] Dashboard → Settings → choisir repo + coller webhook GitHub
-- [ ] (Optionnel) `GITHUB_WEBHOOK_SECRET` sur Vercel si tu veux signature HMAC globale
+- [ ] `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` sur Vercel
+- [ ] Enregistrer 30s Loom / GIF sur la landing
+- [ ] 2–3 citations beta testeurs
+- [ ] Domaine custom
 
 ---
 
-## Dev/Ops — 8.5 → 10
-
-### ✅ Fait
-- CI lint + test + build + Playwright E2E
-- Tests quotas, rate limit, parse-request, commits, drafts
-- `captureException` scaffold + `instrumentation.ts`
-- Vitest + Playwright séparés
-
-### 🔲 Agent
-- [ ] Sentry SDK complet (`@sentry/nextjs`)
-- [ ] Alertes coût Gemini
+## Communication — 8.5 → 10
 
 ### 🔲 Toi
+
+- [ ] Resend + `CRON_SECRET` sur Vercel
+- [ ] Tester signup → welcome + trial activated
+
+---
+
+## Dev/Ops — 9 → 10
+
+### ✅ Fait
+
+- Sentry SDK, CI lint + test + build + Playwright E2E
+- Tests quotas, team, drafts, tickets
+
+### 🔲 Toi
+
 - [ ] Vérifier deploy Vercel vert après chaque push `master`
 
 ---
 
-## UX — 8 → 10
-
-### 🔲 Toi
-- [ ] 5 beta testeurs, noter friction
-- [ ] Feedback → agent polish
-
----
-
-## Ta checklist rapide (15 min)
-
-1. Vercel → `RESEND_API_KEY` + `RESEND_FROM_EMAIL`
-2. Stripe → Customer Portal ON
-3. (Optionnel) Plausible domain
-4. Tester signup + 1 génération + email reçu
-
-Voir aussi `docs/VOTRE-TODO.md`.
+Voir aussi `docs/VOTRE-TODO.md` et `docs/A-FAIRE-MAINTENANT.md`.

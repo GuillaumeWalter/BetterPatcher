@@ -30,6 +30,8 @@ type PatchNoteDetailProps = {
   platformDrafts: PlatformDraft[];
   createdAt: string;
   updatedAt: string;
+  readOnly?: boolean;
+  authorEmail?: string | null;
 };
 
 function toneLabel(tone: Tone) {
@@ -53,6 +55,8 @@ export function PatchNoteDetail({
   platformDrafts: initialDrafts,
   createdAt,
   updatedAt,
+  readOnly = false,
+  authorEmail,
 }: PatchNoteDetailProps) {
   const [markdown, setMarkdown] = useState(initialMarkdown);
   const [socialPost, setSocialPost] = useState(initialSocialPost);
@@ -101,6 +105,7 @@ export function PatchNoteDetail({
           <p className="text-sm text-muted-foreground">
             {toneLabel(tone)}
             {repoFullName ? ` · ${repoFullName}` : ""}
+            {readOnly && authorEmail ? ` · by ${authorEmail}` : ""}
           </p>
           <p className="text-xs text-muted-foreground">
             Created {formatDate(createdAt)}
@@ -132,16 +137,23 @@ export function PatchNoteDetail({
 
       <ShareStudio
         tone={tone}
-        patchNoteId={id}
+        patchNoteId={readOnly ? null : id}
         markdown={markdown}
         socialPost={socialPost}
         initialDrafts={drafts}
-        onMarkdownChange={setMarkdown}
-        onSocialPostChange={setSocialPost}
-        onSaveMarkdown={handleSaveMarkdown}
-        markdownDirty={markdown !== baselineMarkdown}
+        onMarkdownChange={readOnly ? undefined : setMarkdown}
+        onSocialPostChange={readOnly ? undefined : setSocialPost}
+        onSaveMarkdown={readOnly ? undefined : handleSaveMarkdown}
+        markdownDirty={!readOnly && markdown !== baselineMarkdown}
         isSavingMarkdown={isSaving}
+        readOnly={readOnly}
       />
+
+      {readOnly ? (
+        <p className="mt-4 text-sm text-muted-foreground">
+          Team view only — copy drafts or ask the author to edit.
+        </p>
+      ) : null}
 
       {error ? (
         <p className="mt-4 text-sm text-destructive" role="alert">

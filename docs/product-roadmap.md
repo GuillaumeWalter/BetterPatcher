@@ -54,72 +54,55 @@ Create a GitLab OAuth Application (gitlab.com → Applications):
 
 | Source | Status |
 |--------|--------|
-| GitHub (OAuth + repo/commit import) | **Current** (also login) |
-| Manual paste (Perforce, Plastic / Unity Version Control, SVN, any text log) | **Current** |
-| GitLab (import) | **Current** (OAuth link · Solo + Pro + Trial) |
-| Jira / Linear (ticket titles into notes) | Phase 2 | Solo + Pro |
+| GitHub (OAuth + repo/commit import) | **Shipped** |
+| Manual paste (Perforce, Plastic, SVN, any text log) | **Shipped** |
+| GitLab (import) | **Shipped** |
+| Linear (ticket titles into notes) | **Shipped** (Solo + Pro) |
+| Jira | Phase 3 |
 | Bitbucket | Later |
-| Trello | Nice to have |
-| Native Perforce / Plastic API | Not planned (paste is enough) |
 
 ## Pro differentiator (team)
 
-Workspaces / seats: invite teammates to one company account, shared history and quota. **Copy and pricing are ready**; real seats come later.
+Workspaces / seats: invite teammates, **shared quota and shared history** (read + copy). Owners edit; members view team notes.
 
-## Backlog
+## Backlog (post-core)
 
-- Team seats / workspaces (Pro)
-- Jira / Linear ticket titles in patch notes (open decisions: `docs/open-questions.md`)
-- Auto-generate on tag / GitHub Release
+- Discord schedule (cron publish)
+- GitHub Action (tag/release → patch note)
+- Jira ticket enrichment
 - Brand voice / studio tone memory
 - Multi-language patch notes
-- **Share & publish** (see `docs/share-and-publish.md`): Share Studio · per-platform drafts · Discord webhook then bot · schedule · Steam News format · Meta / X / LinkedIn OAuth later
-- Annual plan (15% off)
-- Bitbucket
-- Trello (nice to have)
+- Social OAuth publish (Meta / X / LinkedIn) — see `docs/share-and-publish.md`
+- Bitbucket, Trello
 
-Ops checklists: `docs/env-setup.md` · open product questions: `docs/open-questions.md`.
+Ops checklists: `docs/A-FAIRE-MAINTENANT.md` · `docs/env-setup.md`
 
 ## Phases
 
-### Phase 0 (done)
+### Phase 0–1 (done)
 
-- Product doc + AGENTS pointer
-- Trial / Solo / Pro (quotas + dual Stripe prices)
-- Remove Beta messaging
-- Source copy (Perforce / Plastic / SVN + GitLab / Jira teaser, not Pro-gated)
-- Rebrand to Easy Patch
+Trial / Solo / Pro, GitLab, English UI, Vercel hosting
 
-### Phase 0.5 (done)
+### Phase 2 (done — core product)
 
-- Full English UI
-- Copywriting rules (no dash punctuation · middle dot `·` allowed)
-- Vercel hosting · Stripe / Supabase ops for Solo / Pro
+- Linear ticket enrichment
+- **Share Studio P0** : editable markdown, per-platform drafts, copy, regenerate, Discord publish
+- Guided onboarding, team shared history, regenerate all drafts
 
-### Phase 1 (done)
+### Phase 2.5 (next)
 
-- GitLab import (OAuth connect linked to existing account · last 30 commits)
-
-### Phase 2 (next)
-
-- Jira or Linear (ticket enrichment) | Solo + Pro
-- **Share Studio P0** (parallel track OK): editable markdown + per-platform social drafts + copy (Discord · X · LinkedIn · Threads · Instagram · Steam · Slack). Detail: `docs/share-and-publish.md`
-
-### Phase 2.5
-
-- Discord webhook publish + schedule (Share Studio P1)
-- Dedicated Steam News copy format (no Steam write API)
+- Discord schedule (Share Studio P1)
+- GitHub Action auto-generate on release
 
 ### Phase 3
 
-- Workspaces / multi-user invites (real Pro differentiator)
-- Discord bot (channel map · slash helpers)
-- Bitbucket, auto-release, annual, etc.
+- Jira
+- Social OAuth publish where APIs allow
+- Brand voice memory
 
 ### Phase 4
 
-- Social OAuth publish where APIs allow (Meta FB/IG/Threads · LinkedIn · X with cost/BYOK decision)
-- Media uploads for platform rules (Instagram requires media)
+- Bitbucket, Raycast extension, Product Hunt GTM
 
 ## GTM (later)
 

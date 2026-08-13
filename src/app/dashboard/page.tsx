@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { ArrowRight, History, Sparkles, Wand2 } from "lucide-react";
 
+import { auth } from "@/auth";
 import { BillingQuotaBanner } from "@/components/billing-quota-banner";
 import { DashboardNav } from "@/components/dashboard-nav";
+import { GuidedOnboarding } from "@/components/guided-onboarding";
 import { SetupChecklist } from "@/components/setup-checklist";
 import { BILLING } from "@/lib/billing/constants";
 import { getLocalizedBillingLabels } from "@/lib/billing/localized-labels";
+import { countPatchNotesForUser } from "@/lib/supabase/patch-notes";
 import { getUserQuota } from "@/lib/supabase/users";
-import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,12 +22,21 @@ import {
 export default async function DashboardPage() {
   const session = await auth();
   const quota = session?.user?.id ? await getUserQuota(session.user.id) : null;
+  const generationCount = session?.user?.id
+    ? await countPatchNotesForUser(session.user.id)
+    : 0;
+  const hasGenerated =
+    generationCount > 0 || (quota?.generationsUsed ?? 0) > 0;
   const { soloPriceLabel, proPriceLabel } = await getLocalizedBillingLabels();
 
   return (
     <>
       <DashboardNav />
       <BillingQuotaBanner />
+      <GuidedOnboarding
+        hasGenerated={hasGenerated}
+        variant="dashboard"
+      />
 
       <div className="grid gap-4 sm:grid-cols-2">
       <SetupChecklist />

@@ -2,7 +2,7 @@
 
 Product design for post-generation sharing: edit → adapt per platform → publish or schedule.
 
-**Status:** P0 in progress (Share Studio UI + per-platform drafts + regenerate/copy). Publish / schedule not shipped yet.  
+**Status:** P0 **shipped** (Share Studio UI + per-platform drafts + regenerate/copy + Discord publish). P1 schedule + social OAuth not shipped yet.  
 **UI language:** English. **Hosting:** Vercel.
 
 ---
@@ -194,15 +194,16 @@ Migrate: on first open of Share Studio, seed drafts from existing `social_post` 
 
 ## Phased delivery
 
-### P0 | Share Studio foundations (high value, low API risk)
+### P0 | Share Studio foundations ✅ (shipped v0.6)
 
-**Shipped in code** (run `supabase/platform_drafts.sql` on the Easy Patch Supabase project):
+**In production code** (run `supabase/platform_drafts.sql` on the Easy Patch Supabase project):
 
 - Editable markdown after generate and in history
 - Multi-platform draft generation (defaults by tone; all platforms selectable)
-- Per-draft edit + regenerate (no quota hit) + copy
+- Per-draft edit + regenerate one + **regenerate all** (no quota hit) + copy
+- Discord webhook publish now
 - Persist `platform_drafts`; keep `social_post` as primary social for history
-- Markdown live preview: deferred (plain textarea for now)
+- Pro team: shared history (read + copy drafts)
 
 ### P1 | Discord publish + schedule
 

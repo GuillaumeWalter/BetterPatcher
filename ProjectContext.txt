@@ -2,31 +2,46 @@
 
 ## Vision
 
-SaaS that turns commits (and later tickets) into structured patch notes and ready-to-publish social posts for indies, studios, live ops, and eng / product marketers.
+SaaS that turns commits (and ticket keys) into structured patch notes and ready-to-publish social drafts for indies, studios, live ops, and eng / product marketers.
 
 ## Stack
 
 - Next.js App Router + TypeScript + Tailwind + shadcn/ui
-- Auth.js (GitHub login) · optional GitLab OAuth link for import
-- Stripe (trial card verification + Solo / Pro subscriptions)
-- Supabase (profiles, quotas, patch note history, GitLab tokens)
-- Vercel AI SDK (Gemini / AI Gateway)
-- Hosting: Vercel
+- Auth.js (GitHub login) · GitLab OAuth · Linear OAuth
+- Stripe (trial card verification + Solo / Pro subscriptions, annual)
+- Supabase (profiles, quotas, patch notes, platform drafts, team seats)
+- Vercel AI SDK (Gemini)
+- Hosting: Vercel · Netlify-ready docs in agent skills
 
 ## Pricing (summary)
 
 - Trial: €0, card required, 5 one-time generations
 - Solo: €4.99 / month, 25 generations, 1 user
-- Pro: €9.99 / month, 80 generations, team seats (copy ready; real invites later)
+- Pro: €9.99 / month, 80 generations, team seats (invites + shared quota + shared history)
 
-## Current sources
+## Core product (v0.6 — complete)
 
-GitHub import · GitLab import · manual paste
+- AI patch note generation (streaming)
+- Share Studio: edit markdown, per-platform drafts, copy, regenerate one/all
+- Discord webhook publish + Discord bot
+- GitHub / GitLab import, manual paste
+- Linear ticket title enrichment
+- Guided onboarding after trial activation
+- History (personal + Pro team read/copy)
+- Billing, emails, RGPD delete, PWA, Sentry
 
-## Next
+## Next (post-core)
 
-Jira / Linear enrichment (Phase 2). Decisions: docs/open-questions.md
+- Discord schedule (cron)
+- GitHub Action on release/tag
+- Jira integration
+- Social OAuth publish (Meta, X, LinkedIn)
+- Brand voice memory
 
 ## Copy rules
 
 English only. No dash punctuation in prose. Prefer `:`, `( )`, `/`, `|`, `·`. See docs/copywriting.md.
+
+## User setup
+
+All dashboard tasks: docs/A-FAIRE-MAINTENANT.md

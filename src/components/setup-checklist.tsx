@@ -45,6 +45,7 @@ const CHECKS: CheckItem[] = [
   { key: "CRON_SECRET", label: "Cron secret", group: "ops", required: false },
   { key: "SENTRY_DSN", label: "Sentry DSN", group: "ops", required: false },
   { key: "DISCORD_BOT_TOKEN", label: "Discord bot token", group: "ops", required: false },
+  { key: "AUTH_LINEAR_ID", label: "Linear OAuth ID", group: "ops", required: false },
 ];
 
 export function SetupChecklist() {

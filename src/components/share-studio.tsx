@@ -37,6 +37,7 @@ type ShareStudioProps = {
   onSaveMarkdown?: () => Promise<void> | void;
   markdownDirty?: boolean;
   isSavingMarkdown?: boolean;
+  readOnly?: boolean;
 };
 
 export function ShareStudio({
@@ -51,6 +52,7 @@ export function ShareStudio({
   onSaveMarkdown,
   markdownDirty = false,
   isSavingMarkdown = false,
+  readOnly = false,
 }: ShareStudioProps) {
   const [discordEnabled, setDiscordEnabled] = useState(false);
   const defaultPlatforms = useMemo(
@@ -73,6 +75,7 @@ export function ShareStudio({
   );
   const [copied, setCopied] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [isRegeneratingAll, setIsRegeneratingAll] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [draftSaved, setDraftSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -193,6 +196,45 @@ export function ShareStudio({
       setError(err instanceof Error ? err.message : "Save failed.");
     } finally {
       setIsSavingDraft(false);
+    }
+  }
+
+  async function regenerateAll() {
+    if (!patchNoteId) {
+      setError("Save the patch note first to regenerate platform drafts.");
+      return;
+    }
+    setIsRegeneratingAll(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/patch-notes/${patchNoteId}/drafts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "regenerate_all",
+          platforms: selected,
+          instruction: instruction || undefined,
+        }),
+      });
+      const data = (await response.json()) as {
+        drafts?: PlatformDraft[];
+        error?: string;
+      };
+      if (!response.ok || !data.drafts?.length) {
+        throw new Error(data.error ?? "Could not regenerate drafts.");
+      }
+      updateDrafts(data.drafts);
+      const primary = data.drafts.find(
+        (draft) => draft.platform === defaultPlatforms[0],
+      );
+      if (primary) {
+        onSocialPostChange?.(primary.body);
+      }
+      setDraftSaved(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Regenerate all failed.");
+    } finally {
+      setIsRegeneratingAll(false);
     }
   }
 
@@ -325,7 +367,7 @@ export function ShareStudio({
           <CardTitle className="text-lg">Share Studio</CardTitle>
           <CardDescription>
             Platform drafts shaped for how each channel is used · copy when ready
-            (publish and schedule come next)
+            {readOnly ? " (read-only team view)" : ""}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -442,7 +484,7 @@ export function ShareStudio({
                 {discordPublished ? "Posted!" : "Post to Discord"}
               </Button>
             ) : null}
-            {patchNoteId ? (
+            {patchNoteId && !readOnly ? (
               <>
                 <Button
                   variant="outline"
@@ -474,7 +516,31 @@ export function ShareStudio({
                     </>
                   )}
                 </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={
+                    isRegeneratingAll || !markdown || selected.length === 0
+                  }
+                  onClick={() => void regenerateAll()}
+                >
+                  {isRegeneratingAll ? (
+                    <>
+                      <Loader2 className="animate-spin" />
+                      Regenerating all…
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw />
+                      Regenerate all ({selected.length})
+                    </>
+                  )}
+                </Button>
               </>
+            ) : patchNoteId && readOnly ? (
+              <p className="text-xs text-muted-foreground">
+                Copy drafts from this team note. Editing requires the author.
+              </p>
             ) : (
               <p className="text-xs text-muted-foreground">
                 Open from history (or generate while signed in) to save and

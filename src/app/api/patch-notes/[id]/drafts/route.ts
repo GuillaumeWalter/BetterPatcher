@@ -8,15 +8,58 @@ import {
   DEFAULT_GENERATION_OPTIONS,
   parseGenerationOptions,
 } from "@/lib/constants";
-import { isSharePlatform, type SharePlatform } from "@/lib/share/platforms";
+import {
+  isSharePlatform,
+  SHARE_PLATFORMS,
+  type SharePlatform,
+} from "@/lib/share/platforms";
 import { getPatchNoteForUser } from "@/lib/supabase/patch-notes";
 import {
   listPlatformDraftsForPatchNote,
   updatePlatformDraftBody,
   upsertPlatformDraft,
 } from "@/lib/supabase/platform-drafts";
+import type { PatchNoteRow } from "@/lib/supabase/patch-notes";
 
 type RouteContext = { params: Promise<{ id: string }> };
+
+async function regeneratePlatformDraft(input: {
+  note: PatchNoteRow;
+  patchNoteId: string;
+  platform: SharePlatform;
+  instruction: string;
+  options: ReturnType<typeof parseGenerationOptions>;
+}) {
+  const { output } = await generateText({
+    model: getGenerationModel(),
+    system: getPlatformRegeneratePrompt(
+      input.note.tone,
+      input.platform,
+      input.options,
+    ),
+    prompt: [
+      `Patch note markdown:\n\n${input.note.markdown}`,
+      input.instruction
+        ? `\nUser instruction for this rewrite:\n${input.instruction}`
+        : "",
+      `\nRewrite the draft for platform: ${input.platform}.`,
+    ].join(""),
+    output: Output.object({ schema: singlePlatformDraftSchema }),
+  });
+
+  if (!output?.body?.trim()) {
+    throw new Error(`Regeneration returned an empty draft for ${input.platform}.`);
+  }
+
+  const draft = {
+    platform: input.platform,
+    title: output.title?.trim() ?? "",
+    body: output.body.trim(),
+  };
+
+  await upsertPlatformDraft(input.patchNoteId, draft);
+  return draft;
+}
 
 export async function GET(_request: Request, { params }: RouteContext) {
   const session = await auth();
@@ -46,6 +89,13 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   const note = await getPatchNoteForUser(session.user.id, id);
   if (!note) {
     return Response.json({ error: "Patch note not found." }, { status: 404 });
+  }
+
+  if (note.user_id !== session.user.id) {
+    return Response.json(
+      { error: "Only the author can edit drafts." },
+      { status: 403 },
+    );
   }
 
   let body: unknown;
@@ -121,6 +171,13 @@ export async function POST(request: Request, { params }: RouteContext) {
     return Response.json({ error: "Patch note not found." }, { status: 404 });
   }
 
+  if (note.user_id !== session.user.id) {
+    return Response.json(
+      { error: "Only the author can edit drafts." },
+      { status: 403 },
+    );
+  }
+
   if (!getAiProvider()) {
     return Response.json(
       {
@@ -138,12 +195,12 @@ export async function POST(request: Request, { params }: RouteContext) {
     return Response.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const platform: SharePlatform | null =
+  const action =
     typeof body === "object" &&
     body !== null &&
-    "platform" in body &&
-    isSharePlatform(body.platform)
-      ? body.platform
+    "action" in body &&
+    typeof body.action === "string"
+      ? body.action
       : null;
 
   const instruction =
@@ -159,44 +216,82 @@ export async function POST(request: Request, { params }: RouteContext) {
       ? parseGenerationOptions(body.options)
       : DEFAULT_GENERATION_OPTIONS;
 
+  if (action === "regenerate_all") {
+    const rawPlatforms =
+      typeof body === "object" &&
+      body !== null &&
+      "platforms" in body &&
+      Array.isArray(body.platforms)
+        ? body.platforms
+        : [...SHARE_PLATFORMS];
+
+    const platforms = rawPlatforms.filter(
+      (value): value is SharePlatform =>
+        typeof value === "string" && isSharePlatform(value),
+    );
+
+    if (platforms.length === 0) {
+      return Response.json({ error: "No valid platforms." }, { status: 400 });
+    }
+
+    try {
+      const drafts = [];
+      for (const platform of platforms) {
+        const draft = await regeneratePlatformDraft({
+          note,
+          patchNoteId: id,
+          platform,
+          instruction,
+          options,
+        });
+        drafts.push(draft);
+      }
+      return Response.json({ drafts });
+    } catch (error) {
+      console.error("[/api/patch-notes/:id/drafts POST regenerate_all]", error);
+      return Response.json(
+        {
+          error:
+            error instanceof Error
+              ? error.message
+              : "Could not regenerate all drafts.",
+        },
+        { status: 500 },
+      );
+    }
+  }
+
+  const platform: SharePlatform | null =
+    typeof body === "object" &&
+    body !== null &&
+    "platform" in body &&
+    isSharePlatform(body.platform)
+      ? body.platform
+      : null;
+
   if (!platform) {
     return Response.json({ error: "Invalid platform." }, { status: 400 });
   }
 
   try {
-    const { output } = await generateText({
-      model: getGenerationModel(),
-      system: getPlatformRegeneratePrompt(note.tone, platform, options),
-      prompt: [
-        `Patch note markdown:\n\n${note.markdown}`,
-        instruction
-          ? `\nUser instruction for this rewrite:\n${instruction}`
-          : "",
-        `\nRewrite the draft for platform: ${platform}.`,
-      ].join(""),
-      output: Output.object({ schema: singlePlatformDraftSchema }),
-    });
-
-    if (!output?.body?.trim()) {
-      return Response.json(
-        { error: "Regeneration returned an empty draft." },
-        { status: 502 },
-      );
-    }
-
-    const draft = {
+    const draft = await regeneratePlatformDraft({
+      note,
+      patchNoteId: id,
       platform,
-      title: output.title?.trim() ?? "",
-      body: output.body.trim(),
-    };
-
-    await upsertPlatformDraft(id, draft);
+      instruction,
+      options,
+    });
 
     return Response.json({ draft });
   } catch (error) {
     console.error("[/api/patch-notes/:id/drafts POST]", error);
     return Response.json(
-      { error: "Could not regenerate this draft." },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Could not regenerate this draft.",
+      },
       { status: 500 },
     );
   }

@@ -42,7 +42,8 @@ export default async function HistoryPage() {
           <CardHeader>
             <CardTitle className="text-lg">No history yet</CardTitle>
             <CardDescription>
-              Generate a patch note while signed in to see it appear here.
+              Generate a patch note while signed in to see it appear here. Pro
+              teams share history across seats.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -50,7 +51,7 @@ export default async function HistoryPage() {
               href="/dashboard/generate"
               className="text-sm font-medium text-primary underline-offset-4 hover:underline"
             >
-              Open the generator
+              Open the generator →
             </Link>
           </CardContent>
         </Card>
@@ -66,6 +67,9 @@ export default async function HistoryPage() {
                         {note.repoFullName ?? "Pasted commits"}
                       </CardTitle>
                       <Badge variant="secondary">{toneLabel(note.tone)}</Badge>
+                      {!note.isOwn && note.authorEmail ? (
+                        <Badge variant="outline">Team · {note.authorEmail}</Badge>
+                      ) : null}
                     </div>
                     <CardDescription>{formatDate(note.createdAt)}</CardDescription>
                   </CardHeader>

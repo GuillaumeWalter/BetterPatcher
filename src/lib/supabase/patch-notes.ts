@@ -1,5 +1,6 @@
 import { createSupabaseAdmin } from "@/lib/supabase/server";
 import type { Tone } from "@/lib/constants";
+import { resolveHistoryUserIds } from "@/lib/supabase/history-access";
 
 export type PatchNoteRow = {
   id: string;
@@ -21,6 +22,8 @@ export type PatchNoteSummary = {
   markdownPreview: string;
   createdAt: string;
   updatedAt: string;
+  authorEmail: string | null;
+  isOwn: boolean;
 };
 
 type SavePatchNoteInput = {
@@ -67,10 +70,14 @@ export async function listPatchNotesForUser(
   const supabase = createSupabaseAdmin();
   if (!supabase) return [];
 
+  const userIds = await resolveHistoryUserIds(userId);
+
   const { data, error } = await supabase
     .from("patch_notes")
-    .select("id, tone, repo_full_name, markdown, created_at, updated_at")
-    .eq("user_id", userId)
+    .select(
+      "id, user_id, user_email, tone, repo_full_name, markdown, created_at, updated_at",
+    )
+    .in("user_id", userIds)
     .order("created_at", { ascending: false })
     .limit(50);
 
@@ -86,7 +93,28 @@ export async function listPatchNotesForUser(
     markdownPreview: row.markdown.slice(0, 120),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    authorEmail: row.user_email ?? null,
+    isOwn: row.user_id === userId,
   }));
+}
+
+export async function countPatchNotesForUser(userId: string): Promise<number> {
+  const supabase = createSupabaseAdmin();
+  if (!supabase) return 0;
+
+  const userIds = await resolveHistoryUserIds(userId);
+
+  const { count, error } = await supabase
+    .from("patch_notes")
+    .select("id", { count: "exact", head: true })
+    .in("user_id", userIds);
+
+  if (error) {
+    console.error("[countPatchNotesForUser]", error);
+    return 0;
+  }
+
+  return count ?? 0;
 }
 
 export async function getPatchNoteForUser(
@@ -96,11 +124,13 @@ export async function getPatchNoteForUser(
   const supabase = createSupabaseAdmin();
   if (!supabase) return null;
 
+  const userIds = await resolveHistoryUserIds(userId);
+
   const { data, error } = await supabase
     .from("patch_notes")
     .select("*")
     .eq("id", id)
-    .eq("user_id", userId)
+    .in("user_id", userIds)
     .single();
 
   if (error) {
@@ -118,6 +148,11 @@ export async function updatePatchNoteForUser(
 ): Promise<boolean> {
   const supabase = createSupabaseAdmin();
   if (!supabase) return false;
+
+  const note = await getPatchNoteForUser(userId, id);
+  if (!note || note.user_id !== userId) {
+    return false;
+  }
 
   const payload: Record<string, string> = {};
   if (updates.markdown !== undefined) payload.markdown = updates.markdown;

@@ -24,6 +24,7 @@ export default async function HistoryDetailPage({
     notFound();
   }
 
+  const readOnly = note.user_id !== session.user.id;
   const platformDrafts = await listPlatformDraftsForPatchNote(id);
 
   return (
@@ -37,6 +38,8 @@ export default async function HistoryDetailPage({
       platformDrafts={platformDrafts}
       createdAt={note.created_at}
       updatedAt={note.updated_at}
+      readOnly={readOnly}
+      authorEmail={note.user_email}
     />
   );
 }

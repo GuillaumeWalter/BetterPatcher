@@ -7,6 +7,29 @@ test.describe("public pages", () => {
     await expect(page.getByText("Try it free")).toBeVisible();
   });
 
+  test("landing demo generator accepts commits", async ({ page }) => {
+    await page.goto("/");
+    await page
+      .getByLabel("Paste commits")
+      .fill("feat(ui): add onboarding checklist\nfix: typo in billing banner");
+    await expect(page.getByRole("button", { name: /Generate/i })).toBeEnabled();
+  });
+
+  test("login page loads", async ({ page }) => {
+    await page.goto("/login");
+    await expect(page.getByText("Sign in with GitHub")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /Continue with GitHub/i }),
+    ).toBeVisible();
+  });
+
+  test("onboarding redirects unauthenticated users to login", async ({
+    page,
+  }) => {
+    await page.goto("/onboarding");
+    await expect(page).toHaveURL(/\/login/);
+  });
+
   test("faq page loads", async ({ page }) => {
     await page.goto("/faq");
     await expect(page.getByRole("heading", { name: "FAQ" })).toBeVisible();

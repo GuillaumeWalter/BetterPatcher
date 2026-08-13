@@ -5,6 +5,8 @@
 
 **Repo :** [GuillaumeWalter/BetterPatcher](https://github.com/GuillaumeWalter/BetterPatcher)
 
+**État code (v0.6.0) :** le **cœur produit est terminé** côté agent (génération, Share Studio, onboarding guidé, team history, Linear, Discord). Il te reste surtout les **dashboards** (Supabase, Vercel, Stripe, Resend) + **beta testeurs** avant le marketing payant.
+
 ---
 
 ## 0. Code en prod (2 min)
@@ -156,17 +158,31 @@ Webhook URL release (affichée dans Settings) :
 
 Remplace `TON-DOMAINE` par ton URL Vercel.
 
-- [ ] [Landing](https://TON-DOMAINE/) → **Try free** (demo sans compte)  
+- [ ] [Landing](https://TON-DOMAINE/) → **Try free** (demo sans compte) → **Load sample commits** si besoin  
 - [ ] [Login GitHub](https://TON-DOMAINE/login) → onboarding carte €0  
-- [ ] [Générer](https://TON-DOMAINE/dashboard/generate) une patch note  
+- [ ] Après carte : **Continue to generator** → guide **Getting started** (4 étapes) visible  
+- [ ] [Générer](https://TON-DOMAINE/dashboard/generate) une patch note → Share Studio → **Copy draft** (Discord ou Steam)  
+- [ ] [History](https://TON-DOMAINE/dashboard/history) → note sauvegardée  
 - [ ] [Billing](https://TON-DOMAINE/dashboard/billing) → toggle Monthly/Annual → test checkout *(mode Test Stripe)*  
 - [ ] Email bienvenue reçu ?  
 - [ ] [Vérifier config](https://TON-DOMAINE/api/env-check) *(connecté)* — tout doit être `true` pour les vars obligatoires  
+- [ ] (Pro) Inviter un coéquipier → vérifier **historique partagé**  
+- [ ] (Optionnel) [Linear](https://TON-DOMAINE/dashboard/generate) → Connect Linear → commits avec clés `ENG-42`  
 - [ ] [FAQ](https://TON-DOMAINE/faq) · [Contact](https://TON-DOMAINE/contact) · [Privacy](https://TON-DOMAINE/legal/privacy)
 
 ---
 
-## 7. Avant lancement public FR (quand tu veux)
+## 7. Beta structurée (avant pub / ads)
+
+- [ ] Recruter **5 testeurs** (indie dev, live ops, ou marketer)  
+- [ ] Leur envoyer : lien prod + cette checklist section 6  
+- [ ] Leur demander de noter : onboarding carte, 1ère génération, Share Studio copy, billing  
+- [ ] Collecter 2–3 citations courtes pour la landing  
+- [ ] Remonter bugs / friction → issue GitHub ou message agent
+
+---
+
+## 8. Avant lancement public FR (quand tu veux)
 
 - [ ] Personnaliser [Terms](https://TON-DOMAINE/legal/terms) et [Privacy](https://TON-DOMAINE/legal/privacy) (nom société, adresse)  
 - [ ] Email `support@easypatch.app` → créer la boîte ou changer dans le code/footer  
@@ -215,8 +231,8 @@ Remplace `TON-DOMAINE` par ton URL Vercel.
 - [docs/env-setup.md](./env-setup.md) — toutes les env vars  
 - [docs/emails.md](./emails.md) — liste des emails auto  
 - [docs/VOTRE-TODO.md](./VOTRE-TODO.md) — version courte précédente  
-- [docs/SCORE-10-10.md](./SCORE-10-10.md) — audit go-live
+- [docs/SCORE-10-10.md](./SCORE-10-10.md) — audit go-live (cœur produit 10/10)
 
 ---
 
-*Dernière mise à jour : août 2026 — inclut v0.4.0 (team seats, RGPD, annual, Sentry, PWA).*
+*Dernière mise à jour : août 2026 — v0.6.0 (cœur produit 100 %, onboarding guidé, team history, regenerate all).*

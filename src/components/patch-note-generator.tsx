@@ -54,6 +54,11 @@ fix(api): resolve race condition on webhook delivery
 chore(deps): bump next.js to 16.2
 docs: update deployment guide`;
 
+export const SAMPLE_COMMITS = `feat(gameplay): add dodge roll with i-frames
+fix(netcode): reduce desync on high-latency clients
+balance(weapons): nerf shotgun spread at range
+chore: update anti-cheat SDK to 2.4.1`;
+
 type InputMode = "paste" | "github" | "gitlab";
 
 type PatchNoteGeneratorProps = {
@@ -282,13 +287,26 @@ export function PatchNoteGenerator({
             ) : null}
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <Label htmlFor="commits">Commit messages</Label>
-                {repoFullName ? (
-                  <span className="truncate text-xs text-muted-foreground">
-                    {repoFullName}
-                  </span>
-                ) : null}
+                <div className="flex items-center gap-2">
+                  {!commits.trim() ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => setCommits(SAMPLE_COMMITS)}
+                    >
+                      Load sample commits
+                    </Button>
+                  ) : null}
+                  {repoFullName ? (
+                    <span className="truncate text-xs text-muted-foreground">
+                      {repoFullName}
+                    </span>
+                  ) : null}
+                </div>
               </div>
               <Textarea
                 id="commits"
@@ -487,9 +505,16 @@ export function PatchNoteGenerator({
                 Studio to edit and copy
               </p>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                Your patch note and social drafts will land here after generation.
-              </p>
+              <div className="space-y-3 text-sm text-muted-foreground">
+                <p>
+                  Your patch note and social drafts will land here after
+                  generation.
+                </p>
+                <p className="text-xs">
+                  Tip: use <strong className="text-foreground">Load sample commits</strong> on
+                  the left if you want to try without importing a repo.
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>

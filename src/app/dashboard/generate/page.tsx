@@ -3,11 +3,13 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { BillingQuotaBanner } from "@/components/billing-quota-banner";
 import { DashboardNav } from "@/components/dashboard-nav";
+import { GuidedOnboarding } from "@/components/guided-onboarding";
 import { PatchNoteGenerator } from "@/components/patch-note-generator";
+import { countPatchNotesForUser } from "@/lib/supabase/patch-notes";
 import { getUserQuota } from "@/lib/supabase/users";
 
 type GeneratePageProps = {
-  searchParams: Promise<{ gitlab?: string; linear?: string }>;
+  searchParams: Promise<{ gitlab?: string; linear?: string; welcome?: string }>;
 };
 
 function oauthBanner(
@@ -50,13 +52,21 @@ export default async function GeneratePage({ searchParams }: GeneratePageProps) 
     redirect("/onboarding");
   }
 
-  const { gitlab, linear } = await searchParams;
+  const { gitlab, linear, welcome } = await searchParams;
   const banner = gitlabBanner(gitlab) ?? oauthBanner("Linear", linear);
+  const generationCount = await countPatchNotesForUser(session.user.id);
+  const hasGenerated =
+    generationCount > 0 || (quota?.generationsUsed ?? 0) > 0;
 
   return (
     <>
       <DashboardNav />
       <BillingQuotaBanner />
+      <GuidedOnboarding
+        welcome={welcome === "1"}
+        hasGenerated={hasGenerated}
+        variant="generate"
+      />
       {banner ? (
         <p className={`mb-6 rounded-xl border p-4 text-sm ${banner.className}`}>
           {banner.text}
