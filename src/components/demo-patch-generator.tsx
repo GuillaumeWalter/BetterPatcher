@@ -24,10 +24,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { TONE_OPTIONS, type Tone } from "@/lib/constants";
-
-const PLACEHOLDER = `feat(auth): add OAuth login
-fix(api): resolve webhook race
-docs: update changelog`;
+import {
+  SAMPLE_COMMITS,
+  SAMPLE_COMMITS_PLACEHOLDER,
+} from "@/lib/sample-commits";
 
 export function DemoPatchGenerator() {
   const [commits, setCommits] = useState("");
@@ -116,12 +116,25 @@ export function DemoPatchGenerator() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="demo-commits">Paste commits</Label>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Label htmlFor="demo-commits">Paste commits</Label>
+              {!commits.trim() ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={() => setCommits(SAMPLE_COMMITS)}
+                >
+                  Load sample commits
+                </Button>
+              ) : null}
+            </div>
             <Textarea
               id="demo-commits"
               value={commits}
               onChange={(e) => setCommits(e.target.value)}
-              placeholder={PLACEHOLDER}
+              placeholder={SAMPLE_COMMITS_PLACEHOLDER}
               className="min-h-40 font-mono text-sm"
             />
           </div>

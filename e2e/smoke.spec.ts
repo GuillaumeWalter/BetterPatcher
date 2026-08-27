@@ -9,6 +9,13 @@ test.describe("public pages", () => {
     ).toBeVisible();
   });
 
+  test("landing demo can load sample commits", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: /Load sample commits/i }).click();
+    await expect(page.getByLabel("Paste commits")).not.toHaveValue("");
+    await expect(page.getByRole("button", { name: /Generate/i })).toBeEnabled();
+  });
+
   test("landing demo generator accepts commits", async ({ page }) => {
     await page.goto("/");
     await page

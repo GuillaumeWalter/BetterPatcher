@@ -104,7 +104,8 @@ Trial / Solo / Pro, GitLab, English UI, Vercel hosting
 
 ### Phase 4
 
-- Bitbucket, Raycast extension, Product Hunt GTM
+- Bitbucket, Product Hunt GTM
+- CLI + Raycast: **scaffolded** (`cli/`, `extensions/raycast-easypatch/`, docs)
 
 ## GTM (later)
 

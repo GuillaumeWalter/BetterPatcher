@@ -66,7 +66,7 @@ export default async function GeneratePage({ searchParams }: GeneratePageProps) 
           Generate
         </h1>
         <p className="text-sm text-muted-foreground">
-          Paste a commit log or import from GitHub / GitLab, then generate.
+          Paste any commit log first. GitHub and GitLab import are optional.
         </p>
       </div>
       <AppNav />

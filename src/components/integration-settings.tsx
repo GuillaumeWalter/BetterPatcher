@@ -165,7 +165,25 @@ export function IntegrationSettings({ repos }: IntegrationSettingsProps) {
             </div>
           ) : null}
           <p className="text-xs text-muted-foreground">
-            Guide:{" "}
+            Same credentials power the{" "}
+            <a
+              href="https://github.com/GuillaumeWalter/BetterPatcher/blob/master/docs/cli.md"
+              className="text-primary underline-offset-4 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              CLI
+            </a>{" "}
+            and{" "}
+            <a
+              href="https://github.com/GuillaumeWalter/BetterPatcher/blob/master/docs/raycast.md"
+              className="text-primary underline-offset-4 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Raycast
+            </a>{" "}
+            extension (paste any log, no GitHub required). Guide:{" "}
             <a
               href="https://github.com/GuillaumeWalter/BetterPatcher/blob/master/docs/github-action.md"
               className="text-primary underline-offset-4 hover:underline"

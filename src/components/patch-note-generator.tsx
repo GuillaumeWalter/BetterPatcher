@@ -48,17 +48,13 @@ import {
   type GenerationOptions,
   type Tone,
 } from "@/lib/constants";
+import { SAMPLE_COMMITS } from "@/lib/sample-commits";
 import type { PlatformDraft } from "@/lib/share/platforms";
 
 const PLACEHOLDER_COMMITS = `feat(auth): add OAuth GitHub login
 fix(api): resolve race condition on webhook delivery
 chore(deps): bump next.js to 16.2
 docs: update deployment guide`;
-
-export const SAMPLE_COMMITS = `feat(gameplay): add dodge roll with i-frames
-fix(netcode): reduce desync on high-latency clients
-balance(weapons): nerf shotgun spread at range
-chore: update anti-cheat SDK to 2.4.1`;
 
 type InputMode = "paste" | "github" | "gitlab";
 
@@ -69,9 +65,7 @@ type PatchNoteGeneratorProps = {
 export function PatchNoteGenerator({
   isAuthenticated = false,
 }: PatchNoteGeneratorProps) {
-  const [inputMode, setInputMode] = useState<InputMode>(
-    isAuthenticated ? "github" : "paste",
-  );
+  const [inputMode, setInputMode] = useState<InputMode>("paste");
   const [commits, setCommits] = useState("");
   const [tone, setTone] = useState<Tone>("technical");
   const [options, setOptions] = useState<GenerationOptions>(
@@ -242,7 +236,8 @@ export function PatchNoteGenerator({
           <CardHeader>
             <CardTitle className="text-lg">Your commits</CardTitle>
             <CardDescription>
-              Import from GitHub / GitLab, or paste a log (Perforce, Plastic, SVN…)
+              Start by pasting any log (Perforce, Plastic, SVN…). GitHub and
+              GitLab import are optional.
               {quota ? (
                 <>
                   {" "}
@@ -308,9 +303,9 @@ export function PatchNoteGenerator({
                   {!commits.trim() ? (
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="secondary"
                       size="sm"
-                      className="h-7 text-xs"
+                      className="h-8 text-xs"
                       onClick={handleLoadSampleCommits}
                     >
                       Load sample commits

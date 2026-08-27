@@ -23,7 +23,9 @@ Open [http://localhost:3000](http://localhost:3000).
 | [`docs/product-roadmap.md`](docs/product-roadmap.md) | Positioning, pricing, phases |
 | [`docs/copywriting.md`](docs/copywriting.md) | English UI · no dash punctuation |
 | [`docs/env-setup.md`](docs/env-setup.md) | Full env var reference (agent / co-dev) |
-| [`docs/open-questions.md`](docs/open-questions.md) | Decisions still needed (Jira / Linear, etc.) |
+| [`docs/cli.md`](docs/cli.md) | Terminal CLI (paste any log) |
+| [`docs/raycast.md`](docs/raycast.md) | Raycast extension setup |
+| [`docs/github-action.md`](docs/github-action.md) | CI / tag → patch note |
 
 ## Scripts
 
@@ -31,4 +33,5 @@ Open [http://localhost:3000](http://localhost:3000).
 npm run dev
 npm run build
 npm run lint
+node cli/bin/easypatch.mjs help
 ```

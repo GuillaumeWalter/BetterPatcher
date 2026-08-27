@@ -7,11 +7,13 @@ import {
   Share2,
   Shield,
   Sparkles,
+  Terminal,
   Users,
 } from "lucide-react";
 
 import { auth, signIn } from "@/auth";
 import { DemoPatchGenerator } from "@/components/demo-patch-generator";
+import { LandingProductPreview } from "@/components/landing-product-preview";
 import { StructuredData } from "@/components/structured-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,9 +34,9 @@ export const metadata = pageMetadata({ path: "/" });
 const steps = [
   {
     icon: ClipboardPaste,
-    title: "Bring any commit log",
+    title: "Paste any commit log",
     description:
-      "Paste Perforce, Plastic, SVN, or any text log. Or import GitHub / GitLab when you use them.",
+      "Perforce, Plastic, SVN, or plain text. GitHub and GitLab import are optional extras.",
   },
   {
     icon: Sparkles,
@@ -88,29 +90,29 @@ export default async function LandingPage() {
       />
 
       <div className="relative overflow-hidden">
-        <section className="relative mx-auto flex min-h-[min(88vh,52rem)] max-w-5xl flex-col justify-center px-4 py-16 sm:px-6 sm:py-20">
+        <section className="relative mx-auto flex min-h-[min(92vh,56rem)] max-w-5xl flex-col justify-center px-4 py-14 sm:px-6 sm:py-16">
           <div className="landing-hero-wash pointer-events-none absolute inset-x-0 top-0 -z-10 h-full" />
 
-          <p className="mb-5 text-sm font-medium tracking-wide text-primary/90">
+          <p className="landing-fade-up mb-5 text-sm font-medium tracking-wide text-primary/90">
             Easy Patch
           </p>
-          <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-foreground sm:text-5xl sm:leading-[1.12] lg:text-6xl">
+          <h1 className="landing-fade-up landing-fade-up-delay-1 max-w-3xl text-4xl font-semibold tracking-tight text-foreground sm:text-5xl sm:leading-[1.12] lg:text-6xl">
             <span className="gradient-text">Commits in.</span>
             <span className="mt-1 block">Patch notes out.</span>
           </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Turn any commit log into Markdown release notes and social drafts.
-            Works with paste (any VCS), GitHub, or GitLab. No forge required.
+          <p className="landing-fade-up landing-fade-up-delay-2 mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            Paste any VCS log (no GitHub required). Get Markdown release notes
+            and social drafts ready to ship.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="landing-fade-up landing-fade-up-delay-3 mt-8 flex flex-wrap gap-3">
             <form
               action={async () => {
                 "use server";
                 await signIn("github", { redirectTo: "/onboarding" });
               }}
             >
-              <Button size="lg" type="submit">
+              <Button size="lg" type="submit" className="landing-cta-pulse">
                 Start free trial
               </Button>
             </form>
@@ -118,10 +120,12 @@ export default async function LandingPage() {
               <Link href="#try">Try without account</Link>
             </Button>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">
+          <p className="landing-fade-up landing-fade-up-delay-3 mt-4 text-xs text-muted-foreground">
             Trial · {BILLING.TRIAL_GENERATIONS} generations · card required (€0
-            today)
+            today) · CLI and Raycast available after signup
           </p>
+
+          <LandingProductPreview />
         </section>
 
         <section
@@ -130,12 +134,16 @@ export default async function LandingPage() {
         >
           <h2 className="text-2xl font-semibold tracking-tight">How it works</h2>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Three steps from raw commits to something you can ship to players or
+            Three steps from a raw log to something you can ship to players or
             customers.
           </p>
           <ol className="mt-8 grid gap-8 sm:grid-cols-3">
             {steps.map((step, index) => (
-              <li key={step.title} className="space-y-3">
+              <li
+                key={step.title}
+                className="landing-fade-up space-y-3"
+                style={{ animationDelay: `${0.08 * (index + 1)}s` }}
+              >
                 <div className="flex items-center gap-3">
                   <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-sm font-semibold text-primary">
                     {index + 1}
@@ -159,7 +167,8 @@ export default async function LandingPage() {
             Try it free
           </h2>
           <p className="mb-6 max-w-2xl text-sm text-muted-foreground">
-            Paste sample commits below. No account needed for a quick demo.
+            Paste a log (or load sample commits). No account needed for a quick
+            demo.
           </p>
           <DemoPatchGenerator />
         </section>
@@ -237,7 +246,7 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-5xl px-4 pb-20 sm:px-6">
+        <section className="mx-auto max-w-5xl px-4 pb-12 sm:px-6">
           <div className="rounded-2xl border border-border/70 bg-[image:var(--gradient-warm-soft)] px-6 py-8 sm:px-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="max-w-xl space-y-2">
@@ -256,6 +265,30 @@ export default async function LandingPage() {
                 <Link href="#try">Paste a log</Link>
               </Button>
             </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-5xl px-4 pb-20 sm:px-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-xl space-y-1">
+              <h2 className="flex items-center gap-2 text-lg font-semibold">
+                <Terminal className="size-4 text-primary" aria-hidden />
+                CLI and Raycast
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                After signup, generate from a terminal or Raycast with the same
+                paste workflow. No browser required for each release.
+              </p>
+            </div>
+            <Button variant="outline" asChild>
+              <Link
+                href="https://github.com/GuillaumeWalter/BetterPatcher/blob/master/docs/cli.md"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                CLI docs
+              </Link>
+            </Button>
           </div>
         </section>
       </div>

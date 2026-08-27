@@ -1,0 +1,27 @@
+{
+  "name": "easypatch",
+  "version": "0.1.0",
+  "description": "CLI for Easy Patch: paste any commit log → Markdown patch notes",
+  "type": "module",
+  "bin": {
+    "easypatch": "./bin/easypatch.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin"
+  ],
+  "keywords": [
+    "easypatch",
+    "patch-notes",
+    "changelog",
+    "cli"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GuillaumeWalter/BetterPatcher.git",
+    "directory": "cli"
+  }
+}

@@ -37,7 +37,7 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
 
   const quota = await getUserQuota(session.user.id!);
   if (quota?.paymentMethodVerified) {
-    redirect("/app/generate");
+    redirect("/app/generate?welcome=1");
   }
 
   const { setup } = await searchParams;
@@ -58,7 +58,8 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
             <span className="font-medium text-foreground">
               {session.user.name ?? session.user.email}
             </span>
-            . A card is required to limit abuse:{" "}
+            . Next: paste any commit log and generate. A card is required to
+            limit abuse:{" "}
             <strong className="text-foreground">€0 today</strong>.
           </CardDescription>
         </CardHeader>
@@ -69,7 +70,9 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
             <li>
               ✓ {BILLING.TRIAL_GENERATIONS} patch notes after verification
             </li>
-            <li>✓ Paste commits or import GitHub / GitLab</li>
+            <li>
+              ✓ Paste any commit log first (GitHub / GitLab optional)
+            </li>
             <li>
               ✓ Then Solo ({soloPriceLabel}) or Pro ({proPriceLabel} | team)
             </li>

@@ -46,8 +46,9 @@ const STEPS: Array<{
 }> = [
   {
     id: "import",
-    label: "Import commits",
-    description: "GitHub, GitLab, paste, or Load sample commits.",
+    label: "Paste commits",
+    description:
+      "Paste any log first (or Load sample). GitHub / GitLab import is optional.",
     icon: Sparkles,
   },
   {

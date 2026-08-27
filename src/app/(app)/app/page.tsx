@@ -68,7 +68,7 @@ export default async function AppHomePage() {
           ) : null}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Generate patch notes, reopen past sources, and share from History.
+          Paste any commit log first. GitHub and GitLab import are optional.
         </p>
       </div>
 

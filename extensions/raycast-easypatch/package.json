@@ -1,0 +1,75 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "easypatch",
+  "title": "Easy Patch",
+  "description": "Turn a pasted commit log into Markdown patch notes (any VCS).",
+  "icon": "icon.png",
+  "author": "easypatch",
+  "categories": ["Developer Tools", "Productivity"],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "generate-from-clipboard",
+      "title": "Generate Patch Note from Clipboard",
+      "description": "Paste your clipboard commit log into Easy Patch and open the result.",
+      "mode": "view"
+    },
+    {
+      "name": "generate-from-text",
+      "title": "Generate Patch Note from Text",
+      "description": "Paste any commit log and generate a patch note.",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "userId",
+      "title": "Easy Patch User ID",
+      "description": "From App → Settings → Integrations (part before : in Authorization).",
+      "type": "textfield",
+      "required": true
+    },
+    {
+      "name": "token",
+      "title": "Easy Patch Token",
+      "description": "From App → Settings → Integrations (part after :).",
+      "type": "password",
+      "required": true
+    },
+    {
+      "name": "baseUrl",
+      "title": "API base URL",
+      "description": "Default https://easypatch.app",
+      "type": "textfield",
+      "required": false,
+      "default": "https://easypatch.app"
+    },
+    {
+      "name": "defaultTone",
+      "title": "Default tone",
+      "description": "technical, marketing, or gaming",
+      "type": "dropdown",
+      "required": false,
+      "default": "technical",
+      "data": [
+        { "title": "Technical", "value": "technical" },
+        { "title": "Marketing", "value": "marketing" },
+        { "title": "Gaming", "value": "gaming" }
+      ]
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.94.0",
+    "@raycast/utils": "^1.19.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@types/react": "^19.0.10",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "dev": "ray develop",
+    "build": "ray build",
+    "lint": "ray lint"
+  }
+}

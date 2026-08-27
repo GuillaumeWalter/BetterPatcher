@@ -232,6 +232,101 @@
       );
   }
 
+  @keyframes landing-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes landing-preview-line {
+    0%,
+    100% {
+      opacity: 0.55;
+      transform: translateX(0);
+    }
+    50% {
+      opacity: 1;
+      transform: translateX(2px);
+    }
+  }
+
+  @keyframes landing-preview-output {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 oklch(0.62 0.09 55 / 0);
+    }
+    50% {
+      box-shadow: 0 0 0 4px oklch(0.62 0.09 55 / 0.12);
+    }
+  }
+
+  @keyframes landing-cta-pulse {
+    0%,
+    100% {
+      box-shadow: 0 4px 14px oklch(0.58 0.11 52 / 0.18);
+    }
+    50% {
+      box-shadow: 0 6px 22px oklch(0.58 0.11 52 / 0.28);
+    }
+  }
+
+  .landing-fade-up {
+    animation: landing-fade-up 0.7s ease-out both;
+  }
+
+  .landing-fade-up-delay-1 {
+    animation-delay: 0.08s;
+  }
+
+  .landing-fade-up-delay-2 {
+    animation-delay: 0.16s;
+  }
+
+  .landing-fade-up-delay-3 {
+    animation-delay: 0.24s;
+  }
+
+  .landing-preview {
+    animation: landing-fade-up 0.85s ease-out 0.32s both;
+  }
+
+  .landing-preview-glow {
+    background: radial-gradient(
+      ellipse at center,
+      oklch(0.82 0.06 70 / 0.45),
+      transparent 70%
+    );
+  }
+
+  .landing-preview-line {
+    animation: landing-preview-line 3.6s ease-in-out infinite;
+  }
+
+  .landing-preview-line-1 {
+    animation-delay: 0s;
+  }
+
+  .landing-preview-line-2 {
+    animation-delay: 0.35s;
+  }
+
+  .landing-preview-line-3 {
+    animation-delay: 0.7s;
+  }
+
+  .landing-preview-output {
+    animation: landing-preview-output 3.6s ease-in-out infinite;
+  }
+
+  .landing-cta-pulse {
+    animation: landing-cta-pulse 2.8s ease-in-out infinite;
+  }
+
   .skip-link {
     position: absolute;
     left: -9999px;
@@ -256,6 +351,14 @@
     .glow-orb {
       filter: none;
       opacity: 0.25;
+    }
+
+    .landing-fade-up,
+    .landing-preview,
+    .landing-preview-line,
+    .landing-preview-output,
+    .landing-cta-pulse {
+      animation: none !important;
     }
 
     *,
