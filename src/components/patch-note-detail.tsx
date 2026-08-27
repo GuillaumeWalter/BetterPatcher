@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 
-import { DashboardNav } from "@/components/dashboard-nav";
+import { AppNav } from "@/components/app-nav";
 import { ShareStudio } from "@/components/share-studio";
 import { Button } from "@/components/ui/button";
 import {
@@ -99,7 +99,7 @@ export function PatchNoteDetail({
 
   return (
     <>
-      <DashboardNav />
+      <AppNav />
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm text-muted-foreground">
@@ -115,15 +115,17 @@ export function PatchNoteDetail({
           </p>
         </div>
         <Button variant="outline" size="sm" asChild>
-          <Link href="/dashboard/history">← History</Link>
+          <Link href="/app/history">← History</Link>
         </Button>
       </div>
 
       <div className="mb-6">
         <Card className="surface-card gradient-border">
           <CardHeader>
-            <CardTitle className="text-lg">Source commits</CardTitle>
-            <CardDescription>Raw text used for generation</CardDescription>
+            <CardTitle className="text-lg">Source commits used</CardTitle>
+            <CardDescription>
+              Exact log merged into the generated patch note and drafts
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Textarea

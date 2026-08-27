@@ -1,7 +1,8 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { LogIn } from "lucide-react";
 
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,12 +11,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { APP } from "@/lib/routes";
 
 type LoginPageProps = {
   searchParams: Promise<{ callbackUrl?: string }>;
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const session = await auth();
+  if (session?.user) {
+    redirect(APP.home);
+  }
+
   const { callbackUrl } = await searchParams;
   const redirectTo =
     callbackUrl?.startsWith("/") && !callbackUrl.startsWith("//")
@@ -29,9 +36,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[image:var(--gradient-warm)] text-primary-foreground shadow-sm shadow-primary/15">
             <LogIn className="size-7" />
           </div>
-          <CardTitle className="text-2xl font-semibold">Sign in with GitHub</CardTitle>
+          <CardTitle className="text-2xl font-semibold">
+            Sign in with GitHub
+          </CardTitle>
           <CardDescription className="text-base">
-            Import commits straight from your repositories.
+            Then paste any commit log, or import GitHub / GitLab repos.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

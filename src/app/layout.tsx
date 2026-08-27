@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Plus_Jakarta_Sans } from "next/font/google";
 
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { Analytics } from "@/components/analytics";
 import { PwaInstallPrompt } from "@/components/pwa-install-prompt";
 import { pageMetadata } from "@/lib/seo";
@@ -49,11 +47,7 @@ export default function RootLayout({
           <div className="glow-orb top-1/4 -right-24 size-[380px] bg-[oklch(0.91_0.05_58)]" />
           <div className="glow-orb -bottom-16 -left-16 size-[320px] bg-[oklch(0.93_0.04_82)]" />
         </div>
-        <SiteHeader />
-        <main id="main-content" className="flex flex-1 flex-col">
-          {children}
-        </main>
-        <SiteFooter />
+        {children}
         <PwaInstallPrompt />
         <Analytics />
       </body>

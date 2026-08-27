@@ -31,7 +31,7 @@ export function trialActivatedEmail(name?: string | null) {
         <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
         <p style="margin:0 0 12px;">Your card is verified (€0 charged). You now have <strong>${BILLING.TRIAL_GENERATIONS} free generations</strong>.</p>
         <p style="margin:0 0 12px;">Paste commits or import from GitHub / GitLab — pick a tone and go.</p>
-        ${ctaButton("Generate a patch note", appUrl("/dashboard/generate"))}
+        ${ctaButton("Generate a patch note", appUrl("/app/generate"))}
       `,
     }),
   };
@@ -48,7 +48,7 @@ export function trialLowEmail(remaining: number, name?: string | null) {
         <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
         <p style="margin:0 0 12px;">You have <strong>${remaining} generation</strong> left on your free trial.</p>
         <p style="margin:0 0 12px;">When you're ready, Solo and Pro unlock monthly quotas, history, and Share Studio.</p>
-        ${ctaButton("Open the generator", appUrl("/dashboard/generate"))}
+        ${ctaButton("Open the generator", appUrl("/app/generate"))}
       `,
     }),
   };
@@ -72,7 +72,7 @@ export function trialExhaustedEmail(
           <li><strong>Solo</strong> — ${soloPrice}, ${BILLING.SOLO_MONTHLY_GENERATIONS} gen/mo</li>
           <li><strong>Pro</strong> — ${proPrice}, ${BILLING.PRO_MONTHLY_GENERATIONS} gen/mo (team)</li>
         </ul>
-        ${ctaButton("View plans", appUrl("/dashboard/billing"))}
+        ${ctaButton("View plans", appUrl("/app/billing"))}
       `,
     }),
   };
@@ -98,7 +98,7 @@ export function subscriptionConfirmedEmail(
         <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
         <p style="margin:0 0 12px;">Your <strong>${planName}</strong> subscription is active (${priceLabel}).</p>
         <p style="margin:0 0 12px;">You get <strong>${limit} generations per month</strong>, full history, and Share Studio drafts.</p>
-        ${ctaButton("Start generating", appUrl("/dashboard/generate"))}
+        ${ctaButton("Start generating", appUrl("/app/generate"))}
       `,
     }),
   };
@@ -115,7 +115,7 @@ export function paymentFailedEmail(name?: string | null) {
         <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
         <p style="margin:0 0 12px;">We couldn't process your last payment. Your generations are paused until you update your card.</p>
         <p style="margin:0 0 12px;">It takes less than a minute in the Stripe portal.</p>
-        ${ctaButton("Update payment method", appUrl("/dashboard/billing"))}
+        ${ctaButton("Update payment method", appUrl("/app/billing"))}
       `,
     }),
   };
@@ -132,7 +132,7 @@ export function subscriptionCanceledEmail(name?: string | null) {
         <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
         <p style="margin:0 0 12px;">Your Easy Patch subscription has been canceled. You keep access until the end of your billing period.</p>
         <p style="margin:0 0 12px;">Changed your mind? You can resubscribe anytime.</p>
-        ${ctaButton("View plans", appUrl("/dashboard/billing"))}
+        ${ctaButton("View plans", appUrl("/app/billing"))}
       `,
     }),
   };
@@ -157,7 +157,7 @@ export function upgradeToProEmail(
           <li>Built for studios & live-ops teams</li>
           <li>Invite up to ${BILLING.PRO_MAX_TEAM_SEATS - 1} teammates on one quota</li>
         </ul>
-        ${ctaButton("Upgrade to Pro", appUrl("/dashboard/billing"))}
+        ${ctaButton("Upgrade to Pro", appUrl("/app/billing"))}
       `,
     }),
   };
@@ -173,7 +173,7 @@ export function inactiveTrialReminderEmail(name?: string | null) {
       body: `
         <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
         <p style="margin:0 0 12px;">You activated your trial but haven't generated a patch note yet. Paste a commit log — we'll handle the rest.</p>
-        ${ctaButton("Try it now", appUrl("/dashboard/generate"))}
+        ${ctaButton("Try it now", appUrl("/app/generate"))}
       `,
     }),
   };
@@ -194,7 +194,7 @@ export function soloQuotaLowEmail(
         <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
         <p style="margin:0 0 12px;">You have <strong>${remaining}</strong> of <strong>${limit}</strong> Solo generations left this month.</p>
         <p style="margin:0 0 12px;">Need more headroom? Pro unlocks <strong>${BILLING.PRO_MONTHLY_GENERATIONS} generations/month</strong> for teams and live-ops.</p>
-        ${ctaButton("Open generator", appUrl("/dashboard/generate"))}
+        ${ctaButton("Open generator", appUrl("/app/generate"))}
       `,
     }),
   };
@@ -214,7 +214,7 @@ export function soloQuotaExhaustedEmail(
         <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
         <p style="margin:0 0 12px;">You've used all <strong>${BILLING.SOLO_MONTHLY_GENERATIONS} Solo generations</strong> for this billing period.</p>
         <p style="margin:0 0 12px;">Your quota resets on your next invoice date — or upgrade to <strong>Pro</strong> (${proPrice}) for ${BILLING.PRO_MONTHLY_GENERATIONS} generations/month.</p>
-        ${ctaButton("View plans", appUrl("/dashboard/billing"))}
+        ${ctaButton("View plans", appUrl("/app/billing"))}
       `,
     }),
   };
@@ -235,7 +235,7 @@ export function proQuotaLowEmail(
         <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
         <p style="margin:0 0 12px;">You have <strong>${remaining}</strong> of <strong>${limit}</strong> Pro generations left this month.</p>
         <p style="margin:0 0 12px;">Plan ahead for your next release — or wait for your quota to reset on your invoice date.</p>
-        ${ctaButton("Open generator", appUrl("/dashboard/generate"))}
+        ${ctaButton("Open generator", appUrl("/app/generate"))}
       `,
     }),
   };
@@ -252,7 +252,7 @@ export function proQuotaExhaustedEmail(name?: string | null) {
         <p style="margin:0 0 16px;font-size:17px;font-weight:600;color:#1a1410;">${greeting}</p>
         <p style="margin:0 0 12px;">You've used all <strong>${BILLING.PRO_MONTHLY_GENERATIONS} Pro generations</strong> for this billing period.</p>
         <p style="margin:0 0 12px;">Your quota resets on your next invoice date. Need more before then? Reply to this email and we'll help.</p>
-        ${ctaButton("View billing", appUrl("/dashboard/billing"))}
+        ${ctaButton("View billing", appUrl("/app/billing"))}
       `,
     }),
   };

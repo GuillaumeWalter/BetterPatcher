@@ -100,7 +100,7 @@ export async function POST(request: Request) {
     if (action === "portal") {
       const portalSession = await stripe.billingPortal.sessions.create({
         customer: customerId,
-        return_url: `${baseUrl}/dashboard/billing`,
+        return_url: `${baseUrl}/app/billing`,
       });
 
       if (!portalSession.url) {
@@ -147,8 +147,8 @@ export async function POST(request: Request) {
         mode: "subscription",
         customer: customerId,
         line_items: [{ price: priceId, quantity: 1 }],
-        success_url: `${baseUrl}/dashboard/billing?success=1`,
-        cancel_url: `${baseUrl}/dashboard/billing?canceled=1`,
+        success_url: `${baseUrl}/app/billing?success=1`,
+        cancel_url: `${baseUrl}/app/billing?canceled=1`,
         metadata: {
           userId: session.user.id,
           planTier: plan,

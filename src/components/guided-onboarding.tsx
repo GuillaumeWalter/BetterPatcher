@@ -67,7 +67,7 @@ const STEPS: Array<{
     label: "Open history",
     description: "Find saved patch notes and reopen Share Studio.",
     icon: History,
-    href: "/dashboard/history",
+    href: "/app/history",
   },
 ];
 
@@ -229,7 +229,7 @@ export function GuidedOnboarding({
 
         {variant === "dashboard" ? (
           <Button asChild className="mt-4" size="sm">
-            <Link href="/dashboard/generate">
+            <Link href="/app/generate">
               <Wand2 />
               Open generator
             </Link>

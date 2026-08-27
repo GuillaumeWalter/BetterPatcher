@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { BillingQuotaBanner } from "@/components/billing-quota-banner";
-import { DashboardNav } from "@/components/dashboard-nav";
+import { AppNav } from "@/components/app-nav";
 import { GuidedOnboarding } from "@/components/guided-onboarding";
 import { OnboardingProgressSeeder } from "@/components/onboarding-progress-seeder";
 import { PatchNoteGenerator } from "@/components/patch-note-generator";
@@ -45,7 +45,7 @@ function oauthBanner(
 export default async function GeneratePage({ searchParams }: GeneratePageProps) {
   const session = await auth();
   if (!session?.user) {
-    redirect("/login?callbackUrl=/dashboard/generate");
+    redirect("/login?callbackUrl=/app/generate");
   }
 
   const quota = await getUserQuota(session.user.id!);
@@ -61,7 +61,15 @@ export default async function GeneratePage({ searchParams }: GeneratePageProps) 
 
   return (
     <>
-      <DashboardNav />
+      <div className="mb-6 space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          Generate
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Paste a commit log or import from GitHub / GitLab, then generate.
+        </p>
+      </div>
+      <AppNav />
       <BillingQuotaBanner />
       <OnboardingProgressSeeder hasGenerated={hasGenerated} />
       <GuidedOnboarding

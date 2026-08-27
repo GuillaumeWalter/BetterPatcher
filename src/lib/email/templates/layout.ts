@@ -36,7 +36,7 @@ export function emailLayout({ preheader, body }: LayoutOptions): string {
             <td style="padding:0 32px 28px;font-size:12px;color:#8a7f72;line-height:1.5;">
               <p style="margin:0 0 8px;">You're receiving this because you use Easy Patch.</p>
               <p style="margin:0;">
-                <a href="${appUrl("/dashboard/billing")}" style="color:#c47f2a;">Manage billing</a>
+                <a href="${appUrl("/app/billing")}" style="color:#c47f2a;">Manage billing</a>
                 ·
                 <a href="${appUrl("/contact")}" style="color:#c47f2a;">Contact support</a>
               </p>

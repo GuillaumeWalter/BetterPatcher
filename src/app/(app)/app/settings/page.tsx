@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { AccountDangerZone } from "@/components/account-danger-zone";
-import { DashboardNav } from "@/components/dashboard-nav";
+import { AppNav } from "@/components/app-nav";
 import { IntegrationSettings } from "@/components/integration-settings";
 import { TeamSettings } from "@/components/team-settings";
 import { getUserRepos } from "@/lib/github";
@@ -12,14 +12,14 @@ export const metadata = pageMetadata({
   title: "Settings",
   description:
     "Team seats, integrations, favorite repos, and account settings for Easy Patch.",
-  path: "/dashboard/settings",
+  path: "/app/settings",
   noIndex: true,
 });
 
 export default async function SettingsPage() {
   const session = await auth();
   if (!session?.user) {
-    redirect("/login?callbackUrl=/dashboard/settings");
+    redirect("/login?callbackUrl=/app/settings");
   }
 
   let repos: Array<{ full_name: string }> = [];
@@ -33,7 +33,7 @@ export default async function SettingsPage() {
 
   return (
     <>
-      <DashboardNav />
+      <AppNav />
       <div className="mx-auto max-w-3xl space-y-8">
         <TeamSettings />
         <IntegrationSettings repos={repos} />

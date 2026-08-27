@@ -79,7 +79,7 @@ Authorization: EasyPatch YOUR_USER_ID:YOUR_TOKEN
   "markdown": "…",
   "socialPost": "…",
   "generationsRemaining": 4,
-  "historyUrl": "https://…/dashboard/history/…"
+  "historyUrl": "https://…/app/history/…"
 }
 ```
 

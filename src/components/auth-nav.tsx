@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { auth, signIn, signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { APP } from "@/lib/routes";
 
 export async function AuthNav() {
   const session = await auth();
@@ -10,7 +11,7 @@ export async function AuthNav() {
     return (
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/dashboard/generate">App</Link>
+          <Link href={APP.home}>Open app</Link>
         </Button>
         <form
           action={async () => {

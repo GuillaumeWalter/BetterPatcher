@@ -8,6 +8,8 @@ Living doc. Re-read before product, billing, or integration work.
 
 Easy Patch turns a commit log (or pasted text) into a **Markdown patch note** plus **platform-ready social drafts** (LinkedIn, X, Discord, Steam-style, etc.). Share Studio (roadmap) adds edit → adapt → copy / publish / schedule.
 
+**Surfaces:** marketing landing at `/` · authenticated product at `/app` (legacy `/dashboard` redirects). Signed-in users hitting `/` go straight to the app.
+
 Audience: indies, game studios, live ops, eng leads, product marketers.
 
 ## Pricing

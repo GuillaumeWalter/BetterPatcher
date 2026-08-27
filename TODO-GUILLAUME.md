@@ -4,7 +4,7 @@
 > Repo : [GuillaumeWalter/BetterPatcher](https://github.com/GuillaumeWalter/BetterPatcher) · v0.7.0
 
 **Vérifier ce qui manque :** dashboard → widget **Setup checklist** · ou `https://TON-DOMAINE/api/env-check`  
-**Coller les clés :** [Vercel → Settings → Environment Variables](https://vercel.com/dashboard) → Production + Preview → **Redeploy**
+**Coller les clés :** [Vercel → Settings → Environment Variables](https://vercel.com/app) → Production + Preview → **Redeploy**
 
 ---
 
@@ -48,12 +48,12 @@ Test : `https://TON-DOMAINE/api/emails/preview?template=welcome`
 
 ## 2. Stripe — une fois
 
-- [ ] [Customer Portal](https://dashboard.stripe.com/settings/billing/portal) activé *(si « Manage subscription » plante)*
+- [ ] [Customer Portal](https://app.stripe.com/settings/billing/portal) activé *(si « Manage subscription » plante)*
 - [ ] Mode **Live** + prices live → **seulement quand j'encaisse pour de vrai**
 
 ### Toggle Annual dans l'UI (optionnel)
 
-1. [Stripe → Products](https://dashboard.stripe.com/products) → Solo → Add price → Yearly → €50.88  
+1. [Stripe → Products](https://app.stripe.com/products) → Solo → Add price → Yearly → €50.88  
 2. Pro → €101.88 / an  
 3. Vercel : `STRIPE_SOLO_ANNUAL_PRICE_ID` et `STRIPE_PRO_ANNUAL_PRICE_ID` (`price_…`)
 
@@ -118,8 +118,8 @@ Remplace `TON-DOMAINE` par ton URL.
 
 | Quoi | Lien |
 |------|------|
-| Vercel | https://vercel.com/dashboard |
-| Stripe Portal | https://dashboard.stripe.com/settings/billing/portal |
+| Vercel | https://vercel.com/app |
+| Stripe Portal | https://app.stripe.com/settings/billing/portal |
 | GitHub Action | `docs/github-action.md` |
 | Discord bot | `docs/discord-bot.md` |
 | Emails | `docs/emails.md` |

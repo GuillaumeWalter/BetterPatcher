@@ -19,13 +19,13 @@ describe("email templates", () => {
     const { html } = trialExhaustedEmail("€4.99", "€9.99", null);
     expect(html).toContain("Solo");
     expect(html).toContain("Pro");
-    expect(html).toContain("/dashboard/billing");
+    expect(html).toContain("/app/billing");
   });
 
   it("payment failed links to billing", () => {
     const { subject, html } = paymentFailedEmail();
     expect(subject.toLowerCase()).toContain("payment");
-    expect(html).toContain("/dashboard/billing");
+    expect(html).toContain("/app/billing");
   });
 
   it("solo quota low mentions remaining count", async () => {

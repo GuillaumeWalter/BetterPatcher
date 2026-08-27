@@ -14,18 +14,18 @@ export async function GET(request: Request) {
 
   if (error === "access_denied") {
     return Response.redirect(
-      `${baseUrl}/dashboard/generate?linear=denied`,
+      `${baseUrl}/app/generate?linear=denied`,
     );
   }
 
   if (!code || !state) {
-    return Response.redirect(`${baseUrl}/dashboard/generate?linear=error`);
+    return Response.redirect(`${baseUrl}/app/generate?linear=error`);
   }
 
   const userId = parseLinearOAuthState(state);
   if (!userId) {
     return Response.redirect(
-      `${baseUrl}/dashboard/generate?linear=invalid_state`,
+      `${baseUrl}/app/generate?linear=invalid_state`,
     );
   }
 
@@ -34,14 +34,14 @@ export async function GET(request: Request) {
     const saved = await setLinearAccessToken(userId, accessToken);
     if (!saved) {
       return Response.redirect(
-        `${baseUrl}/dashboard/generate?linear=save_failed`,
+        `${baseUrl}/app/generate?linear=save_failed`,
       );
     }
     return Response.redirect(
-      `${baseUrl}/dashboard/generate?linear=connected`,
+      `${baseUrl}/app/generate?linear=connected`,
     );
   } catch (err) {
     console.error("[linear/callback]", err);
-    return Response.redirect(`${baseUrl}/dashboard/generate?linear=error`);
+    return Response.redirect(`${baseUrl}/app/generate?linear=error`);
   }
 }

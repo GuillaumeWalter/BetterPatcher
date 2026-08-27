@@ -286,7 +286,7 @@ export function PatchNoteGenerator({
               <div id="panel-github" role="tabpanel" aria-labelledby="tab-github">
               <GitHubCommitImport
                 isAuthenticated={isAuthenticated}
-                loginCallbackUrl="/dashboard/generate"
+                loginCallbackUrl="/app/generate"
                 onImport={handleSourceImport}
               />
               </div>
@@ -478,7 +478,7 @@ export function PatchNoteGenerator({
                 </p>
                 {showBillingCta ? (
                   <Button variant="outline" size="sm" asChild>
-                    <Link href="/dashboard/billing">{billingCtaLabel}</Link>
+                    <Link href="/app/billing">{billingCtaLabel}</Link>
                   </Button>
                 ) : null}
               </div>
@@ -496,7 +496,7 @@ export function PatchNoteGenerator({
                   {" "}
                   ·{" "}
                   <Link
-                    href={`/dashboard/history/${savedId}`}
+                    href={`/app/history/${savedId}`}
                     className="text-primary underline-offset-4 hover:underline"
                   >
                     Open in history

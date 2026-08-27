@@ -107,7 +107,7 @@ export function DemoPatchGenerator() {
       </p>
       <Card className="surface-card gradient-border">
         <CardHeader>
-          <CardTitle className="text-lg">Try it free</CardTitle>
+          <CardTitle className="text-lg">Demo generator</CardTitle>
           <CardDescription>
             {demoRemaining !== null
               ? `${demoRemaining}/${demoLimit} demo generations left this hour · no account required`

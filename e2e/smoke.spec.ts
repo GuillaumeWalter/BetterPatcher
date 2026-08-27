@@ -4,7 +4,9 @@ test.describe("public pages", () => {
   test("landing page loads", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(page.getByText("Try it free")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Try it free" }),
+    ).toBeVisible();
   });
 
   test("landing demo generator accepts commits", async ({ page }) => {
@@ -28,6 +30,16 @@ test.describe("public pages", () => {
   }) => {
     await page.goto("/onboarding");
     await expect(page).toHaveURL(/\/login/);
+  });
+
+  test("app redirects unauthenticated users to login", async ({ page }) => {
+    await page.goto("/app");
+    await expect(page).toHaveURL(/\/login/);
+  });
+
+  test("legacy dashboard path redirects toward app", async ({ page }) => {
+    await page.goto("/dashboard");
+    await expect(page).toHaveURL(/\/(app|login)/);
   });
 
   test("faq page loads", async ({ page }) => {

@@ -14,10 +14,30 @@ export function SiteHeader() {
           <div>
             <p className="text-sm font-semibold tracking-tight">Easy Patch</p>
             <p className="text-xs text-muted-foreground">
-              Patch notes in one click
+              Patch notes from any commit log
             </p>
           </div>
         </Link>
+        <nav className="hidden items-center gap-1 sm:flex">
+          <Link
+            href="/#how"
+            className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+          >
+            How it works
+          </Link>
+          <Link
+            href="/#pricing"
+            className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+          >
+            Pricing
+          </Link>
+          <Link
+            href="/faq"
+            className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+          >
+            FAQ
+          </Link>
+        </nav>
         <div className="flex items-center gap-3">
           <AuthNav />
         </div>

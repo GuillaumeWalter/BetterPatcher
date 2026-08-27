@@ -3,7 +3,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { BillingQuotaBanner } from "@/components/billing-quota-banner";
 import { BillingPlans } from "@/components/billing-plans";
-import { DashboardNav } from "@/components/dashboard-nav";
+import { AppNav } from "@/components/app-nav";
 import { getUserQuota } from "@/lib/supabase/users";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +30,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
   return (
     <>
-      <DashboardNav />
+      <AppNav />
       <BillingQuotaBanner />
 
       <div className="mb-6 max-w-3xl space-y-3">
@@ -68,7 +68,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
       />
 
       <Button variant="outline" className="mt-6" asChild>
-        <Link href="/dashboard/generate">Back to generator</Link>
+        <Link href="/app/generate">Back to generator</Link>
       </Button>
     </>
   );

@@ -14,20 +14,20 @@ export async function GET(request: Request) {
 
   if (oauthError) {
     return Response.redirect(
-      `${baseUrl}/dashboard/generate?gitlab=denied`,
+      `${baseUrl}/app/generate?gitlab=denied`,
     );
   }
 
   if (!code || !state) {
     return Response.redirect(
-      `${baseUrl}/dashboard/generate?gitlab=error`,
+      `${baseUrl}/app/generate?gitlab=error`,
     );
   }
 
   const userId = parseGitLabOAuthState(state);
   if (!userId) {
     return Response.redirect(
-      `${baseUrl}/dashboard/generate?gitlab=invalid_state`,
+      `${baseUrl}/app/generate?gitlab=invalid_state`,
     );
   }
 
@@ -36,16 +36,16 @@ export async function GET(request: Request) {
     const saved = await setGitLabAccessToken(userId, accessToken);
     if (!saved) {
       return Response.redirect(
-        `${baseUrl}/dashboard/generate?gitlab=save_failed`,
+        `${baseUrl}/app/generate?gitlab=save_failed`,
       );
     }
     return Response.redirect(
-      `${baseUrl}/dashboard/generate?gitlab=connected`,
+      `${baseUrl}/app/generate?gitlab=connected`,
     );
   } catch (error) {
     console.error("[gitlab/callback]", error);
     return Response.redirect(
-      `${baseUrl}/dashboard/generate?gitlab=error`,
+      `${baseUrl}/app/generate?gitlab=error`,
     );
   }
 }

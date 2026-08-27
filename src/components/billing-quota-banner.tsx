@@ -152,7 +152,7 @@ export function BillingQuotaBanner() {
         ) : null}
         {quota.requiresSubscription ? (
           <Button asChild size="sm">
-            <Link href="/dashboard/billing">
+            <Link href="/app/billing">
               <Sparkles />
               View plans
             </Link>
@@ -160,7 +160,7 @@ export function BillingQuotaBanner() {
         ) : null}
         {quota.plan === "solo" ? (
           <Button asChild size="sm" variant="outline">
-            <Link href="/dashboard/billing">
+            <Link href="/app/billing">
               <Sparkles />
               Upgrade to Pro
             </Link>
@@ -168,7 +168,7 @@ export function BillingQuotaBanner() {
         ) : null}
         {quota.plan === "solo" || quota.plan === "pro" ? (
           <Button asChild size="sm" variant="ghost">
-            <Link href="/dashboard/billing">Manage billing</Link>
+            <Link href="/app/billing">Manage billing</Link>
           </Button>
         ) : null}
       </div>

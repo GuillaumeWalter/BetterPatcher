@@ -97,7 +97,7 @@ export function TicketEnrichmentPanel({
       {!data.canEnrich ? (
         <p className="text-xs text-muted-foreground">
           Linear enrichment is included on Solo and Pro.{" "}
-          <Link href="/dashboard/billing" className="text-primary underline-offset-4 hover:underline">
+          <Link href="/app/billing" className="text-primary underline-offset-4 hover:underline">
             Upgrade
           </Link>
         </p>

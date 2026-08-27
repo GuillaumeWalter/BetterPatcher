@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { auth } from "@/auth";
-import { DashboardNav } from "@/components/dashboard-nav";
+import { AppNav } from "@/components/app-nav";
 import { OnboardingHistoryMarker } from "@/components/onboarding-history-marker";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -12,7 +12,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TONE_OPTIONS } from "@/lib/constants";
+import { APP } from "@/lib/routes";
+import { pageMetadata } from "@/lib/seo";
 import { listPatchNotesForUser } from "@/lib/supabase/patch-notes";
+
+export const metadata = pageMetadata({
+  title: "History",
+  description: "Browse generated patch notes and the commits used to create them.",
+  path: APP.history,
+  noIndex: true,
+});
 
 function toneLabel(tone: string) {
   return TONE_OPTIONS.find((option) => option.value === tone)?.label ?? tone;
@@ -33,11 +42,18 @@ export default async function HistoryPage() {
 
   return (
     <>
+      <div className="mb-6 space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          History
+        </h1>
+        <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          Every generated note keeps the source commits (or pasted log) used in
+          the text. Open one to edit, share, or copy drafts.
+        </p>
+      </div>
+
       <OnboardingHistoryMarker />
-      <DashboardNav />
-      <p className="mb-8 max-w-2xl text-base leading-relaxed text-muted-foreground">
-        Your generated patch notes are saved here. Click to view or edit.
-      </p>
+      <AppNav />
 
       {notes.length === 0 ? (
         <Card className="surface-card gradient-border">
@@ -50,7 +66,7 @@ export default async function HistoryPage() {
           </CardHeader>
           <CardContent>
             <Link
-              href="/dashboard/generate"
+              href={APP.generate}
               className="text-sm font-medium text-primary underline-offset-4 hover:underline"
             >
               Open the generator →
@@ -61,7 +77,7 @@ export default async function HistoryPage() {
         <ul className="space-y-3">
           {notes.map((note) => (
             <li key={note.id}>
-              <Link href={`/dashboard/history/${note.id}`}>
+              <Link href={APP.historyItem(note.id)}>
                 <Card className="surface-card gradient-border transition-all hover:shadow-md hover:shadow-primary/5">
                   <CardHeader className="pb-2">
                     <div className="flex flex-wrap items-center gap-2">
@@ -69,13 +85,26 @@ export default async function HistoryPage() {
                         {note.repoFullName ?? "Pasted commits"}
                       </CardTitle>
                       <Badge variant="secondary">{toneLabel(note.tone)}</Badge>
+                      <Badge variant="outline">
+                        {note.commitLineCount} source line
+                        {note.commitLineCount === 1 ? "" : "s"}
+                      </Badge>
                       {!note.isOwn && note.authorEmail ? (
-                        <Badge variant="outline">Team · {note.authorEmail}</Badge>
+                        <Badge variant="outline">
+                          Team · {note.authorEmail}
+                        </Badge>
                       ) : null}
                     </div>
-                    <CardDescription>{formatDate(note.createdAt)}</CardDescription>
+                    <CardDescription>
+                      {formatDate(note.createdAt)}
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-2">
+                    {note.commitsPreview ? (
+                      <p className="line-clamp-2 font-mono text-xs text-muted-foreground">
+                        Sources: {note.commitsPreview}
+                      </p>
+                    ) : null}
                     <p className="line-clamp-2 font-mono text-sm text-muted-foreground">
                       {note.markdownPreview}
                     </p>

@@ -20,11 +20,27 @@ export type PatchNoteSummary = {
   tone: Tone;
   repoFullName: string | null;
   markdownPreview: string;
+  commitsPreview: string;
+  commitLineCount: number;
   createdAt: string;
   updatedAt: string;
   authorEmail: string | null;
   isOwn: boolean;
 };
+
+function summarizeCommits(commitsRaw: string): {
+  commitsPreview: string;
+  commitLineCount: number;
+} {
+  const lines = commitsRaw
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  return {
+    commitLineCount: lines.length,
+    commitsPreview: lines.slice(0, 3).join(" · "),
+  };
+}
 
 type SavePatchNoteInput = {
   userId: string;
@@ -75,7 +91,7 @@ export async function listPatchNotesForUser(
   const { data, error } = await supabase
     .from("patch_notes")
     .select(
-      "id, user_id, user_email, tone, repo_full_name, markdown, created_at, updated_at",
+      "id, user_id, user_email, tone, repo_full_name, commits_raw, markdown, created_at, updated_at",
     )
     .in("user_id", userIds)
     .order("created_at", { ascending: false })
@@ -86,16 +102,23 @@ export async function listPatchNotesForUser(
     return [];
   }
 
-  return (data ?? []).map((row) => ({
-    id: row.id,
-    tone: row.tone as Tone,
-    repoFullName: row.repo_full_name,
-    markdownPreview: row.markdown.slice(0, 120),
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-    authorEmail: row.user_email ?? null,
-    isOwn: row.user_id === userId,
-  }));
+  return (data ?? []).map((row) => {
+    const { commitsPreview, commitLineCount } = summarizeCommits(
+      row.commits_raw ?? "",
+    );
+    return {
+      id: row.id,
+      tone: row.tone as Tone,
+      repoFullName: row.repo_full_name,
+      markdownPreview: row.markdown.slice(0, 120),
+      commitsPreview,
+      commitLineCount,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      authorEmail: row.user_email ?? null,
+      isOwn: row.user_id === userId,
+    };
+  });
 }
 
 export async function countPatchNotesForUser(userId: string): Promise<number> {

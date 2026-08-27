@@ -129,7 +129,7 @@ export async function POST(request: Request) {
     socialPost: result.socialPost,
     generationsRemaining: result.generationsRemaining,
     historyUrl: baseUrl
-      ? `${baseUrl}/dashboard/history/${result.savedId}`
-      : `/dashboard/history/${result.savedId}`,
+      ? `${baseUrl}/app/history/${result.savedId}`
+      : `/app/history/${result.savedId}`,
   });
 }

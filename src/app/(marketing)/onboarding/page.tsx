@@ -37,7 +37,7 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
 
   const quota = await getUserQuota(session.user.id!);
   if (quota?.paymentMethodVerified) {
-    redirect("/dashboard/generate");
+    redirect("/app/generate");
   }
 
   const { setup } = await searchParams;
@@ -79,7 +79,7 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
 
           {setup === "success" ? (
             <Button className="w-full" asChild>
-              <Link href="/dashboard/generate?welcome=1">
+              <Link href="/app/generate?welcome=1">
                 Continue to generator
               </Link>
             </Button>

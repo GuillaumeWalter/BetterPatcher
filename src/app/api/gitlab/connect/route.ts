@@ -12,7 +12,7 @@ export async function GET() {
 
   if (!session?.user?.id) {
     return Response.redirect(
-      `${baseUrl}/login?callbackUrl=${encodeURIComponent("/dashboard/generate")}`,
+      `${baseUrl}/login?callbackUrl=${encodeURIComponent("/app/generate")}`,
     );
   }
 

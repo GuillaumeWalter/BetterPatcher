@@ -40,7 +40,7 @@ Run [supabase/discord_bot.sql](https://github.com/GuillaumeWalter/BetterPatcher/
 
 ## 5. Link a channel in the app
 
-1. [Easy Patch → Settings](https://TON-DOMAINE/dashboard/settings)
+1. [Easy Patch → Settings](https://TON-DOMAINE/app/settings)
 2. **Discord bot** → **Invite bot to server**
 3. **Generate link code**
 4. In Discord, in the target channel: `/easypatch link ABCD12` (your code)

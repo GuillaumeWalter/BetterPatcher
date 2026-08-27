@@ -129,6 +129,6 @@ export async function POST(request: Request) {
     savedId: result.savedId,
     tag: tagName,
     repo: repoFullName,
-    historyUrl: `/dashboard/history/${result.savedId}`,
+    historyUrl: `/app/history/${result.savedId}`,
   });
 }
