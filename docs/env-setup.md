@@ -21,7 +21,7 @@ In order:
 | `AUTH_SECRET` | Random secret for Auth.js (also accepts `NEXTAUTH_SECRET`) |
 | `AUTH_GITHUB_ID` | GitHub OAuth App client id |
 | `AUTH_GITHUB_SECRET` | GitHub OAuth App client secret |
-| `NEXT_PUBLIC_APP_URL` | Canonical site URL (e.g. `https://easypatch.app`) |
+| `NEXT_PUBLIC_APP_URL` | Canonical site URL (e.g. `https://easy-patch.com`) |
 
 GitHub OAuth callback: `https://YOUR_DOMAIN/api/auth/callback/github`
 

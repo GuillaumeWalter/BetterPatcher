@@ -21,10 +21,10 @@ export default function ContactPage() {
         <p className="text-sm">
           Email:{" "}
           <a
-            href="mailto:support@easypatch.app"
+            href="mailto:support@easy-patch.com"
             className="font-medium text-primary underline-offset-4 hover:underline"
           >
-            support@easypatch.app
+            support@easy-patch.com
           </a>
         </p>
         <p className="text-sm text-muted-foreground">

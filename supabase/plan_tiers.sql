@@ -36,9 +36,6 @@ begin
     return jsonb_build_object('ok', false, 'code', 'profile_not_found');
   end if;
 
-  if not profile.payment_method_verified then
-    return jsonb_build_object('ok', false, 'code', 'setup_required');
-  end if;
 
   if profile.last_generation_at is not null
      and profile.last_generation_at > now() - (p_min_interval_seconds || ' seconds')::interval then

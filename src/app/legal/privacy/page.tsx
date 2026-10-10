@@ -21,10 +21,10 @@ export default function PrivacyPage() {
             Easy Patch (operator name and address to be completed before public
             launch). Contact:{" "}
             <a
-              href="mailto:support@easypatch.app"
+              href="mailto:support@easy-patch.com"
               className="text-primary underline-offset-4 hover:underline"
             >
-              support@easypatch.app
+              support@easy-patch.com
             </a>
             .
           </p>
@@ -113,10 +113,10 @@ export default function PrivacyPage() {
           <p>
             Request access, correction, deletion, or portability at{" "}
             <a
-              href="mailto:support@easypatch.app"
+              href="mailto:support@easy-patch.com"
               className="text-primary underline-offset-4 hover:underline"
             >
-              support@easypatch.app
+              support@easy-patch.com
             </a>
             . You may lodge a complaint with your local data protection authority.
           </p>

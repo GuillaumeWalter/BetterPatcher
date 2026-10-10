@@ -99,22 +99,6 @@ export function buildQuotaSnapshot(
   options?: { teamOwnerId?: string | null },
 ): QuotaSnapshot {
   const teamOwnerId = options?.teamOwnerId ?? null;
-  const requiresSetup = !profile.paymentMethodVerified && !teamOwnerId;
-
-  if (requiresSetup) {
-    return {
-      plan: "pending_setup",
-      paymentMethodVerified: false,
-      generationsUsed: 0,
-      generationsLimit: BILLING.TRIAL_GENERATIONS,
-      generationsRemaining: 0,
-      requiresSubscription: false,
-      requiresSetup: true,
-      canGenerate: false,
-      minSecondsBetweenGenerations: BILLING.MIN_SECONDS_BETWEEN_GENERATIONS,
-      teamOwnerId,
-    };
-  }
 
   if (profile.subscriptionStatus === "past_due") {
     const tier: PaidPlanTier =

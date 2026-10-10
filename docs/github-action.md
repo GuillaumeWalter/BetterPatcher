@@ -13,7 +13,7 @@ Two options:
 
 ## 1. Get credentials (2 min)
 
-1. Sign in to [Easy Patch](https://easypatch.app) (or your Vercel URL)
+1. Sign in to [Easy Patch](https://easy-patch.com) (or your Vercel URL)
 2. Open **Dashboard → Settings → Integrations**
 3. Copy:
    - **User ID** from the `Authorization` header (part before `:`)

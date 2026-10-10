@@ -39,7 +39,7 @@ jobs:
 
       - name: Generate patch note via Easy Patch
         env:
-          EASYPATCH_URL: https://easypatch.app
+          EASYPATCH_URL: https://easy-patch.com
         run: |
           COMMITS=$(cat commits.txt | head -c 14000)
           if [ -z "$COMMITS" ]; then

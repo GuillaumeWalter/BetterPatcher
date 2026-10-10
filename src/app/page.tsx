@@ -88,9 +88,9 @@ export default async function Home() {
           </h1>
           <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             Import GitHub or GitLab, or paste any log. Get Markdown release notes
-            and a social post ready to publish. Create an account, verify your
-            card (€0), try {BILLING.TRIAL_GENERATIONS} times, then pick Solo or
-            Pro.
+            and a social post ready to publish. Create an account, try{" "}
+            {BILLING.TRIAL_GENERATIONS} times free (no card required), then pick
+            Solo or Pro.
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export default async function Home() {
             <form
               action={async () => {
                 "use server";
-                await signIn("github", { redirectTo: "/onboarding" });
+                await signIn("github", { redirectTo: "/dashboard/generate?welcome=1" });
               }}
             >
               <Button size="lg" type="submit">
@@ -150,12 +150,12 @@ export default async function Home() {
           <Card className="surface-card gradient-border">
             <CardHeader>
               <CardTitle className="text-lg">Trial</CardTitle>
-              <CardDescription>€0 | card required (abuse prevention)</CardDescription>
+              <CardDescription>€0 | no credit card required</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p className="flex items-center gap-2">
                 <Shield className="size-4 text-primary" />
-                Stripe verification (no charge today)
+                Free trial on your own repositories
               </p>
               <ul className="space-y-1.5">
                 <li>· {BILLING.TRIAL_GENERATIONS} free generations</li>
